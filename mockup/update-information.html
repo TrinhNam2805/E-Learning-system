@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cập nhật thông tin | E-Learning CNTT</title>
+    <title data-i18n="update.title">Cập nhật thông tin | E-Learning CNTT</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,10 +17,10 @@
         <button class="nav-toggle" aria-label="Mở menu" type="button">&#9776;</button>
 
         <div class="links">
-            <a href="homepage.html">Trang chủ</a>
-            <a href="interaction.html">Diễn đàn</a>
-            <a href="change-password.html">Đổi mật khẩu</a>
-            <a href="logout.html">Đăng xuất</a>
+            <a href="homepage.html" data-i18n="nav.login">Trang chủ</a>
+            <a href="interaction.html" data-i18n="nav.interaction">Diễn đàn</a>
+            <a href="change-password.html" data-i18n="page.title.change">Đổi mật khẩu</a>
+            <a href="logout.html" data-i18n="nav.logout">Đăng xuất</a>
         </div>
     </nav>
 </header>
@@ -28,104 +28,181 @@
 <main class="page">
     <section class="page-hero">
         <div>
-            
-            <h1>Cập nhật thông tin cá nhân</h1>
-            <p class="subtitle">Chỉnh sửa thông tin hồ sơ, ảnh đại diện và các thông tin liên hệ được cho phép.</p>
+            <h1 data-i18n="update.title">Cập nhật thông tin cá nhân</h1>
+            <p class="subtitle" data-i18n="update.subtitle">Chỉnh sửa thông tin hồ sơ, ảnh đại diện và các thông tin liên hệ được cho phép.</p>
         </div>
-        <div class="status-pill success">Đang đăng nhập</div>
+        <div class="status-pill success" id="login-status" data-i18n="update.status.logged">Đang đăng nhập</div>
     </section>
 
     <section class="profile-layout">
         <aside class="profile-card">
             <div class="avatar-wrap">
-                <img src="https://via.placeholder.com/160x160" alt="Ảnh đại diện" class="avatar">
+                <img id="profile-avatar" src="https://via.placeholder.com/160x160" alt="Ảnh đại diện" class="avatar">
             </div>
-            <h2>Nguyễn Văn A</h2>
-            <p class="role">Student</p>
+            <h2 id="profile-fullname">Nguyễn Văn A</h2>
+            <p class="role" id="profile-role">Student</p>
 
             <div class="profile-meta">
                 <div>
+                    <span data-i18n="update.department">Khoa</span>
+                    <strong id="profile-dept">CNTT</strong>
+                </div>
+                <div>
                     <span>Mã số</span>
-                    <strong>IT2026001</strong>
+                    <strong id="profile-id">IT2026001</strong>
                 </div>
                 <div>
-                    <span>Lớp</span>
-                    <strong>KTPM01</strong>
-                </div>
-                <div>
-                    <span>Khoa</span>
-                    <strong>CNTT</strong>
+                    <span data-i18n="interaction.quick.info.participants">Người tham gia</span>
+                    <strong>126</strong>
                 </div>
             </div>
 
-            <a class="ghost-button" href="change-password.html">Đổi mật khẩu</a>
+            <a class="ghost-button" href="change-password.html" data-i18n="page.title.change">Đổi mật khẩu</a>
         </aside>
 
         <section class="form-card">
             <div class="card-header">
-                <h2>Thông tin cần cập nhật</h2>
-                <p>Hệ thống sẽ kiểm tra dữ liệu trước khi lưu thay đổi.</p>
+                <h2 data-i18n="update.title">Thông tin cần cập nhật</h2>
+                <p data-i18n-html="update.note" data-i18n="update.note"></p>
             </div>
 
-            <form class="profile-form">
+            <form id="profile-form" class="profile-form">
                 <div class="form-grid">
                     <div class="field">
-                        <label for="fullname">Họ và tên</label>
-                        <input type="text" id="fullname" value="Nguyễn Văn A" required>
+                        <label for="fullname" data-i18n="update.fullname">Họ và tên</label>
+                        <input type="text" id="fullname" required>
                     </div>
 
                     <div class="field">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" value="nguyenvana@university.edu.vn" required>
+                        <label for="email" data-i18n="update.email">Email</label>
+                        <input type="email" id="email" required>
                     </div>
 
                     <div class="field">
-                        <label for="phone">Số điện thoại</label>
-                        <input type="tel" id="phone" placeholder="Nhập số điện thoại">
+                        <label for="phone" data-i18n="update.phone">Số điện thoại</label>
+                        <input type="tel" id="phone" placeholder="">
                     </div>
 
                     <div class="field">
-                        <label for="dob">Ngày sinh</label>
+                        <label for="dob" data-i18n="update.dob">Ngày sinh</label>
                         <input type="date" id="dob">
                     </div>
 
                     <div class="field">
-                        <label for="department">Khoa</label>
-                        <input type="text" id="department" value="Công nghệ thông tin">
+                        <label for="department" data-i18n="update.department">Khoa</label>
+                        <input type="text" id="department">
                     </div>
 
                     <div class="field">
-                        <label for="avatar">Ảnh đại diện</label>
+                        <label for="avatar" data-i18n="update.avatar">Ảnh đại diện</label>
                         <input type="file" id="avatar" accept="image/*">
                     </div>
                 </div>
 
                 <div class="field full">
-                    <label for="address">Địa chỉ</label>
-                    <textarea id="address" rows="4" placeholder="Nhập địa chỉ liên hệ"></textarea>
+                    <label for="address" data-i18n="update.address">Địa chỉ</label>
+                    <textarea id="address" rows="4"></textarea>
                 </div>
 
                 <div class="notice">
-                    <strong>Lưu ý:</strong> Chỉ các trường được cho phép mới có thể chỉnh sửa. Nếu thông tin không hợp lệ, hệ thống sẽ hiển thị lỗi ngay tại từng trường.
+                    <strong data-i18n="update.note"></strong>
                 </div>
 
                 <div class="actions">
-                    <button type="reset" class="secondary-button">Hủy</button>
-                    <button type="submit" class="primary-button">Lưu thay đổi</button>
+                    <button type="reset" class="secondary-button" data-i18n="update.cancel">Hủy</button>
+                    <button type="submit" class="primary-button" data-i18n="update.save">Lưu thay đổi</button>
                 </div>
             </form>
+
+            <div id="update-message" style="display:none; margin-top:12px;"></div>
         </section>
     </section>
 </main>
 
 <footer class="site-footer">
-    &copy; 2026 E-Learning CNTT. All rights reserved.
+    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
 </footer>
 
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
 <script>
-    const toggle = document.querySelector('.nav-toggle');
-    const nav = document.querySelector('.navbar');
-    toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
+document.addEventListener('DOMContentLoaded', () => {
+  // Ensure i18n runs first
+  const tryInit = () => {
+    if (!window.authService || !window.i18n) {
+      setTimeout(tryInit, 80);
+      return;
+    }
+    const currentUser = authService.getCurrentUser();
+    if (!currentUser) {
+      // nếu chưa login => chuyển về login
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // populate form and sidebar
+    document.getElementById('fullname').value = currentUser.fullName || '';
+    document.getElementById('email').value = currentUser.email || '';
+    document.getElementById('phone').value = currentUser.phone || '';
+    document.getElementById('dob').value = currentUser.dob || '';
+    document.getElementById('department').value = currentUser.department || currentUser.role || '';
+    document.getElementById('address').value = currentUser.address || '';
+
+    document.getElementById('profile-fullname').textContent = currentUser.fullName || '';
+    document.getElementById('profile-role').textContent = currentUser.role || '';
+    document.getElementById('profile-dept').textContent = currentUser.department || '';
+    if (currentUser.avatar) {
+      document.getElementById('profile-avatar').src = currentUser.avatar;
+    }
+
+    // handle form submit
+    const form = document.getElementById('profile-form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const updated = {
+        fullName: document.getElementById('fullname').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        dob: document.getElementById('dob').value || '',
+        department: document.getElementById('department').value.trim(),
+        address: document.getElementById('address').value.trim()
+      };
+
+      // Handle avatar file as data URL (best-effort, local only)
+      const avatarInput = document.getElementById('avatar');
+      if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          updated.avatar = evt.target.result;
+          const res = authService.updateProfile(updated);
+          showMessage(res.success ? 'success' : 'error', res.message || 'Saved successfully');
+        };
+        reader.readAsDataURL(avatarInput.files[0]);
+      } else {
+        const res = authService.updateProfile(updated);
+        showMessage(res.success ? 'success' : 'error', res.message || 'Saved successfully');
+      }
+    });
+
+    i18n.updatePageLanguage();
+  };
+
+  tryInit();
+
+  function showMessage(type, text) {
+    const msg = document.getElementById('update-message');
+    msg.style.display = 'block';
+    msg.style.color = type === 'success' ? 'green' : 'red';
+    msg.textContent = text;
+    // update sidebar display
+    const cu = authService.getCurrentUser();
+    if (cu) {
+      document.getElementById('profile-fullname').textContent = cu.fullName || '';
+      if (cu.avatar) document.getElementById('profile-avatar').src = cu.avatar;
+      document.getElementById('profile-dept').textContent = cu.department || '';
+    }
+  }
+});
 </script>
 </body>
 </html>

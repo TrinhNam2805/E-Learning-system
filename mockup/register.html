@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký | E-Learning CNTT</title>
+    <title>Register | E-Learning CNTT</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,38 +15,44 @@
         </div>
         <div class="nav-toggle">&#9776;</div>
         <div class="links">
-            <a href="homepage.html">Trang chủ</a>
-            <a href="login.html">Đăng nhập</a>
+            <a href="homepage.html">Home</a>
+            <a href="login.html" data-i18n="nav.login">Login</a>
+            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
+                <span>🇬🇧</span>
+            </button>
         </div>
     </nav>
 </header>
 
 <main>
 <div class="container">
-    <h2>Đăng ký</h2>
-    <form>
-        <label for="name">Họ và tên</label>
+    <h2 data-i18n="register.title">Register</h2>
+    <div id="register-error" class="error-message" style="display: none;"></div>
+    <form onsubmit="handleRegister(event)">
+        <label for="name" data-i18n="register.fullname">Full Name</label>
         <input type="text" id="name" required>
 
-        <label for="email">Email</label>
+        <label for="email" data-i18n="register.email">Email</label>
         <input type="email" id="email" required>
 
-        <label for="password">Mật khẩu</label>
+        <label for="password" data-i18n="register.password">Password</label>
         <input type="password" id="password" required>
 
-        <label for="confirm-password">Xác nhận mật khẩu</label>
+        <label for="confirm-password" data-i18n="register.confirm">Confirm Password</label>
         <input type="password" id="confirm-password" required>
 
-        <button type="submit">Đăng ký</button>
+        <button type="submit" data-i18n="register.button">Register</button>
     </form>
-    <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+    <p><span data-i18n="register.exist">Already have an account?</span> <a href="login.html" data-i18n="register.signin">Sign in here</a></p>
 </div>
 </main>
 
 <footer>
-    &copy; 2026 E-Learning CNTT. All rights reserved.
+    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
 </footer>
 
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
 <script>
     const toggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('nav');

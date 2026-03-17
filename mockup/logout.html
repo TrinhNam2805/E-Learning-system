@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="2;url=login.html" />
-    <title>Đăng xuất | E-Learning CNTT</title>
+    <title>Logout | E-Learning CNTT</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,24 +14,39 @@
             E-Learning CNTT
         </div>
         <div class="nav-toggle">&#9776;</div>
+        <div class="links">
+            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
+                <span>🇬🇧</span>
+            </button>
+        </div>
     </nav>
 </header>
 
 <main>
 <div class="container">
-    <h2>Bạn đã đăng xuất</h2>
-    <p>Hệ thống đang chuyển đến trang <a href="login.html">đăng nhập</a>...</p>
+    <h2 data-i18n="logout.title">Logout</h2>
+    <p data-i18n="logout.message">You have been logged out successfully.</p>
+    <p data-i18n="logout.button"><a href="homepage.html">Back to Home</a></p>
 </div>
 </main>
 
 <footer>
-    &copy; 2026 E-Learning CNTT. All rights reserved.
+    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
 </footer>
 
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
 <script>
     const toggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('nav');
     toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
+
+    // Logout user
+    document.addEventListener('DOMContentLoaded', () => {
+        if (authService) {
+            authService.logout();
+        }
+    });
 </script>
 
 </body>

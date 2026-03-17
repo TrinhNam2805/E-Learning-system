@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "username": "ngoc123",
+    "email": "ngoc@example.com",
+    "password": "password123",
+    "fullName": "Nguyễn Thị Ngọc",
+    "role": "student",
+    "createdAt": "2026-01-15"
+  },
+  {
+    "id": 2,
+    "username": "minh456",
+    "email": "minh@example.com",
+    "password": "password456",
+    "fullName": "Trần Văn Minh",
+    "role": "student",
+    "createdAt": "2026-02-20"
+  },
+  {
+    "id": 3,
+    "username": "teacher_hung",
+    "email": "hung@example.com",
+    "password": "teacher123",
+    "fullName": "Võ Thanh Hùng",
+    "role": "teacher",
+    "createdAt": "2025-12-01"
+  }
+]

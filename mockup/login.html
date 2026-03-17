@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập | E-Learning CNTT</title>
+    <title>Login | E-Learning CNTT</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,33 +15,39 @@
         </div>
         <div class="nav-toggle">&#9776;</div>
         <div class="links">
-            <a href="homepage.html">Trang chủ</a>
-            <a href="register.html">Đăng ký</a>
+            <a href="homepage.html" data-i18n="nav.login">Home</a>
+            <a href="register.html" data-i18n="nav.register">Register</a>
+            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
+                <span>🇬🇧</span>
+            </button>
         </div>
     </nav>
 </header>
 
 <main>
 <div class="container">
-    <h2>Đăng nhập</h2>
-    <form>
-        <label for="email">Email</label>
+    <h2 data-i18n="login.title">Login</h2>
+    <div id="login-error" class="error-message" style="display: none;"></div>
+    <form onsubmit="handleLogin(event)">
+        <label for="email" data-i18n="login.email">Email</label>
         <input type="email" id="email" required>
 
-        <label for="password">Mật khẩu</label>
+        <label for="password" data-i18n="login.password">Password</label>
         <input type="password" id="password" required>
 
-        <button type="submit">Đăng nhập</button>
+        <button type="submit" data-i18n="login.button">Login</button>
     </form>
-    <p><a href="forgot-password.html">Quên mật khẩu?</a></p>
-    <p>Chưa có tài khoản? <a href="register.html">Đăng ký</a></p>
+    <p><a href="forgot-password.html" data-i18n="login.forgot">Forgot Password?</a></p>
+    <p><span data-i18n="login.newuser">New user?</span> <a href="register.html" data-i18n="login.signup">Sign up here</a></p>
 </div>
 </main>
 
 <footer>
-    &copy; 2026 E-Learning CNTT. All rights reserved.
+    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
 </footer>
 
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
 <script>
     const toggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('nav');
