@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ | E-Learning CNTT</title>
+    <title>Home | E-Learning CNTT</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -11,84 +11,145 @@
     <nav>
         <div class="logo">E-Learning CNTT</div>
         <div class="nav-toggle">&#9776;</div>
-        <div class="links">
-            <a href="login.html">Đăng nhập</a>
-            <a href="register.html">Đăng ký</a>
+        <div class="links" id="nav-links">
+            <a href="login.html" data-i18n="nav.login">Login</a>
+            <a href="register.html" data-i18n="nav.register">Register</a>
+            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
+                <span>🇬🇧</span>
+            </button>
         </div>
     </nav>
 </header>
 
 <main>
 <section class="hero">
-    <img src="images/hero.jpg" alt="E-Learning platform" class="hero-img">
+    <img src="images/e-learning.jpg" alt="E-Learning platform" class="hero-img">
     <div class="hero-text">
-        <h1>Chào mừng đến với E‑Learning Khoa CNTT</h1>
-        <p>Học trực tuyến mọi lúc, mọi nơi với kho tài nguyên phong phú.</p>
-        <a href="register.html"><button>Tham gia ngay</button></a>
+        <h1 data-i18n="hero.title">Welcome to E-Learning CNTT</h1>
+        <p data-i18n="hero.subtitle">Learn online anytime, anywhere with rich resources.</p>
+        <a href="register.html"><button data-i18n="hero.button">Join Now</button></a>
     </div>
 </section>
 
 <section class="features">
     <div class="feature-card">
-        <h3>Khóa học</h3>
-        <p>Hơn 200 khóa học chất lượng.</p>
+        <h3 data-i18n="feature.courses">Courses</h3>
+        <p data-i18n="feature.courses.desc">Over 200 quality courses.</p>
     </div>
     <div class="feature-card">
-        <h3>Giảng viên</h3>
-        <p>Đội ngũ giảng viên uy tín.</p>
+        <h3 data-i18n="feature.teachers">Teachers</h3>
+        <p data-i18n="feature.teachers.desc">Trusted team of instructors.</p>
     </div>
     <div class="feature-card">
-        <h3>Cộng đồng</h3>
-        <p>Thảo luận, kết nối và chia sẻ.</p>
+        <h3 data-i18n="feature.community">Community</h3>
+        <p data-i18n="feature.community.desc">Discuss, connect and share.</p>
     </div>
 </section>
 
-<!-- Bài viết mới -->
+<!-- Articles -->
 <section class="card-grid">
     <div class="article-card">
-        <img src="https://via.placeholder.com/300x140" alt="Bài viết 1">
+        <img src="images/intro-e-learning.png" alt="Article 1">
         <div class="content">
-            <h4>Bài viết 1</h4>
-            <p>Giới thiệu về học trực tuyến.</p>
+            <h4 data-i18n="article.title1">Article 1</h4>
+            <p data-i18n="article.desc1">Introduction to online learning.</p>
         </div>
     </div>
     <div class="article-card">
-        <img src="https://via.placeholder.com/300x140" alt="Bài viết 2">
+        <img src="images/strategies.png" alt="Article 2">
         <div class="content">
-            <h4>Bài viết 2</h4>
-            <p>Chiến lược học tập hiệu quả.</p>
+            <h4 data-i18n="article.title2">Article 2</h4>
+            <p data-i18n="article.desc2">Effective learning strategies.</p>
         </div>
     </div>
 </section>
 
-<!-- Khóa học nổi bật -->
+<!-- Featured Courses -->
 <section class="card-grid">
     <div class="course-card">
-        <img src="https://via.placeholder.com/300x140" alt="Khóa học A">
+        <img src="images/html-css.png" alt="Course A">
         <div class="content">
-            <h4>Khóa học A</h4>
-            <p>HTML & CSS cơ bản.</p>
+            <h4 data-i18n="course.title1">Course A</h4>
+            <p data-i18n="course.desc1">HTML & CSS Basics.</p>
         </div>
     </div>
     <div class="course-card">
-        <img src="https://via.placeholder.com/300x140" alt="Khóa học B">
+        <img src="images/python.jpg" alt="Course B">
         <div class="content">
-            <h4>Khóa học B</h4>
-            <p>Lập trình Python nâng cao.</p>
+            <h4 data-i18n="course.title2">Course B</h4>
+            <p data-i18n="course.desc2">Advanced Python Programming.</p>
         </div>
     </div>
 </section>
 </main>
 
 <footer>
-    &copy; 2026 E-Learning CNTT. All rights reserved.
+    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
 </footer>
 
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
 <script>
     const toggle = document.querySelector('.nav-toggle');
     const nav = document.querySelector('nav');
     toggle && toggle.addEventListener('click', () => {
         nav.classList.toggle('open');
+    });
+
+    // Update navigation based on login status
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.getElementById('nav-links');
+        const currentUser = authService.getCurrentUser();
+        
+        if (currentUser) {
+            // User is logged in
+            navLinks.innerHTML = `
+                <span class="logged-in-user">Welcome, ${currentUser.fullName}!</span>
+                
+                <!-- Notification Icon -->
+                <button class="icon-btn notification-btn" title="Notifications">
+                    <span>🔔</span>
+                    <span class="badge">3</span>
+                </button>
+                
+                <!-- Account Dropdown Menu -->
+                <div class="account-menu">
+                    <button class="icon-btn account-btn" onclick="toggleAccountMenu()" title="Account">
+                        <span>👤</span>
+                    </button>
+                    <div id="account-dropdown" class="dropdown-menu" style="display: none;">
+                        <a href="#profile" class="dropdown-item">📋 Profile</a>
+                        <a href="#my-courses" class="dropdown-item">📚 My Courses</a>
+                        <a href="change-password.html" class="dropdown-item">🔐 Change Password</a>
+                        <hr>
+                        <a href="logout.html" class="dropdown-item logout-item">🚪 Logout</a>
+                    </div>
+                </div>
+                
+                <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
+                    <span>🇬🇧</span>
+                </button>
+            `;
+            // Re-apply i18n to new elements
+            i18n.updatePageLanguage();
+        }
+    });
+
+    // Toggle Account Dropdown Menu
+    function toggleAccountMenu() {
+        const dropdown = document.getElementById('account-dropdown');
+        if (dropdown) {
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const accountBtn = document.querySelector('.account-btn');
+        const dropdown = document.getElementById('account-dropdown');
+        if (accountBtn && dropdown && !accountBtn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
     });
 </script>
 
