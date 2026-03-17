@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ | E-Learning CNTT</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+    <nav>
+        <div class="logo">E-Learning CNTT</div>
+        <div class="nav-toggle">&#9776;</div>
+        <div class="links">
+            <a href="login.html">Đăng nhập</a>
+            <a href="register.html">Đăng ký</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+<section class="hero">
+    <img src="images/hero.jpg" alt="E-Learning platform" class="hero-img">
+    <div class="hero-text">
+        <h1>Chào mừng đến với E‑Learning Khoa CNTT</h1>
+        <p>Học trực tuyến mọi lúc, mọi nơi với kho tài nguyên phong phú.</p>
+        <a href="register.html"><button>Tham gia ngay</button></a>
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature-card">
+        <h3>Khóa học</h3>
+        <p>Hơn 200 khóa học chất lượng.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Giảng viên</h3>
+        <p>Đội ngũ giảng viên uy tín.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Cộng đồng</h3>
+        <p>Thảo luận, kết nối và chia sẻ.</p>
+    </div>
+</section>
+
+<!-- Bài viết mới -->
+<section class="card-grid">
+    <div class="article-card">
+        <img src="https://via.placeholder.com/300x140" alt="Bài viết 1">
+        <div class="content">
+            <h4>Bài viết 1</h4>
+            <p>Giới thiệu về học trực tuyến.</p>
+        </div>
+    </div>
+    <div class="article-card">
+        <img src="https://via.placeholder.com/300x140" alt="Bài viết 2">
+        <div class="content">
+            <h4>Bài viết 2</h4>
+            <p>Chiến lược học tập hiệu quả.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Khóa học nổi bật -->
+<section class="card-grid">
+    <div class="course-card">
+        <img src="https://via.placeholder.com/300x140" alt="Khóa học A">
+        <div class="content">
+            <h4>Khóa học A</h4>
+            <p>HTML & CSS cơ bản.</p>
+        </div>
+    </div>
+    <div class="course-card">
+        <img src="https://via.placeholder.com/300x140" alt="Khóa học B">
+        <div class="content">
+            <h4>Khóa học B</h4>
+            <p>Lập trình Python nâng cao.</p>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer>
+    &copy; 2026 E-Learning CNTT. All rights reserved.
+</footer>
+
+<script>
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('nav');
+    toggle && toggle.addEventListener('click', () => {
+        nav.classList.toggle('open');
+    });
+</script>
+
+</body>
+</html>

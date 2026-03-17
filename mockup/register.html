@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký | E-Learning CNTT</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+    <nav>
+        <div class="logo">E-Learning CNTT</div>
+        <div class="nav-toggle">&#9776;</div>
+        <div class="links">
+            <a href="homepage.html">Trang chủ</a>
+            <a href="login.html">Đăng nhập</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+<div class="container">
+    <h2>Đăng ký</h2>
+    <form>
+        <label for="name">Họ và tên</label>
+        <input type="text" id="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" required>
+
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" required>
+
+        <label for="confirm-password">Xác nhận mật khẩu</label>
+        <input type="password" id="confirm-password" required>
+
+        <button type="submit">Đăng ký</button>
+    </form>
+    <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+</div>
+</main>
+
+<footer>
+    &copy; 2026 E-Learning CNTT. All rights reserved.
+</footer>
+
+<script>
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('nav');
+    toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
+</script>
+
+</body>
+</html>
