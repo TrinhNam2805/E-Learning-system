@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập nhật thông tin | E-Learning CNTT</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-mark">E</span>
+            <span>E-Learning CNTT</span>
+        </div>
+
+        <button class="nav-toggle" aria-label="Mở menu" type="button">&#9776;</button>
+
+        <div class="links">
+            <a href="homepage.html">Trang chủ</a>
+            <a href="interaction.html">Diễn đàn</a>
+            <a href="change-password.html">Đổi mật khẩu</a>
+            <a href="logout.html">Đăng xuất</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page">
+    <section class="page-hero">
+        <div>
+            
+            <h1>Cập nhật thông tin cá nhân</h1>
+            <p class="subtitle">Chỉnh sửa thông tin hồ sơ, ảnh đại diện và các thông tin liên hệ được cho phép.</p>
+        </div>
+        <div class="status-pill success">Đang đăng nhập</div>
+    </section>
+
+    <section class="profile-layout">
+        <aside class="profile-card">
+            <div class="avatar-wrap">
+                <img src="https://via.placeholder.com/160x160" alt="Ảnh đại diện" class="avatar">
+            </div>
+            <h2>Nguyễn Văn A</h2>
+            <p class="role">Student</p>
+
+            <div class="profile-meta">
+                <div>
+                    <span>Mã số</span>
+                    <strong>IT2026001</strong>
+                </div>
+                <div>
+                    <span>Lớp</span>
+                    <strong>KTPM01</strong>
+                </div>
+                <div>
+                    <span>Khoa</span>
+                    <strong>CNTT</strong>
+                </div>
+            </div>
+
+            <a class="ghost-button" href="change-password.html">Đổi mật khẩu</a>
+        </aside>
+
+        <section class="form-card">
+            <div class="card-header">
+                <h2>Thông tin cần cập nhật</h2>
+                <p>Hệ thống sẽ kiểm tra dữ liệu trước khi lưu thay đổi.</p>
+            </div>
+
+            <form class="profile-form">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="fullname">Họ và tên</label>
+                        <input type="text" id="fullname" value="Nguyễn Văn A" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" value="nguyenvana@university.edu.vn" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" placeholder="Nhập số điện thoại">
+                    </div>
+
+                    <div class="field">
+                        <label for="dob">Ngày sinh</label>
+                        <input type="date" id="dob">
+                    </div>
+
+                    <div class="field">
+                        <label for="department">Khoa</label>
+                        <input type="text" id="department" value="Công nghệ thông tin">
+                    </div>
+
+                    <div class="field">
+                        <label for="avatar">Ảnh đại diện</label>
+                        <input type="file" id="avatar" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="field full">
+                    <label for="address">Địa chỉ</label>
+                    <textarea id="address" rows="4" placeholder="Nhập địa chỉ liên hệ"></textarea>
+                </div>
+
+                <div class="notice">
+                    <strong>Lưu ý:</strong> Chỉ các trường được cho phép mới có thể chỉnh sửa. Nếu thông tin không hợp lệ, hệ thống sẽ hiển thị lỗi ngay tại từng trường.
+                </div>
+
+                <div class="actions">
+                    <button type="reset" class="secondary-button">Hủy</button>
+                    <button type="submit" class="primary-button">Lưu thay đổi</button>
+                </div>
+            </form>
+        </section>
+    </section>
+</main>
+
+<footer class="site-footer">
+    &copy; 2026 E-Learning CNTT. All rights reserved.
+</footer>
+
+<script>
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.navbar');
+    toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
+</script>
+</body>
+</html>

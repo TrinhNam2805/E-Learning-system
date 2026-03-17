@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diễn đàn thảo luận | E-Learning CNTT</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-mark">E</span>
+            <span>E-Learning CNTT</span>
+        </div>
+
+        <button class="nav-toggle" aria-label="Mở menu" type="button">&#9776;</button>
+
+        <div class="links">
+            <a href="homepage.html">Trang chủ</a>
+            <a href="update-information.html">Hồ sơ</a>
+            <a href="change-password.html">Đổi mật khẩu</a>
+            <a href="logout.html">Đăng xuất</a>
+        </div>
+    </nav>
+</header>
+
+<main class="page">
+    <section class="page-hero">
+        <div>
+            <h1>Forum lớp học</h1>
+            <p class="subtitle">Tạo bài viết, trả lời câu hỏi và phản hồi bình luận theo luồng thảo luận của từng môn học.</p>
+        </div>
+
+        <div class="hero-actions">
+            <label class="search-box">
+                <span>Tìm kiếm</span>
+                <input type="text" placeholder="Tìm theo tiêu đề, tác giả...">
+            </label>
+            <button class="primary-button">Ask a Question</button>
+        </div>
+    </section>
+
+    <section class="forum-layout">
+        <aside class="sidebar">
+            <div class="panel">
+                <h2>Chủ đề</h2>
+                <a class="topic active" href="#">Tất cả</a>
+                <a class="topic" href="#">Câu hỏi</a>
+                <a class="topic" href="#">Thảo luận</a>
+                <a class="topic" href="#">Thông báo</a>
+                <a class="topic" href="#">Đã giải quyết</a>
+            </div>
+
+            <div class="panel summary">
+                <h2>Thông tin nhanh</h2>
+                <div>
+                    <span>Bài viết hôm nay</span>
+                    <strong>18</strong>
+                </div>
+                <div>
+                    <span>Bình luận mới</span>
+                    <strong>42</strong>
+                </div>
+                <div>
+                    <span>Người tham gia</span>
+                    <strong>126</strong>
+                </div>
+            </div>
+        </aside>
+
+        <section class="content">
+            <article class="composer card">
+                <div class="card-header">
+                    <h2>Đăng bài mới</h2>
+                    <p>Điền tiêu đề và nội dung để tạo chủ đề mới trong forum.</p>
+                </div>
+
+                <form class="post-form">
+                    <div class="field">
+                        <label for="title">Tiêu đề</label>
+                        <input type="text" id="title" placeholder="Nhập tiêu đề bài viết">
+                    </div>
+
+                    <div class="field">
+                        <label for="content">Nội dung</label>
+                        <textarea id="content" rows="5" placeholder="Nhập nội dung câu hỏi hoặc thảo luận"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label for="attachment">Đính kèm</label>
+                        <input type="file" id="attachment">
+                    </div>
+
+                    <div class="actions">
+                        <button type="reset" class="secondary-button">Xóa</button>
+                        <button type="submit" class="primary-button">Post</button>
+                    </div>
+                </form>
+            </article>
+
+            <section class="discussion-list">
+                <article class="post card">
+                    <div class="post-top">
+                        <div>
+                            <h3>Hỏi về cách submit Assignment 2</h3>
+                            <p class="meta">Nguyễn Văn A · 10 phút trước · 3 replies</p>
+                        </div>
+                        <span class="badge open">Open</span>
+                    </div>
+
+                    <p class="excerpt">Mình gặp lỗi khi nộp bài trên hệ thống. Có ai biết giới hạn kích thước file là bao nhiêu không?</p>
+
+                    <div class="post-actions">
+                        <button class="link-button">Reply</button>
+                        <button class="link-button">Comment</button>
+                        <button class="link-button">Mark as solved</button>
+                    </div>
+
+                    <div class="thread">
+                        <div class="comment">
+                            <strong>Lê Thị B</strong>
+                            <p>Bạn thử nén file PDF trước khi nộp nhé, hệ thống chỉ cho phép dung lượng nhỏ hơn giới hạn.</p>
+                            <div class="nested-reply">
+                                <input type="text" placeholder="Trả lời trực tiếp bình luận này...">
+                                <button>Send</button>
+                            </div>
+                        </div>
+
+                        <div class="comment reply">
+                            <strong>Giảng viên</strong>
+                            <p>Đúng rồi, file đính kèm vượt quá dung lượng sẽ bị từ chối. Bạn kiểm tra lại mục hướng dẫn nộp bài.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="post card">
+                    <div class="post-top">
+                        <div>
+                            <h3>Thảo luận: Tài liệu học phần tuần 3</h3>
+                            <p class="meta">Giảng viên · 2 giờ trước · 7 replies</p>
+                        </div>
+                        <span class="badge info">Discussion</span>
+                    </div>
+
+                    <p class="excerpt">Các bạn có thể chia sẻ tài liệu tham khảo hoặc câu hỏi liên quan đến nội dung tuần 3 ở đây.</p>
+
+                    <div class="post-actions">
+                        <button class="link-button">Reply</button>
+                        <button class="link-button">Comment</button>
+                    </div>
+                </article>
+            </section>
+        </section>
+    </section>
+</main>
+
+<footer class="site-footer">
+    &copy; 2026 E-Learning CNTT. All rights reserved.
+</footer>
+
+<script>
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.navbar');
+    toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
+</script>
+</body>
+</html>
