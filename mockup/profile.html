@@ -68,7 +68,7 @@
 
       <div style="display:flex; gap:.75rem; flex-wrap:wrap;">
         <a href="change-password.html" class="btn btn-outline">🔐 Đổi mật khẩu</a>
-        <a href="${user.role === 'TEACHER' ? 'teacher-dashboard.html' : 'student-dashboard.html'}" class="btn btn-outline">📊 Dashboard</a>
+        <a href="${user.role === 'ADMIN' ? 'admin.html' : 'student-dashboard.html'}" class="btn btn-outline">📊 Dashboard</a>
       </div>`;
   });
 

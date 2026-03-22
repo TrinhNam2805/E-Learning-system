@@ -5,7 +5,10 @@
     "email": "ngoc@example.com",
     "password": "password123",
     "fullName": "Nguyễn Thị Ngọc",
-    "role": "student",
+    "role": "STUDENT",
+    "phone": "0901234567",
+    "active": true,
+    "locked": false,
     "createdAt": "2026-01-15"
   },
   {
@@ -14,16 +17,46 @@
     "email": "minh@example.com",
     "password": "password456",
     "fullName": "Trần Văn Minh",
-    "role": "student",
+    "role": "STUDENT",
+    "phone": "0912345678",
+    "active": true,
+    "locked": false,
     "createdAt": "2026-02-20"
   },
   {
     "id": 3,
-    "username": "teacher_hung",
+    "username": "hung_teacher",
     "email": "hung@example.com",
     "password": "teacher123",
     "fullName": "Võ Thanh Hùng",
-    "role": "teacher",
+    "role": "TEACHER",
+    "phone": "0923456789",
+    "active": true,
+    "locked": false,
     "createdAt": "2025-12-01"
+  },
+  {
+    "id": 4,
+    "username": "lan_teacher",
+    "email": "lan@example.com",
+    "password": "teacher123",
+    "fullName": "Nguyễn Thị Lan",
+    "role": "TEACHER",
+    "phone": "0934567890",
+    "active": true,
+    "locked": false,
+    "createdAt": "2025-11-15"
+  },
+  {
+    "id": 5,
+    "username": "admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "fullName": "Quản Trị Viên",
+    "role": "ADMIN",
+    "phone": "0945678901",
+    "active": true,
+    "locked": false,
+    "createdAt": "2025-10-01"
   }
 ]

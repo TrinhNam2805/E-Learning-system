@@ -1,59 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | E-Learning CNTT</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>
-    <nav>
-        <div class="logo">
-            <span class="logo-mark">E</span>
-            E-Learning CNTT
-        </div>
-        <div class="nav-toggle">&#9776;</div>
-        <div class="links">
-            <a href="homepage.html" data-i18n="nav.login">Home</a>
-            <a href="register.html" data-i18n="nav.register">Register</a>
-            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
-                <span>🇬🇧</span>
-            </button>
-        </div>
-    </nav>
-</header>
-
+<header><nav id="top-nav"></nav></header>
 <main>
-<div class="container">
-    <h2 data-i18n="login.title">Login</h2>
-    <div id="login-error" class="error-message" style="display: none;"></div>
-    <form onsubmit="handleLogin(event)">
-        <label for="email" data-i18n="login.email">Email</label>
-        <input type="email" id="email" required>
-
-        <label for="password" data-i18n="login.password">Password</label>
-        <input type="password" id="password" required>
-
-        <button type="submit" data-i18n="login.button">Login</button>
-    </form>
-    <p><a href="forgot-password.html" data-i18n="login.forgot">Forgot Password?</a></p>
-    <p><span data-i18n="login.newuser">New user?</span> <a href="register.html" data-i18n="login.signup">Sign up here</a></p>
-</div>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h2>Đăng nhập</h2>
+      <div id="msg"></div>
+      <form onsubmit="doLogin(event)">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="example@email.com" required>
+        <label>Mật khẩu</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+        <button type="submit" class="btn btn-full" style="margin-top:1rem;">Đăng nhập</button>
+      </form>
+      <div class="auth-links">
+        <a href="forgot-password.html">Quên mật khẩu?</a>
+        &nbsp;·&nbsp;
+        Chưa có tài khoản? <a href="register.html">Đăng ký</a>
+      </div>
+    </div>
+  </div>
 </main>
-
-<footer>
-    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
-</footer>
-
-<script src="js/i18n.js"></script>
-<script src="js/auth.js"></script>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
 <script>
-    const toggle = document.querySelector('.nav-toggle');
-    const nav = document.querySelector('nav');
-    toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
-</script>
+  document.addEventListener('DOMContentLoaded', () => {
+    renderNav();
+    // Redirect if already logged in
+    if (DB.isLoggedIn()) window.location.href = 'homepage.html';
+  });
 
+  function doLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const msg = document.getElementById('msg');
+    const result = DB.login(email, password);
+    if (!result) {
+      msg.innerHTML = '<div class="alert alert-error">Email hoặc mật khẩu không đúng.</div>';
+      document.getElementById('password').value = '';
+      return;
+    }
+    if (result === 'locked') {
+      msg.innerHTML = '<div class="alert alert-error">Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.</div>';
+      return;
+    }
+    // Redirect based on role
+    const dest = result.role === 'ADMIN' ? 'admin.html' : result.role === 'TEACHER' ? 'student-dashboard.html' : 'homepage.html';
+    window.location.href = dest;
+  }
+</script>
 </body>
 </html>
-

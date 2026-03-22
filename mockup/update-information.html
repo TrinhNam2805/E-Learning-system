@@ -1,208 +1,73 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="update.title">Cập nhật thông tin | E-Learning CNTT</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cập nhật thông tin | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header class="site-header">
-    <nav class="navbar">
-        <div class="logo">
-            <span class="logo-mark">E</span>
-            <span>E-Learning CNTT</span>
-        </div>
-
-        <button class="nav-toggle" aria-label="Mở menu" type="button">&#9776;</button>
-
-        <div class="links">
-            <a href="homepage.html" data-i18n="nav.login">Trang chủ</a>
-            <a href="interaction.html" data-i18n="nav.interaction">Diễn đàn</a>
-            <a href="change-password.html" data-i18n="page.title.change">Đổi mật khẩu</a>
-            <a href="logout.html" data-i18n="nav.logout">Đăng xuất</a>
-        </div>
-    </nav>
-</header>
-
-<main class="page">
-    <section class="page-hero">
-        <div>
-            <h1 data-i18n="update.title">Cập nhật thông tin cá nhân</h1>
-            <p class="subtitle" data-i18n="update.subtitle">Chỉnh sửa thông tin hồ sơ, ảnh đại diện và các thông tin liên hệ được cho phép.</p>
-        </div>
-        <div class="status-pill success" id="login-status" data-i18n="update.status.logged">Đang đăng nhập</div>
-    </section>
-
-    <section class="profile-layout">
-        <aside class="profile-card">
-            <div class="avatar-wrap">
-                <img id="profile-avatar" src="https://via.placeholder.com/160x160" alt="Ảnh đại diện" class="avatar">
-            </div>
-            <h2 id="profile-fullname">Nguyễn Văn A</h2>
-            <p class="role" id="profile-role">Student</p>
-
-            <div class="profile-meta">
-                <div>
-                    <span data-i18n="update.department">Khoa</span>
-                    <strong id="profile-dept">CNTT</strong>
-                </div>
-                <div>
-                    <span>Mã số</span>
-                    <strong id="profile-id">IT2026001</strong>
-                </div>
-                <div>
-                    <span data-i18n="interaction.quick.info.participants">Người tham gia</span>
-                    <strong>126</strong>
-                </div>
-            </div>
-
-            <a class="ghost-button" href="change-password.html" data-i18n="page.title.change">Đổi mật khẩu</a>
-        </aside>
-
-        <section class="form-card">
-            <div class="card-header">
-                <h2 data-i18n="update.title">Thông tin cần cập nhật</h2>
-                <p data-i18n-html="update.note" data-i18n="update.note"></p>
-            </div>
-
-            <form id="profile-form" class="profile-form">
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="fullname" data-i18n="update.fullname">Họ và tên</label>
-                        <input type="text" id="fullname" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="email" data-i18n="update.email">Email</label>
-                        <input type="email" id="email" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="phone" data-i18n="update.phone">Số điện thoại</label>
-                        <input type="tel" id="phone" placeholder="">
-                    </div>
-
-                    <div class="field">
-                        <label for="dob" data-i18n="update.dob">Ngày sinh</label>
-                        <input type="date" id="dob">
-                    </div>
-
-                    <div class="field">
-                        <label for="department" data-i18n="update.department">Khoa</label>
-                        <input type="text" id="department">
-                    </div>
-
-                    <div class="field">
-                        <label for="avatar" data-i18n="update.avatar">Ảnh đại diện</label>
-                        <input type="file" id="avatar" accept="image/*">
-                    </div>
-                </div>
-
-                <div class="field full">
-                    <label for="address" data-i18n="update.address">Địa chỉ</label>
-                    <textarea id="address" rows="4"></textarea>
-                </div>
-
-                <div class="notice">
-                    <strong data-i18n="update.note"></strong>
-                </div>
-
-                <div class="actions">
-                    <button type="reset" class="secondary-button" data-i18n="update.cancel">Hủy</button>
-                    <button type="submit" class="primary-button" data-i18n="update.save">Lưu thay đổi</button>
-                </div>
-            </form>
-
-            <div id="update-message" style="display:none; margin-top:12px;"></div>
-        </section>
-    </section>
+<header><nav id="top-nav"></nav></header>
+<main>
+  <div class="page">
+    <h2>Cập nhật thông tin cá nhân</h2>
+    <div id="update-content"></div>
+  </div>
 </main>
-
-<footer class="site-footer">
-    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
-</footer>
-
-<script src="js/i18n.js"></script>
-<script src="js/auth.js"></script>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Ensure i18n runs first
-  const tryInit = () => {
-    if (!window.authService || !window.i18n) {
-      setTimeout(tryInit, 80);
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!requireLogin()) return;
+    renderNav();
+    const user = DB.getCurrentUser();
+    const fullUser = DB.getUsers().find(u => u.id === user.id);
+
+    document.getElementById('update-content').innerHTML = `
+      <div style="background:#fff; border:1px solid #e0e7ef; border-radius:12px; padding:1.5rem; max-width:560px;">
+        <div id="msg"></div>
+        <form onsubmit="doUpdate(event)">
+          <div class="info-grid">
+            <div>
+              <label>Họ và tên</label>
+              <input type="text" id="fullName" value="${fullUser.fullName}" required>
+            </div>
+            <div>
+              <label>Số điện thoại</label>
+              <input type="tel" id="phone" value="${fullUser.phone || ''}">
+            </div>
+            <div>
+              <label>Email</label>
+              <input type="email" value="${fullUser.email}" disabled style="background:#f5f7fa; color:#888;">
+            </div>
+            <div>
+              <label>Tên đăng nhập</label>
+              <input type="text" value="${fullUser.username}" disabled style="background:#f5f7fa; color:#888;">
+            </div>
+          </div>
+          <div style="display:flex; gap:.75rem; margin-top:1.25rem; flex-wrap:wrap;">
+            <button type="submit" style="width:auto; padding:.65rem 1.5rem;">Lưu thay đổi</button>
+            <a href="profile.html" class="btn btn-outline" style="padding:.65rem 1.5rem;">Hủy</a>
+          </div>
+        </form>
+      </div>`;
+  });
+
+  function doUpdate(e) {
+    e.preventDefault();
+    const user = DB.getCurrentUser();
+    const fullName = document.getElementById('fullName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const result = DB.updateProfile(user.id, { fullName, phone });
+    const msg = document.getElementById('msg');
+    if (!result) {
+      msg.innerHTML = '<div class="alert alert-error">Cập nhật thất bại.</div>';
       return;
     }
-    const currentUser = authService.getCurrentUser();
-    if (!currentUser) {
-      // nếu chưa login => chuyển về login
-      window.location.href = 'login.html';
-      return;
-    }
-
-    // populate form and sidebar
-    document.getElementById('fullname').value = currentUser.fullName || '';
-    document.getElementById('email').value = currentUser.email || '';
-    document.getElementById('phone').value = currentUser.phone || '';
-    document.getElementById('dob').value = currentUser.dob || '';
-    document.getElementById('department').value = currentUser.department || currentUser.role || '';
-    document.getElementById('address').value = currentUser.address || '';
-
-    document.getElementById('profile-fullname').textContent = currentUser.fullName || '';
-    document.getElementById('profile-role').textContent = currentUser.role || '';
-    document.getElementById('profile-dept').textContent = currentUser.department || '';
-    if (currentUser.avatar) {
-      document.getElementById('profile-avatar').src = currentUser.avatar;
-    }
-
-    // handle form submit
-    const form = document.getElementById('profile-form');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const updated = {
-        fullName: document.getElementById('fullname').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        dob: document.getElementById('dob').value || '',
-        department: document.getElementById('department').value.trim(),
-        address: document.getElementById('address').value.trim()
-      };
-
-      // Handle avatar file as data URL (best-effort, local only)
-      const avatarInput = document.getElementById('avatar');
-      if (avatarInput && avatarInput.files && avatarInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          updated.avatar = evt.target.result;
-          const res = authService.updateProfile(updated);
-          showMessage(res.success ? 'success' : 'error', res.message || 'Saved successfully');
-        };
-        reader.readAsDataURL(avatarInput.files[0]);
-      } else {
-        const res = authService.updateProfile(updated);
-        showMessage(res.success ? 'success' : 'error', res.message || 'Saved successfully');
-      }
-    });
-
-    i18n.updatePageLanguage();
-  };
-
-  tryInit();
-
-  function showMessage(type, text) {
-    const msg = document.getElementById('update-message');
-    msg.style.display = 'block';
-    msg.style.color = type === 'success' ? 'green' : 'red';
-    msg.textContent = text;
-    // update sidebar display
-    const cu = authService.getCurrentUser();
-    if (cu) {
-      document.getElementById('profile-fullname').textContent = cu.fullName || '';
-      if (cu.avatar) document.getElementById('profile-avatar').src = cu.avatar;
-      document.getElementById('profile-dept').textContent = cu.department || '';
-    }
+    msg.innerHTML = '<div class="alert alert-success">Cập nhật thông tin thành công!</div>';
+    setTimeout(() => window.location.href = 'profile.html', 1200);
   }
-});
 </script>
 </body>
 </html>

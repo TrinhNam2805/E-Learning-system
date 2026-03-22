@@ -92,13 +92,12 @@ const MOCK_NOTES = [
   { id: 4, studentId: 1, lessonId: 8, courseId: 3, content: "Semantic HTML giúp SEO và accessibility tốt hơn rất nhiều", highlightColor: "#FFFF00", createdAt: "2026-02-03" }
 ];
 
-// Rankings (XP leaderboard)
+// Rankings (XP leaderboard) — chỉ dùng userId có trong MOCK_USERS
 const MOCK_RANKINGS = [
   { userId: 1, totalXp: 330, rank: 1 },
   { userId: 2, totalXp: 180, rank: 2 },
-  { userId: 6, totalXp: 120, rank: 3, fullName: "Lê Hoàng Nam" },
-  { userId: 7, totalXp: 90,  rank: 4, fullName: "Phạm Thị Hoa" },
-  { userId: 8, totalXp: 60,  rank: 5, fullName: "Đỗ Minh Tuấn" }
+  { userId: 3, totalXp: 120, rank: 3 },
+  { userId: 4, totalXp: 90,  rank: 4 }
 ];
 
 // ===== STATE HELPERS =====
@@ -201,16 +200,36 @@ const DB = {
     const users = this.getUsers();
     const xpMap = {};
     enrollments.forEach(e => { xpMap[e.studentId] = (xpMap[e.studentId] || 0) + e.totalXp; });
-    // Merge with mock extras (users not in enrollments)
-    MOCK_RANKINGS.forEach(r => { if (!xpMap[r.userId]) xpMap[r.userId] = r.totalXp; });
+    // Seed with mock rankings for users with no enrollments yet
+    MOCK_RANKINGS.forEach(r => {
+      const exists = users.find(u => u.id === r.userId);
+      if (exists && !xpMap[r.userId]) xpMap[r.userId] = r.totalXp;
+    });
     return Object.entries(xpMap)
       .map(([uid, xp]) => {
         const u = users.find(u => u.id === parseInt(uid));
-        const name = u ? u.fullName : (MOCK_RANKINGS.find(r => r.userId === parseInt(uid)) || {}).fullName || 'Ẩn danh';
-        return { userId: parseInt(uid), fullName: name, totalXp: xp };
+        if (!u) return null; // skip ghost users
+        return { userId: parseInt(uid), fullName: u.fullName, totalXp: xp };
       })
+      .filter(Boolean)
       .sort((a, b) => b.totalXp - a.totalXp)
       .map((r, i) => ({ ...r, rank: i + 1 }));
+  },
+
+  updateProfile(userId, data) {
+    const users = this.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) return false;
+    if (data.fullName) user.fullName = data.fullName;
+    if (data.phone !== undefined) user.phone = data.phone;
+    this.saveUsers(users);
+    // Update session
+    const session = this.getCurrentUser();
+    if (session && session.id === userId) {
+      if (data.fullName) session.fullName = data.fullName;
+      localStorage.setItem('currentUser', JSON.stringify(session));
+    }
+    return user;
   },
 
   // Deadlines for a user (from enrolled courses)

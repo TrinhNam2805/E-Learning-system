@@ -21,7 +21,7 @@
     if (!requireLogin()) return;
     renderNav();
     const user = DB.getCurrentUser();
-    if (user.role === 'TEACHER') { window.location.href = 'teacher-dashboard.html'; return; }
+    if (user.role === 'TEACHER') { window.location.href = 'student-dashboard.html'; return; }
     if (user.role === 'ADMIN') { window.location.href = 'admin.html'; return; }
 
     const enrollments = DB.getEnrollments().filter(e => e.studentId === user.id);

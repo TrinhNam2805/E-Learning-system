@@ -16,10 +16,11 @@ function renderNav(activePage) {
       <a href="login.html">Đăng nhập</a>
       <a href="register.html">Đăng ký</a>`;
   } else {
-    const dashHref = user.role === 'TEACHER' ? 'teacher-dashboard.html' : (user.role === 'ADMIN' ? 'admin.html' : 'student-dashboard.html');
+    const dashHref = user.role === 'ADMIN' ? 'admin.html' : 'student-dashboard.html';
     links = `
       <a href="courses.html">Khóa học</a>
       <a href="${dashHref}">Dashboard</a>
+      ${user.role !== 'ADMIN' ? '<a href="notes.html">📓 Ghi chú</a>' : ''}
       <div class="account-menu">
         <button class="icon-btn notification-btn" onclick="toggleNotif()" title="Thông báo">
           🔔${unread > 0 ? `<span class="notif-badge">${unread}</span>` : ''}
