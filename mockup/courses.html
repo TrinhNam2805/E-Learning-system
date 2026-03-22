@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khóa học | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header><nav id="top-nav"></nav></header>
+<main>
+  <div class="page">
+    <div class="page-header">
+      <h2>Danh sách khóa học</h2>
+      <form class="search-form" onsubmit="doSearch(event)">
+        <input type="text" id="q" placeholder="Tìm theo tên, mã môn...">
+        <button type="submit">Tìm</button>
+      </form>
+    </div>
+    <div id="search-info" style="font-size:.88rem; color:#666; margin-bottom:.75rem;"></div>
+    <div class="card-grid" id="course-list"></div>
+  </div>
+</main>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  let allCourses = [];
+  document.addEventListener('DOMContentLoaded', () => {
+    renderNav();
+    allCourses = DB.getCourses().filter(c => c.status === 'PUBLISHED');
+    const q = getParam('q');
+    if (q) { document.getElementById('q').value = q; }
+    renderCourses(q ? allCourses.filter(c => matches(c, q)) : allCourses, q);
+  });
+
+  function matches(c, q) {
+    const s = q.toLowerCase();
+    return c.courseName.toLowerCase().includes(s) || c.courseCode.toLowerCase().includes(s) || c.description.toLowerCase().includes(s);
+  }
+
+  function doSearch(e) {
+    e.preventDefault();
+    const q = document.getElementById('q').value.trim();
+    const filtered = q ? allCourses.filter(c => matches(c, q)) : allCourses;
+    renderCourses(filtered, q);
+    if (q) document.getElementById('search-info').innerHTML = `Kết quả cho "<strong>${q}</strong>": ${filtered.length} khóa học. <a href="courses.html">Xóa bộ lọc</a>`;
+    else document.getElementById('search-info').innerHTML = '';
+  }
+
+  function renderCourses(courses, q) {
+    const user = DB.getCurrentUser();
+    if (!courses.length) {
+      document.getElementById('course-list').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>Không tìm thấy khóa học nào.</p></div>';
+      return;
+    }
+    document.getElementById('course-list').innerHTML = courses.map(c => {
+      const teacher = DB.getUsers().find(u => u.id === c.teacherId);
+      const enrolled = user && DB.isEnrolled(user.id, c.id);
+      return `<a class="card" href="course-detail.html?id=${c.id}">
+        <div class="card-thumb"><img src="${c.thumbnail}" alt="${c.courseName}" onerror="this.src='images/e-learning.jpg'"></div>
+        <div class="content">
+          <div class="badge-row">
+            <span class="badge">${c.courseCode}</span>
+            <span class="badge badge-dark">${c.semester}</span>
+            ${c.enrollPassword ? '<span class="badge badge-gray">🔒 Có mật khẩu</span>' : ''}
+            ${enrolled ? '<span class="badge badge-green">✓ Đã đăng ký</span>' : ''}
+          </div>
+          <h4>${c.courseName}</h4>
+          <p>${c.description.substring(0,120)}...</p>
+          <div style="font-size:.82rem; color:#888; margin-top:.25rem;">👨‍🏫 ${teacher ? teacher.fullName : 'N/A'} · ${c.maxStudents} sinh viên</div>
+          <span class="btn-link">Xem chi tiết →</span>
+        </div>
+      </a>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>

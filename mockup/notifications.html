@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông báo | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header><nav id="top-nav"></nav></header>
+<main>
+  <div class="page">
+    <div class="page-header">
+      <h2>Thông báo</h2>
+      <button onclick="markAllRead()" class="btn btn-outline btn-sm">✓ Đánh dấu tất cả đã đọc</button>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+</main>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!requireLogin()) return;
+    renderNav();
+    renderNotifs();
+  });
+
+  function renderNotifs() {
+    const user = DB.getCurrentUser();
+    const notifs = DB.getNotifications().filter(n => n.userId === user.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const typeIcon = { GRADE:'📊', ASSIGNMENT:'📝', BADGE:'🏅', COMMENT:'💬', ANNOUNCEMENT:'📢', SYSTEM:'⚙️' };
+    document.getElementById('notif-list').innerHTML = notifs.length === 0
+      ? '<div class="empty-state"><p>Không có thông báo nào.</p></div>'
+      : notifs.map(n => `
+        <div class="post-item ${!n.isRead ? 'notif-unread' : ''}" style="margin-bottom:.5rem; display:flex; gap:.75rem; align-items:flex-start;">
+          <div style="font-size:1.5rem; flex-shrink:0;">${typeIcon[n.type] || '🔔'}</div>
+          <div style="flex:1;">
+            <div style="font-weight:${n.isRead ? '400' : '700'}; color:#0a3d7a;">${n.title}</div>
+            <div style="font-size:.9rem; color:#555; margin-top:.25rem;">${n.message}</div>
+            <div style="font-size:.8rem; color:#aaa; margin-top:.3rem;">${formatDate(n.createdAt)}</div>
+          </div>
+          ${!n.isRead ? '<span class="badge badge-dark" style="flex-shrink:0; align-self:center;">Mới</span>' : ''}
+        </div>`).join('');
+  }
+
+  function markAllRead() {
+    const user = DB.getCurrentUser();
+    DB.markAllRead(user.id);
+    renderNav();
+    renderNotifs();
+    showToast('Đã đánh dấu tất cả là đã đọc.');
+  }
+</script>
+</body>
+</html>

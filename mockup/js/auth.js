@@ -77,33 +77,6 @@ class AuthService {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
   }
-
-  /**
-   * Cập nhật thông tin user hiện tại.
-   * updatedFields: { id?, fullName?, email?, phone?, dob?, department?, address?, avatar? }
-   * LƯU Ý: không thể ghi vào mockData/users.json từ client — ta cập nhật localStorage & bộ nhớ tạm users[] nếu có.
-   */
-  updateProfile(updatedFields = {}) {
-    const current = this.getCurrentUser();
-    if (!current) {
-      return { success: false, message: 'No logged in user' };
-    }
-
-    // Merge into current user
-    const updatedUser = { ...current, ...updatedFields };
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-
-    // Update in-memory users[] if loaded (best-effort)
-    if (this.users && this.users.length > 0) {
-      const idx = this.users.findIndex(u => u.id === updatedUser.id || u.email === updatedUser.email);
-      if (idx !== -1) {
-        // Update fields on mock user object
-        this.users[idx] = { ...this.users[idx], ...updatedFields, fullName: updatedUser.fullName, email: updatedUser.email };
-      }
-    }
-
-    return { success: true, user: updatedUser };
-  }
 }
 
 // Khởi tạo Auth Service
@@ -123,7 +96,6 @@ function handleLogin(e) {
   // Clear error message
   if (errorElement) {
     errorElement.textContent = '';
-    errorElement.style.display = 'none';
   }
 
   // Validate input
@@ -166,7 +138,6 @@ function handleRegister(e) {
   // Clear error message
   if (errorElement) {
     errorElement.textContent = '';
-    errorElement.style.display = 'none';
   }
 
   // Validate
@@ -203,7 +174,7 @@ function handleRegister(e) {
     return;
   }
 
-  // Register thành công (demo: không ghi file, hướng người dùng đăng nhập)
+  // Register thành công
   alert('Registration successful! Please login.');
   window.location.href = 'login.html';
 }

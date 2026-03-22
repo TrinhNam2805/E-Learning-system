@@ -1,163 +1,338 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | E-Learning CNTT</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>
-    <nav>
-        <div class="logo">
-            <span class="logo-mark">E</span>
-            E-Learning CNTT
-        </div>
-        <div class="nav-toggle">&#9776;</div>
-        <div class="links" id="nav-links">
-            <a href="login.html"data-i18n="nav.login">Login</a>
-            <a href="register.html" data-i18n="nav.register">Register</a>
-            <a href="update-information.html" data-i18n="nav.update">Update Information</a>
-            <a href="interaction.html" data-i18n="nav.interaction">Interaction</a>
-            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
-                <span>🇬🇧</span>
-            </button>
-        </div>
-    </nav>
-</header>
-
+<header><nav id="top-nav"></nav></header>
 <main>
-<section class="hero">
-    <img src="images/e-learning.jpg" alt="E-Learning platform" class="hero-img">
+  <section class="hero">
+    <img src="images/e-learning.jpg" alt="E-Learning" class="hero-img">
     <div class="hero-text">
-        <h1 data-i18n="hero.title">Welcome to E-Learning CNTT</h1>
-        <p data-i18n="hero.subtitle">Learn online anytime, anywhere with rich resources.</p>
-        <div class="hero-actions">
-            <a href="register.html"><button data-i18n="hero.button">Join Now</button></a>
-        </div>
+      <h1>E-Learning Portal – Khoa CNTT</h1>
+      <p>Nền tảng học tập trực tuyến: khóa học, bài giảng, bài tập và theo dõi tiến độ.</p>
+      <div class="hero-actions">
+        <a href="courses.html"><button>Xem khóa học</button></a>
+        <a href="register.html" id="hero-register-btn"><button class="btn-outline">Đăng ký ngay</button></a>
+      </div>
     </div>
-</section>
+  </section>
 
-<section class="features">
-    <div class="feature-card">
-        <h3 data-i18n="feature.courses">Courses</h3>
-        <p data-i18n="feature.courses.desc">Over 200 quality courses.</p>
-    </div>
-    <div class="feature-card">
-        <h3 data-i18n="feature.teachers">Teachers</h3>
-        <p data-i18n="feature.teachers.desc">Trusted team of instructors.</p>
-    </div>
-    <div class="feature-card">
-        <h3 data-i18n="feature.community">Community</h3>
-        <p data-i18n="feature.community.desc">Discuss, connect and share.</p>
-    </div>
-</section>
+  <!-- Guest: features strip -->
+  <section class="features" id="features-strip">
+    <div class="feature-card"><div class="feature-icon">📚</div><h3>Khóa học đa dạng</h3><p>Nhiều môn học CNTT từ cơ bản đến nâng cao.</p></div>
+    <div class="feature-card"><div class="feature-icon">📝</div><h3>Bài tập & Kiểm tra</h3><p>Nộp bài, làm quiz và nhận phản hồi từ giảng viên.</p></div>
+    <div class="feature-card"><div class="feature-icon">🏆</div><h3>Gamification</h3><p>Tích XP, huy hiệu và bảng xếp hạng.</p></div>
+    <div class="feature-card"><div class="feature-icon">📓</div><h3>Ghi chú thông minh</h3><p>Highlight và ghi chú ngay trong bài giảng.</p></div>
+  </section>
 
-<!-- Articles -->
-<section class="card-grid">
-    <div class="article-card">
-        <img src="images/intro-e-learning.png" alt="Article 1">
-        <div class="content">
-            <h4 data-i18n="article.title1">Article 1</h4>
-            <p data-i18n="article.desc1">Introduction to online learning.</p>
-        </div>
-    </div>
-    <div class="article-card">
-        <img src="images/strategies.png" alt="Article 2">
-        <div class="content">
-            <h4 data-i18n="article.title2">Article 2</h4>
-            <p data-i18n="article.desc2">Effective learning strategies.</p>
-        </div>
-    </div>
-</section>
-
-<!-- Featured Courses -->
-<section class="card-grid">
-    <div class="course-card">
-        <img src="images/html-css.png" alt="Course A">
-        <div class="content">
-            <h4 data-i18n="course.title1">Course A</h4>
-            <p data-i18n="course.desc1">HTML & CSS Basics.</p>
-        </div>
-    </div>
-    <div class="course-card">
-        <img src="images/python.jpg" alt="Course B">
-        <div class="content">
-            <h4 data-i18n="course.title2">Course B</h4>
-            <p data-i18n="course.desc2">Advanced Python Programming.</p>
-        </div>
-    </div>
-</section>
+  <!-- Main content area: changes based on login state -->
+  <div class="page" id="main-area"></div>
 </main>
-
-<footer>
-    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
-</footer>
-
-<script src="js/i18n.js"></script>
-<script src="js/auth.js"></script>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
 <script>
-    const toggle = document.querySelector('.nav-toggle');
-    const nav = document.querySelector('nav');
-    toggle && toggle.addEventListener('click', () => {
-        nav.classList.toggle('open');
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  renderNav();
+  const user = DB.getCurrentUser();
 
-    // Update navigation based on login status
-    document.addEventListener('DOMContentLoaded', () => {
-        const navLinks = document.getElementById('nav-links');
-        const currentUser = authService.getCurrentUser();
-        
-        if (currentUser) {
-            // User is logged in
-            navLinks.innerHTML = `
-                <span class="logged-in-user">Welcome, ${currentUser.fullName}!</span>
-                
-                <!-- Notification Icon -->
-                <button class="icon-btn notification-btn" title="Notifications">
-                    <span>🔔</span>
-                    <span class="badge">3</span>
-                </button>
-                
-                <!-- Account Dropdown Menu -->
-                <div class="account-menu">
-                    <button class="icon-btn account-btn" onclick="toggleAccountMenu()" title="Account">
-                        <span>👤</span>
-                    </button>
-                    <div id="account-dropdown" class="dropdown-menu" style="display: none;">
-                        <a href="#profile" class="dropdown-item">📋 Profile</a>
-                        <a href="#my-courses" class="dropdown-item">📚 My Courses</a>
-                        <a href="change-password.html" class="dropdown-item">🔐 Change Password</a>
-                        <hr>
-                        <a href="logout.html" class="dropdown-item logout-item">🚪 Logout</a>
-                    </div>
-                </div>
-                
-                <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
-                    <span>🇬🇧</span>
-                </button>
-            `;
-            // Re-apply i18n to new elements
-            i18n.updatePageLanguage();
-        }
-    });
+  if (!user) {
+    renderGuest();
+  } else {
+    document.getElementById('hero-register-btn').style.display = 'none';
+    document.getElementById('features-strip').style.display = 'none';
+    renderLoggedIn(user);
+  }
+});
 
-    // Toggle Account Dropdown Menu
-    function toggleAccountMenu() {
-        const dropdown = document.getElementById('account-dropdown');
-        if (dropdown) {
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        }
+// ── GUEST VIEW ──────────────────────────────────────────────
+function renderGuest() {
+  const courses = DB.getCourses().filter(c => c.status === 'PUBLISHED');
+  document.getElementById('main-area').innerHTML = `
+    <div class="page-header" style="margin-top:.5rem;">
+      <h2>Khóa học nổi bật</h2>
+      <a href="courses.html" class="btn btn-outline btn-sm">Xem tất cả →</a>
+    </div>
+    <div class="card-grid">
+      ${courses.slice(0,4).map(c => {
+        const teacher = DB.getUsers().find(u => u.id === c.teacherId);
+        return `<a class="card" href="course-detail.html?id=${c.id}">
+          <div class="card-thumb"><img src="${c.thumbnail}" alt="${c.courseName}" onerror="this.src='images/e-learning.jpg'"></div>
+          <div class="content">
+            <div class="badge-row"><span class="badge">${c.courseCode}</span><span class="badge badge-dark">${c.semester}</span></div>
+            <h4>${c.courseName}</h4>
+            <p>${c.description.substring(0,100)}...</p>
+            <div style="font-size:.8rem;color:#888;margin-top:.25rem;">👨‍🏫 ${teacher ? teacher.fullName : ''}</div>
+            <span class="btn-link">Xem chi tiết →</span>
+          </div>
+        </a>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── LOGGED-IN VIEW (sidebar layout) ─────────────────────────
+function renderLoggedIn(user) {
+  document.getElementById('main-area').innerHTML = `
+    <div class="home-layout">
+      <div class="home-main" id="home-main"></div>
+      <aside class="home-sidebar" id="home-sidebar"></aside>
+    </div>`;
+  renderHomeMain(user);
+  renderSidebar(user);
+}
+
+function renderHomeMain(user) {
+  const enrollments = DB.getEnrollments().filter(e => e.studentId === user.id);
+  const courses = DB.getCourses();
+
+  // Continue learning
+  const inProgress = enrollments
+    .filter(e => e.progressPercentage < 100)
+    .map(e => ({ ...e, course: courses.find(c => c.id === e.courseId) }))
+    .filter(e => e.course);
+
+  const allCourses = DB.getCourses().filter(c => c.status === 'PUBLISHED');
+
+  document.getElementById('home-main').innerHTML = `
+    <div style="margin-bottom:1.5rem;">
+      <h2>Xin chào, ${user.fullName.split(' ').pop()} 👋</h2>
+      <p style="color:#666;font-size:.92rem;">Tiếp tục hành trình học tập của bạn hôm nay.</p>
+    </div>
+
+    ${inProgress.length ? `
+    <div style="margin-bottom:1.75rem;">
+      <div class="page-header" style="margin-bottom:.75rem;">
+        <h2>Tiếp tục học</h2>
+        <a href="student-dashboard.html" class="btn btn-outline btn-sm">Tất cả →</a>
+      </div>
+      ${inProgress.slice(0,2).map(e => {
+        const lessons = DB.getLessons().filter(l => l.courseId === e.courseId);
+        const next = lessons.find(l => !DB.getLessonCompleted(user.id, l.id));
+        return `<div class="continue-card">
+          <div class="continue-thumb"><img src="${e.course.thumbnail}" onerror="this.src='images/e-learning.jpg'" alt=""></div>
+          <div class="continue-info">
+            <div class="badge-row"><span class="badge">${e.course.courseCode}</span></div>
+            <div class="continue-title">${e.course.courseName}</div>
+            ${next ? `<div class="continue-next">▶ Tiếp theo: ${next.lessonTitle}</div>` : ''}
+            <div style="margin:.5rem 0;">
+              <div style="display:flex;justify-content:space-between;font-size:.8rem;color:#666;margin-bottom:.25rem;">
+                <span>Tiến độ</span><span>${e.progressPercentage}%</span>
+              </div>
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:${e.progressPercentage}%"></div></div>
+            </div>
+          </div>
+          <div class="continue-action">
+            ${next
+              ? `<a href="lesson.html?courseId=${e.courseId}&lessonId=${next.id}" class="btn btn-sm">Học ngay</a>`
+              : `<span class="badge badge-green">✓ Xong</span>`}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+
+    <div class="page-header" style="margin-bottom:.75rem;">
+      <h2>Khóa học nổi bật</h2>
+      <a href="courses.html" class="btn btn-outline btn-sm">Xem tất cả →</a>
+    </div>
+    <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+      ${allCourses.slice(0,4).map(c => {
+        const enrolled = DB.isEnrolled(user.id, c.id);
+        const teacher = DB.getUsers().find(u => u.id === c.teacherId);
+        return `<a class="card" href="course-detail.html?id=${c.id}">
+          <div class="card-thumb"><img src="${c.thumbnail}" onerror="this.src='images/e-learning.jpg'" alt="${c.courseName}"></div>
+          <div class="content">
+            <div class="badge-row">
+              <span class="badge">${c.courseCode}</span>
+              ${enrolled ? '<span class="badge badge-green">✓</span>' : ''}
+            </div>
+            <h4>${c.courseName}</h4>
+            <div style="font-size:.8rem;color:#888;">👨‍🏫 ${teacher ? teacher.fullName : ''}</div>
+            <span class="btn-link">Chi tiết →</span>
+          </div>
+        </a>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────────
+function renderSidebar(user) {
+  const sidebar = document.getElementById('home-sidebar');
+  sidebar.innerHTML =
+    renderMiniDashboard(user) +
+    renderCalendar(user) +
+    renderRanking(user) +
+    renderRecentNotes(user);
+}
+
+// 1. Mini dashboard card
+function renderMiniDashboard(user) {
+  const enrollments = DB.getEnrollments().filter(e => e.studentId === user.id);
+  const totalXp = enrollments.reduce((s, e) => s + e.totalXp, 0);
+  const completedLessons = DB.getProgress().filter(p => p.studentId === user.id && p.completed).length;
+  const rankings = DB.getRankings();
+  const myRank = rankings.find(r => r.userId === user.id);
+  const level = Math.floor(totalXp / 100) + 1;
+  const xpInLevel = totalXp % 100;
+  const initials = user.fullName.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase();
+
+  return `
+  <div class="sidebar-card">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+      <div class="avatar" style="width:48px;height:48px;font-size:1.1rem;">${initials}</div>
+      <div>
+        <div style="font-weight:700;color:#0a3d7a;font-size:.95rem;">${user.fullName}</div>
+        <div style="font-size:.8rem;color:#888;">${user.role}</div>
+      </div>
+    </div>
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="mini-num">${totalXp}</div><div class="mini-label">XP</div></div>
+      <div class="mini-stat"><div class="mini-num">Lv.${level}</div><div class="mini-label">Cấp độ</div></div>
+      <div class="mini-stat"><div class="mini-num">${myRank ? '#' + myRank.rank : '—'}</div><div class="mini-label">Xếp hạng</div></div>
+      <div class="mini-stat"><div class="mini-num">${completedLessons}</div><div class="mini-label">Bài xong</div></div>
+    </div>
+    <div style="margin-top:.75rem;">
+      <div style="display:flex;justify-content:space-between;font-size:.78rem;color:#666;margin-bottom:.3rem;">
+        <span>XP đến Lv.${level + 1}</span><span>${xpInLevel}/100</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:${xpInLevel}%;background:#f59e0b;"></div></div>
+    </div>
+    <a href="student-dashboard.html" class="btn btn-outline btn-sm btn-full" style="margin-top:.85rem;">Xem Dashboard →</a>
+  </div>`;
+}
+
+// 2. Calendar with deadline dots
+function renderCalendar(user) {
+  const deadlines = DB.getDeadlines(user.id);
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); // 0-indexed
+  const monthNames = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+  // Map deadline dates to day numbers this month
+  const deadlineDays = {};
+  deadlines.forEach(a => {
+    const d = new Date(a.dueDate);
+    if (d.getFullYear() === year && d.getMonth() === month) {
+      const day = d.getDate();
+      if (!deadlineDays[day]) deadlineDays[day] = [];
+      deadlineDays[day].push(a);
     }
+  });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        const accountBtn = document.querySelector('.account-btn');
-        const dropdown = document.getElementById('account-dropdown');
-        if (accountBtn && dropdown && !accountBtn.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.style.display = 'none';
-        }
-    });
+  const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayDate = today.getDate();
+
+  let cells = '';
+  // Empty cells before first day (Mon-based: shift Sun to end)
+  const startOffset = (firstDay + 6) % 7;
+  for (let i = 0; i < startOffset; i++) cells += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === todayDate;
+    const hasDl = deadlineDays[d];
+    const typeColors = { QUIZ: '#f59e0b', EXAM: '#b00020', HOMEWORK: '#0a66c2' };
+    const dotColor = hasDl ? typeColors[hasDl[0].type] || '#0a66c2' : '';
+    cells += `<div class="cal-day ${isToday ? 'cal-today' : ''} ${hasDl ? 'cal-has-dl' : ''}"
+      ${hasDl ? `title="${hasDl.map(a=>a.title).join(', ')}"` : ''}>
+      ${d}
+      ${hasDl ? `<span class="cal-dot" style="background:${dotColor};"></span>` : ''}
+    </div>`;
+  }
+
+  // Upcoming deadlines list (next 5)
+  const upcoming = deadlines.filter(a => new Date(a.dueDate) >= today).slice(0, 5);
+  const typeIcon = { QUIZ: '📝', EXAM: '📋', HOMEWORK: '📌' };
+  const typeColor = { QUIZ: '#f59e0b', EXAM: '#b00020', HOMEWORK: '#0a66c2' };
+
+  const upcomingHtml = upcoming.length
+    ? upcoming.map(a => {
+        const course = DB.getCourses().find(c => c.id === a.courseId);
+        const daysLeft = Math.ceil((new Date(a.dueDate) - today) / 86400000);
+        const urgent = daysLeft <= 3;
+        return `<div class="deadline-item ${urgent ? 'deadline-urgent' : ''}">
+          <span style="font-size:1rem;">${typeIcon[a.type] || '📅'}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.83rem;font-weight:600;color:#0a3d7a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.title}</div>
+            <div style="font-size:.76rem;color:#888;">${course ? course.courseCode : ''} · ${formatDate(a.dueDate)}</div>
+          </div>
+          <span style="font-size:.75rem;font-weight:700;color:${urgent ? '#b00020' : '#666'};white-space:nowrap;">${daysLeft === 0 ? 'Hôm nay' : daysLeft + 'n'}</span>
+        </div>`;
+      }).join('')
+    : '<div style="font-size:.85rem;color:#aaa;text-align:center;padding:.5rem 0;">Không có deadline sắp tới 🎉</div>';
+
+  return `
+  <div class="sidebar-card">
+    <div class="sidebar-card-title">📅 Lịch & Deadline – ${monthNames[month]}</div>
+    <div class="calendar">
+      <div class="cal-header">
+        <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
+      </div>
+      <div class="cal-grid">${cells}</div>
+    </div>
+    <div style="margin-top:.85rem;">
+      <div style="font-size:.8rem;font-weight:600;color:#444;margin-bottom:.5rem;">Sắp đến hạn</div>
+      ${upcomingHtml}
+    </div>
+    <div style="display:flex;gap:.75rem;margin-top:.6rem;font-size:.75rem;color:#888;">
+      <span><span style="color:#0a66c2;">●</span> Bài tập</span>
+      <span><span style="color:#f59e0b;">●</span> Quiz</span>
+      <span><span style="color:#b00020;">●</span> Thi</span>
+    </div>
+  </div>`;
+}
+
+// 3. Leaderboard
+function renderRanking(user) {
+  const rankings = DB.getRankings().slice(0, 5);
+  const myRank = rankings.find(r => r.userId === user.id);
+  const medalColors = ['#f59e0b', '#9ca3af', '#b45309'];
+
+  return `
+  <div class="sidebar-card">
+    <div class="sidebar-card-title">🏆 Bảng xếp hạng XP</div>
+    <div style="display:flex;flex-direction:column;gap:.4rem;">
+      ${rankings.map((r, i) => {
+        const isMe = r.userId === user.id;
+        const medal = i < 3 ? `<span style="color:${medalColors[i]};font-size:1rem;">${['🥇','🥈','🥉'][i]}</span>` : `<span style="color:#aaa;font-size:.85rem;width:1.2rem;text-align:center;">${r.rank}</span>`;
+        return `<div class="rank-item ${isMe ? 'rank-me' : ''}">
+          ${medal}
+          <div style="flex:1;font-size:.88rem;font-weight:${isMe ? '700' : '400'};color:${isMe ? '#0a66c2' : '#333'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${r.fullName}${isMe ? ' (bạn)' : ''}
+          </div>
+          <div style="font-size:.82rem;font-weight:600;color:#f59e0b;white-space:nowrap;">${r.totalXp} XP</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${!myRank ? `<div style="font-size:.8rem;color:#888;margin-top:.6rem;text-align:center;">Hoàn thành bài học để lên bảng xếp hạng!</div>` : ''}
+  </div>`;
+}
+
+// 4. Recent notes
+function renderRecentNotes(user) {
+  const notes = DB.getNotes().filter(n => n.studentId === user.id)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+
+  const noteItems = notes.length
+    ? notes.map(n => {
+        const course = DB.getCourses().find(c => c.id === n.courseId);
+        const lesson = DB.getLessons().find(l => l.id === n.lessonId);
+        return `<div class="note-item" style="border-left:3px solid ${n.highlightColor};">
+          <div style="font-size:.83rem;color:#333;line-height:1.5;">${n.content.substring(0, 80)}${n.content.length > 80 ? '…' : ''}</div>
+          <div style="font-size:.75rem;color:#aaa;margin-top:.25rem;">${course ? course.courseCode : ''} · ${lesson ? lesson.lessonTitle.substring(0,30) : ''}</div>
+        </div>`;
+      }).join('')
+    : '<div style="font-size:.85rem;color:#aaa;text-align:center;padding:.5rem 0;">Chưa có ghi chú nào.</div>';
+
+  return `
+  <div class="sidebar-card">
+    <div class="sidebar-card-title">📓 Ghi chú gần đây</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;">${noteItems}</div>
+  </div>`;
+}
 </script>
 
 </body>

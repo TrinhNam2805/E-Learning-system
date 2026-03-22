@@ -44,12 +44,7 @@ class I18n {
     // Update all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const key = element.getAttribute('data-i18n');
-      // allow html in translations for note area
-      if (element.hasAttribute('data-i18n-html')) {
-        element.innerHTML = this.translate(key);
-      } else {
-        element.textContent = this.translate(key);
-      }
+      element.textContent = this.translate(key);
     });
 
     // Update all elements with data-i18n-placeholder attribute
@@ -60,10 +55,7 @@ class I18n {
 
     // Update page title
     const titleKey = `page.title.${this.getCurrentPageName()}`;
-    const title = this.translate(titleKey);
-    if (title && title !== titleKey) {
-      document.title = title;
-    }
+    document.title = this.translate(titleKey);
   }
 
   getCurrentPageName() {
@@ -73,8 +65,6 @@ class I18n {
     if (path.includes('forgot')) return 'forgot';
     if (path.includes('change')) return 'change';
     if (path.includes('logout')) return 'logout';
-    if (path.includes('update-information') || path.includes('update')) return 'update';
-    if (path.includes('interaction')) return 'interaction';
     return 'home';
   }
 
@@ -96,4 +86,4 @@ class I18n {
 let i18n;
 document.addEventListener('DOMContentLoaded', () => {
   i18n = new I18n();
-})
+});

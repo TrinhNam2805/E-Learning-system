@@ -1,53 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="2;url=login.html" />
-    <title>Logout | E-Learning CNTT</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng xuất | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header>
-    <nav>
-        <div class="logo">
-            <span class="logo-mark">E</span>
-            E-Learning CNTT
-        </div>
-        <div class="nav-toggle">&#9776;</div>
-        <div class="links">
-            <button class="language-toggle" onclick="i18n && i18n.toggleLanguage()" title="Toggle Language">
-                <span>🇬🇧</span>
-            </button>
-        </div>
-    </nav>
-</header>
-
+<header><nav id="top-nav"></nav></header>
 <main>
-<div class="container">
-    <h2 data-i18n="logout.title">Logout</h2>
-    <p data-i18n="logout.message">You have been logged out successfully.</p>
-    <p data-i18n="logout.button"><a href="homepage.html">Back to Home</a></p>
-</div>
+  <div class="auth-wrapper">
+    <div class="auth-card" style="text-align:center;">
+      <div style="font-size:3rem; margin-bottom:1rem;">👋</div>
+      <h2>Đã đăng xuất</h2>
+      <p style="color:#666; margin:1rem 0;">Bạn đã đăng xuất thành công. Hẹn gặp lại!</p>
+      <a href="login.html" class="btn btn-full">Đăng nhập lại</a>
+      <a href="homepage.html" class="btn btn-outline btn-full" style="margin-top:.5rem;">Về trang chủ</a>
+    </div>
+  </div>
 </main>
-
-<footer>
-    <span data-i18n="footer.text">© 2026 E-Learning CNTT. All rights reserved.</span>
-</footer>
-
-<script src="js/i18n.js"></script>
-<script src="js/auth.js"></script>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
 <script>
-    const toggle = document.querySelector('.nav-toggle');
-    const nav = document.querySelector('nav');
-    toggle && toggle.addEventListener('click', () => nav.classList.toggle('open'));
-
-    // Logout user
-    document.addEventListener('DOMContentLoaded', () => {
-        if (authService) {
-            authService.logout();
-        }
-    });
+  document.addEventListener('DOMContentLoaded', () => {
+    DB.logout();
+    renderNav();
+  });
 </script>
-
 </body>
 </html>

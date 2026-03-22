@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài giảng | E-Learning CNTT</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header><nav id="top-nav"></nav></header>
+<main>
+  <div class="page">
+    <a class="back-link" id="back-link" href="courses.html">← Quay lại khóa học</a>
+    <div id="lesson-content"></div>
+  </div>
+</main>
+<footer>© 2026 E-Learning CNTT. All rights reserved.</footer>
+<script src="mockData/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!requireLogin()) return;
+    renderNav();
+
+    const courseId = parseInt(getParam('courseId'));
+    const lessonId = parseInt(getParam('lessonId'));
+    const user = DB.getCurrentUser();
+    const course = DB.getCourses().find(c => c.id === courseId);
+    const lesson = DB.getLessons().find(l => l.id === lessonId);
+
+    if (!course || !lesson) { document.getElementById('lesson-content').innerHTML = '<div class="empty-state"><p>Không tìm thấy bài giảng.</p></div>'; return; }
+
+    // Guard: must be enrolled (or teacher)
+    if (user.role === 'STUDENT' && !DB.isEnrolled(user.id, courseId)) {
+      window.location.href = `course-detail.html?id=${courseId}`;
+      return;
+    }
+
+    document.getElementById('back-link').href = `course-detail.html?id=${courseId}`;
+
+    const lessons = DB.getLessons().filter(l => l.courseId === courseId).sort((a,b) => a.lessonOrder - b.lessonOrder);
+    const idx = lessons.findIndex(l => l.id === lessonId);
+    const prev = idx > 0 ? lessons[idx - 1] : null;
+    const next = idx < lessons.length - 1 ? lessons[idx + 1] : null;
+    const isCompleted = DB.getLessonCompleted(user.id, lessonId);
+
+    document.getElementById('lesson-content').innerHTML = `
+      <div class="lesson-view">
+        <div class="lesson-view-header">
+          <div class="badge-row">
+            <span class="badge">${course.courseCode}</span>
+            <span class="badge badge-dark">${course.courseName}</span>
+            <span class="badge">Bài ${lesson.lessonOrder}/${lessons.length}</span>
+          </div>
+          <h2>${lesson.lessonTitle}</h2>
+          <div style="font-size:.85rem; color:#888; margin-top:.35rem;">⏱ ${lesson.durationMinutes} phút</div>
+        </div>
+
+        <div class="lesson-view-body">
+          <div class="lesson-content-box">${lesson.lessonContent}</div>
+        </div>
+
+        <div class="lesson-view-footer">
+          <div style="display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; width:100%;">
+            ${prev ? `<a href="lesson.html?courseId=${courseId}&lessonId=${prev.id}" class="btn btn-outline btn-sm">← Bài trước</a>` : '<span></span>'}
+            <div style="flex:1;"></div>
+            ${isCompleted
+              ? `<span class="badge badge-green" style="font-size:.93rem; padding:.4rem .9rem;">✓ Đã hoàn thành</span>`
+              : `<button onclick="markDone()" class="btn-success" style="width:auto; padding:.7rem 1.75rem;">✓ Đánh dấu hoàn thành</button>`}
+            ${next ? `<a href="lesson.html?courseId=${courseId}&lessonId=${next.id}" class="btn btn-sm">Bài tiếp theo →</a>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem;">
+        <h2>Bài giảng trong khóa học</h2>
+        <div class="lesson-list" style="margin-top:.75rem;">
+          ${lessons.map(l => {
+            const done = DB.getLessonCompleted(user.id, l.id);
+            const active = l.id === lessonId;
+            return `<a class="lesson-item ${done ? 'completed' : ''}" href="lesson.html?courseId=${courseId}&lessonId=${l.id}"
+              style="${active ? 'background:#e8f0fe; border-color:#0a66c2;' : ''}">
+              <div class="lesson-num ${done ? 'done' : ''}">${done ? '✓' : l.lessonOrder}</div>
+              <div class="lesson-info">
+                <div class="lesson-title" style="${active ? 'color:#0a66c2;' : ''}">${l.lessonTitle}</div>
+                <div class="lesson-meta">${l.durationMinutes} phút</div>
+              </div>
+              <div class="lesson-arrow">${active ? '▶' : '→'}</div>
+            </a>`;
+          }).join('')}
+        </div>
+      </div>`;
+  });
+
+  function markDone() {
+    const user = DB.getCurrentUser();
+    const lessonId = parseInt(getParam('lessonId'));
+    const courseId = parseInt(getParam('courseId'));
+    DB.markLessonComplete(user.id, lessonId);
+    showToast('Đã đánh dấu hoàn thành bài học! +20 XP');
+    setTimeout(() => location.reload(), 900);
+  }
+</script>
+</body>
+</html>
