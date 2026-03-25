@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | E-Learning IT'">E-Learning IT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Fallback: ensure CSS loads even without context path issues -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav th:fragment="navbar" id="top-nav">
+    <div class="logo"><a th:href="@{/}">E-Learning IT</a></div>
+    <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('open')">&#9776;</button>
+    <div class="links">
+        <a th:href="@{/courses}">Courses</a>
+        <a th:href="@{/rankings}">Rankings</a>
+
+        <th:block th:if="${currentUser != null}">
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <div class="account-menu">
+                <button class="icon-btn notification-btn" onclick="toggleNotif()" title="Notifications">
+                    &#128276;
+                    <span class="notif-badge" th:if="${unreadCount != null and unreadCount > 0}"
+                          th:text="${unreadCount}"></span>
+                </button>
+                <div id="notif-dropdown" class="dropdown-menu" style="display:none; min-width:300px;">
+                    <div style="padding:.75rem 1rem; font-weight:600; border-bottom:1px solid #eee;">Notifications</div>
+                    <div style="padding:.5rem 1rem; font-size:.88rem; color:#888;">
+                        <a th:href="@{/notifications}">View all notifications &rarr;</a>
+                    </div>
+                </div>
+            </div>
+            <div class="account-menu">
+                <button class="icon-btn account-btn" onclick="toggleAccount()" title="Account">
+                    &#128100;
+                    <span style="font-size:.88rem; font-weight:600;"
+                          th:text="${currentUser.fullName}"></span>
+                </button>
+                <div id="account-dropdown" class="dropdown-menu" style="display:none;">
+                    <div style="padding:.75rem 1rem; border-bottom:1px solid #eee;">
+                        <div style="font-weight:600;" th:text="${currentUser.fullName}"></div>
+                        <div style="font-size:.82rem; color:#888;" th:text="${currentUser.role}"></div>
+                    </div>
+                    <a th:href="@{/profile}" class="dropdown-item">&#128100; My Profile</a>
+                    <a th:href="@{/dashboard}" class="dropdown-item">&#128202; Dashboard</a>
+                    <a th:href="@{/notes}" class="dropdown-item">&#128211; My Notes</a>
+                    <a th:href="@{/change-password}" class="dropdown-item">&#128274; Change Password</a>
+                    <hr style="margin:.25rem 0; border:none; border-top:1px solid #eee;">
+                    <a th:href="@{/logout}" class="dropdown-item logout-item">&#128682; Logout</a>
+                </div>
+            </div>
+        </th:block>
+
+        <th:block th:if="${currentUser == null}">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/register}">Register</a>
+        </th:block>
+    </div>
+</nav>
+
+<footer th:fragment="footer">
+    <div style="max-width:1200px; margin:0 auto; padding:0 5%;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+                <div style="font-weight:700; color:#0a66c2; font-size:1rem; margin-bottom:.25rem;">E-Learning IT</div>
+                <div>Online Learning Platform - Faculty of Information Technology</div>
+            </div>
+            <div style="display:flex; gap:1.5rem; font-size:.88rem;">
+                <a th:href="@{/courses}" style="color:#888;">Courses</a>
+                <a th:href="@{/rankings}" style="color:#888;">Rankings</a>
+            </div>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e8eef6; text-align:center;">
+            &copy; 2026 E-Learning IT. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <!-- Hero -->
+    <section class="hero">
+        <img th:src="@{/images/e-learning.jpg}" alt="E-Learning" class="hero-img">
+        <div class="hero-text">
+            <h1>E-Learning Portal - Faculty of IT</h1>
+            <p>Online learning platform: courses, lessons, assignments and progress tracking.</p>
+            <div class="hero-actions">
+                <a th:href="@{/courses}" class="btn">Browse Courses</a>
+                <th:block th:if="${currentUser == null}">
+                    <a th:href="@{/register}" class="btn btn-outline">Get Started</a>
+                </th:block>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features (guest only) -->
+    <th:block th:if="${currentUser == null}">
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">&#128218;</div>
+                <h3>Diverse Courses</h3>
+                <p>IT subjects from beginner to advanced level.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128221;</div>
+                <h3>Assignments &amp; Quizzes</h3>
+                <p>Submit work, take quizzes and get feedback from instructors.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#127942;</div>
+                <h3>Gamification</h3>
+                <p>Earn XP, badges and compete on the leaderboard.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128211;</div>
+                <h3>Smart Notes</h3>
+                <p>Highlight and take notes directly inside lessons.</p>
+            </div>
+        </section>
+    </th:block>
+
+    <div class="page">
+        <th:block th:if="${currentUser != null}">
+            <div class="home-layout">
+                <div class="home-main">
+                    <div style="margin-bottom:1.5rem;">
+                        <h2 th:text="'Welcome back, ' + ${currentUser.fullName} + '!'">Welcome!</h2>
+                        <p style="color:#666; font-size:.92rem;">Continue your learning journey today.</p>
+                    </div>
+
+                    <!-- Continue learning -->
+                    <div th:if="${enrollments != null and !enrollments.isEmpty()}" style="margin-bottom:1.75rem;">
+                        <div class="page-header" style="margin-bottom:.75rem;">
+                            <h2>Continue Learning</h2>
+                            <a th:href="@{/student/dashboard}" class="btn btn-outline btn-sm">All courses &rarr;</a>
+                        </div>
+                        <div th:each="e, stat : ${enrollments}" th:if="${stat.index < 2 and e.progressPercentage < 100}">
+                            <div class="continue-card">
+                                <div class="continue-thumb">
+                                    <img th:src="${e.course.thumbnail}" th:alt="${e.course.courseName}"
+                                         onerror="this.src='/images/e-learning.jpg'">
+                                </div>
+                                <div class="continue-info">
+                                    <div class="badge-row">
+                                        <span class="badge" th:text="${e.course.courseCode}"></span>
+                                    </div>
+                                    <div class="continue-title" th:text="${e.course.courseName}"></div>
+                                    <div style="margin:.5rem 0;">
+                                        <div style="display:flex; justify-content:space-between; font-size:.8rem; color:#666; margin-bottom:.25rem;">
+                                            <span>Progress</span>
+                                            <span th:text="${e.progressPercentage} + '%'"></span>
+                                        </div>
+                                        <div class="progress-bar-wrap">
+                                            <div class="progress-bar" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="continue-action">
+                                    <a th:href="@{/courses/{id}(id=${e.course.id})}" class="btn btn-sm">Continue</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured courses -->
+                    <div class="page-header" style="margin-bottom:.75rem;">
+                        <h2>Featured Courses</h2>
+                        <a th:href="@{/courses}" class="btn btn-outline btn-sm">View all &rarr;</a>
+                    </div>
+                    <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
+                        <a class="card" th:each="c : ${featuredCourses}" th:href="@{/courses/{id}(id=${c.id})}">
+                            <div class="card-thumb">
+                                <img th:src="${c.thumbnail}" th:alt="${c.courseName}" onerror="this.src='/images/e-learning.jpg'">
+                            </div>
+                            <div class="content">
+                                <div class="badge-row">
+                                    <span class="badge" th:text="${c.courseCode}"></span>
+                                </div>
+                                <h4 th:text="${c.courseName}"></h4>
+                                <div style="font-size:.8rem; color:#888;" th:text="${c.teacher?.fullName}"></div>
+                                <span class="btn-link">View details &rarr;</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="home-sidebar">
+                    <div class="sidebar-card" th:if="${myRank != null}">
+                        <div style="font-weight:700; margin-bottom:.75rem;" th:text="${currentUser?.fullName}"></div>
+                        <div class="mini-stats">
+                            <div class="mini-stat">
+                                <div class="mini-num" th:text="${myRank?.totalXp}">0</div>
+                                <div class="mini-label">XP</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-num" th:text="'Lv.' + ${myRank?.level}">Lv.1</div>
+                                <div class="mini-label">Level</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-num" th:text="'#' + ${myRank?.rank}">#-</div>
+                                <div class="mini-label">Rank</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-num" th:text="${enrollments?.size()}">0</div>
+                                <div class="mini-label">Courses</div>
+                            </div>
+                        </div>
+                        <a th:href="@{/dashboard}" class="btn btn-outline btn-sm btn-full" style="margin-top:.85rem;">Go to Dashboard &rarr;</a>
+                    </div>
+
+                    <!-- Rankings -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-title">&#127942; XP Leaderboard</div>
+                        <div style="display:flex; flex-direction:column; gap:.4rem;">
+                            <div class="rank-item" th:each="r, stat : ${rankings}"
+                                 th:classappend="${currentUser != null and r.userId == currentUser.id} ? 'rank-me' : ''">
+                                <span th:if="${stat.index == 0}">&#129351;</span>
+                                <span th:if="${stat.index == 1}">&#129352;</span>
+                                <span th:if="${stat.index == 2}">&#129353;</span>
+                                <span th:if="${stat.index >= 3}" style="color:#aaa; font-size:.85rem; width:1.2rem; text-align:center;"
+                                      th:text="${r.rank}"></span>
+                                <div style="flex:1; font-size:.88rem;" th:text="${r.fullName}"></div>
+                                <div style="font-size:.82rem; font-weight:600; color:#f59e0b;"
+                                     th:text="${r.totalXp} + ' XP'"></div>
+                            </div>
+                        </div>
+                        <a th:href="@{/rankings}" class="btn btn-outline btn-sm btn-full" style="margin-top:.75rem;">Full Rankings &rarr;</a>
+                    </div>
+
+                    <!-- Recent notes -->
+                    <div class="sidebar-card" th:if="${recentNotes != null and !recentNotes.isEmpty()}">
+                        <div class="sidebar-card-title">&#128211; Recent Notes</div>
+                        <div style="display:flex; flex-direction:column; gap:.5rem;">
+                            <div class="note-item" th:each="n : ${recentNotes}"
+                                 th:style="'border-left:3px solid ' + ${n.highlightColor} + ';'">
+                                <div style="font-size:.83rem; color:#333; line-height:1.5;"
+                                     th:text="${#strings.abbreviate(n.content, 80)}"></div>
+                            </div>
+                        </div>
+                        <a th:href="@{/notes}" class="btn btn-outline btn-sm btn-full" style="margin-top:.75rem;">All Notes &rarr;</a>
+                    </div>
+                </aside>
+            </div>
+        </th:block>
+
+        <!-- Guest: featured courses -->
+        <th:block th:if="${currentUser == null}">
+            <div class="page-header" style="margin-top:.5rem;">
+                <h2>Featured Courses</h2>
+                <a th:href="@{/courses}" class="btn btn-outline btn-sm">View all &rarr;</a>
+            </div>
+            <div class="card-grid">
+                <a class="card" th:each="c : ${featuredCourses}" th:href="@{/courses/{id}(id=${c.id})}">
+                    <div class="card-thumb">
+                        <img th:src="${c.thumbnail}" th:alt="${c.courseName}" onerror="this.src='/images/e-learning.jpg'">
+                    </div>
+                    <div class="content">
+                        <div class="badge-row">
+                            <span class="badge" th:text="${c.courseCode}"></span>
+                        </div>
+                        <h4 th:text="${c.courseName}"></h4>
+                        <p th:text="${#strings.abbreviate(c.description, 100)}"></p>
+                        <div style="font-size:.8rem; color:#888;" th:text="${c.teacher?.fullName}"></div>
+                        <span class="btn-link">View details &rarr;</span>
+                    </div>
+                </a>
+            </div>
+        </th:block>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Students - ' + ${course.courseName})}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <div class="page">
+        <a class="back-link" th:href="@{/teacher/dashboard}">&larr; Back to Dashboard</a>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="page-header">
+            <div>
+                <h2 th:text="'Students - ' + ${course.courseName}">Students</h2>
+                <p style="color:#666; font-size:.92rem; margin-top:.25rem;"
+                   th:text="${course.courseCode} + ' &middot; ' + ${enrollments.size()} + ' enrolled'"></p>
+            </div>
+            <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-outline btn-sm">View Course</a>
+        </div>
+
+        <div class="table-wrap" style="margin-top:1rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Enrolled At</th>
+                        <th>Progress</th>
+                        <th>XP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${enrollments.isEmpty()}">
+                        <td colspan="6" style="text-align:center; color:#aaa; padding:2rem;">No students enrolled yet.</td>
+                    </tr>
+                    <tr th:each="e, stat : ${enrollments}">
+                        <td th:text="${stat.count}"></td>
+                        <td>
+                            <div style="font-weight:600;" th:text="${e.student.fullName}"></div>
+                        </td>
+                        <td style="color:#666; font-size:.88rem;" th:text="${e.student.email}"></td>
+                        <td style="font-size:.88rem; color:#888;"
+                            th:text="${#temporals.format(e.enrolledAt, 'MM/dd/yyyy')}"></td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:.5rem; min-width:120px;">
+                                <div class="progress-bar-wrap" style="flex:1;">
+                                    <div class="progress-bar" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
+                                </div>
+                                <span style="font-size:.82rem; color:#666; white-space:nowrap;"
+                                      th:text="${e.progressPercentage} + '%'"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-green" th:text="${e.totalXp} + ' XP'"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

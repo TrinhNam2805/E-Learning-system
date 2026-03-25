@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Students')}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <div class="page">
+        <a class="back-link" th:href="@{/teacher/dashboard}">← Dashboard</a>
+        <div class="page-header">
+            <h2 th:text="'Students – ' + ${course.courseCode} + ': ' + ${course.courseName}">Students</h2>
+        </div>
+
+        <div th:if="${enrollments.isEmpty()}" class="empty-state"><p>No students enrolled yet.</p></div>
+
+        <div class="table-wrap" th:unless="${enrollments.isEmpty()}">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Full Name</th><th>Email</th><th>Progress</th><th>XP</th><th>Enrolled</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="e, stat : ${enrollments}">
+                        <td style="color:#888;" th:text="${stat.index + 1}"></td>
+                        <td><strong th:text="${e.student.fullName}"></strong></td>
+                        <td style="color:#666;" th:text="${e.student.email}"></td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:.5rem;">
+                                <div style="flex:1; background:#e0e7ef; border-radius:99px; height:8px; min-width:80px;">
+                                    <div style="background:#2563eb; border-radius:99px; height:8px;"
+                                         th:style="'width:' + ${e.progressPercentage} + '%'"></div>
+                                </div>
+                                <span style="font-size:.82rem; color:#666;" th:text="${e.progressPercentage} + '%'"></span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-green" th:text="${e.totalXp} + ' XP'"></span></td>
+                        <td style="color:#888;" th:text="${#temporals.format(e.enrolledAt, 'MM/dd/yyyy')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

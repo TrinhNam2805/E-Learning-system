@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Courses')}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <div class="page">
+        <div class="page-header">
+            <h2>All Courses</h2>
+            <form class="search-form" th:action="@{/courses}" method="get">
+                <input type="text" name="q" th:value="${q}" placeholder="Search by name, code...">
+                <button type="submit" class="btn">Search</button>
+            </form>
+        </div>
+
+        <div th:if="${q != null and !q.trim().isEmpty()}" style="font-size:.88rem; color:#666; margin-bottom:.75rem;">
+            Results for "<strong th:text="${q}"></strong>":
+            <span th:text="${courses.size()}"></span> course(s).
+            <a th:href="@{/courses}">Clear filter</a>
+        </div>
+
+        <div th:if="${courses.isEmpty()}" class="empty-state">
+            <p>No courses found.</p>
+        </div>
+
+        <div class="card-grid" th:unless="${courses.isEmpty()}">
+            <a class="card" th:each="c : ${courses}" th:href="@{/courses/{id}(id=${c.id})}">
+                <div class="card-thumb">
+                    <img th:src="${c.thumbnail}" th:alt="${c.courseName}" onerror="this.src='/images/e-learning.jpg'">
+                </div>
+                <div class="content">
+                    <div class="badge-row">
+                        <span class="badge" th:text="${c.courseCode}"></span>
+                        <span class="badge badge-dark" th:text="${c.semester}"></span>
+                        <span class="badge badge-gray" th:if="${c.enrollPassword != null and !c.enrollPassword.trim().isEmpty()}">&#128274; Password required</span>
+                    </div>
+                    <h4 th:text="${c.courseName}"></h4>
+                    <p th:text="${#strings.abbreviate(c.description, 120)}"></p>
+                    <div style="font-size:.82rem; color:#888; margin-top:.25rem;"
+                         th:text="${c.teacher?.fullName} + ' &middot; Max ' + ${c.maxStudents} + ' students'"></div>
+                    <span class="btn-link">View details &rarr;</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

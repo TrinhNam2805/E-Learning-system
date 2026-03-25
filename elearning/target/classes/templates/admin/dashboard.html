@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <div class="page">
+        <div style="margin-bottom:1.5rem;">
+            <h2>Admin Dashboard ⚙️</h2>
+            <p style="color:#666; font-size:.93rem;">Manage the entire E-Learning system.</p>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-num" th:text="${totalUsers}">0</div><div class="stat-label">Total Users</div></div>
+            <div class="stat-card"><div class="stat-num" th:text="${totalStudents}">0</div><div class="stat-label">Students</div></div>
+            <div class="stat-card"><div class="stat-num" th:text="${totalTeachers}">0</div><div class="stat-label">Teachers</div></div>
+            <div class="stat-card"><div class="stat-num" th:text="${totalCourses}">0</div><div class="stat-label">Total Courses</div></div>
+            <div class="stat-card"><div class="stat-num" th:text="${totalPublished}">0</div><div class="stat-label">Published</div></div>
+            <div class="stat-card"><div class="stat-num" th:text="${totalEnrollments}">0</div><div class="stat-label">Enrollments</div></div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex; gap:.75rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+            <button onclick="showTab('users')" class="btn" id="tab-users">👥 Users</button>
+            <button onclick="showTab('courses')" class="btn btn-outline" id="tab-courses">📚 Courses</button>
+            <a th:href="@{/admin/courses/create}" class="btn btn-success">+ Create Course</a>
+        </div>
+
+        <!-- Users tab -->
+        <div id="tab-users-content">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Full Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}">
+                            <td style="color:#888;" th:text="'#' + ${u.id}"></td>
+                            <td><strong th:text="${u.fullName}"></strong></td>
+                            <td style="color:#666;" th:text="${u.email}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${u.role.name() == 'ADMIN'} ? 'badge-dark' : (${u.role.name() == 'TEACHER'} ? 'badge-green' : '')"
+                                      th:text="${u.role}"></span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${u.locked} ? 'badge-red' : 'badge-green'"
+                                      th:text="${u.locked} ? 'Locked' : 'Active'"></span>
+                            </td>
+                            <td style="color:#888;" th:text="${#temporals.format(u.createdAt, 'MM/dd/yyyy')}"></td>
+                            <td>
+                                <form th:action="@{/admin/users/{id}/toggle-lock(id=${u.id})}" method="post" style="display:inline;">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="submit" class="btn btn-sm"
+                                            th:classappend="${u.locked} ? 'btn-success' : 'btn-danger'"
+                                            th:text="${u.locked} ? 'Unlock' : 'Lock'"
+                                            style="width:auto;"></button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Courses tab -->
+        <div id="tab-courses-content" style="display:none;">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Code</th><th>Course Name</th><th>Teacher</th><th>Semester</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${courses}">
+                            <td><span class="badge" th:text="${c.courseCode}"></span></td>
+                            <td><strong th:text="${c.courseName}"></strong></td>
+                            <td th:text="${c.teacher?.fullName}"></td>
+                            <td th:text="${c.semester}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${c.status.name() == 'PUBLISHED'} ? 'badge-green' : 'badge-gray'"
+                                      th:text="${c.status}"></span>
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:.4rem; flex-wrap:wrap;">
+                                    <a th:href="@{/courses/{id}(id=${c.id})}" class="btn btn-outline btn-sm">View</a>
+                                    <a th:href="@{/admin/courses/{id}/lessons(id=${c.id})}" class="btn btn-outline btn-sm">Lessons</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+function showTab(tab) {
+    document.getElementById('tab-users-content').style.display = tab === 'users' ? 'block' : 'none';
+    document.getElementById('tab-courses-content').style.display = tab === 'courses' ? 'block' : 'none';
+    document.getElementById('tab-users').className = tab === 'users' ? 'btn' : 'btn btn-outline';
+    document.getElementById('tab-courses').className = tab === 'courses' ? 'btn' : 'btn btn-outline';
+}
+</script>
+</body>
+</html>
