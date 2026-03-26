@@ -30,8 +30,7 @@ public class DashboardController {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
         if (user.getRole() == User.Role.STUDENT) return "redirect:/student/dashboard";
-        if (user.getRole() == User.Role.TEACHER) return "redirect:/teacher/dashboard";
-        return "redirect:/admin/dashboard";
+        return "redirect:/access-denied";
     }
 
     @GetMapping("/student/dashboard")
@@ -67,19 +66,6 @@ public class DashboardController {
         if (userDetails == null) return "redirect:/login";
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
-        if (user.getRole() != User.Role.TEACHER) return "redirect:/dashboard";
-
-        List<Course> myCourses = courseService.findByTeacher(user);
-        long totalStudents = myCourses.stream()
-                .mapToLong(c -> enrollmentService.countEnrollmentsByCourse(c.getId())).sum();
-        long totalLessons = myCourses.stream()
-                .mapToLong(c -> lessonService.countByCourseId(c.getId())).sum();
-
-        model.addAttribute("currentUser", user);
-        model.addAttribute("myCourses", myCourses);
-        model.addAttribute("totalStudents", totalStudents);
-        model.addAttribute("totalLessons", totalLessons);
-        model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
-        return "dashboard/teacher";
+        return "redirect:/access-denied";
     }
 }

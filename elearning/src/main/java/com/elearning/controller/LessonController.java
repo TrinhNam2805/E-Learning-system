@@ -81,6 +81,8 @@ public class LessonController {
 
         Lesson lesson = lessonService.findById(lessonId).orElse(null);
         if (lesson == null) return "redirect:/courses/" + courseId;
+        if (user.getRole() != User.Role.STUDENT) return "redirect:/access-denied";
+        if (!enrollmentService.isEnrolled(user.getId(), courseId)) return "redirect:/courses/" + courseId;
 
         enrollmentService.markLessonComplete(user, lesson);
         notificationService.send(user, "Lesson Completed",

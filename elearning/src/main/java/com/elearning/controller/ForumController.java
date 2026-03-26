@@ -87,6 +87,11 @@ public class ForumController {
             ra.addFlashAttribute("error", "Only teachers can post announcements.");
             return "redirect:/forum?courseId=" + courseId;
         }
+        if (user.getRole() != User.Role.STUDENT) return "redirect:/access-denied";
+        if (!enrollmentService.isEnrolled(user.getId(), courseId)) {
+            ra.addFlashAttribute("error", "You must enroll in this course to post.");
+            return "redirect:/forum?courseId=" + courseId;
+        }
 
         Course course = courseService.findById(courseId).orElse(null);
         if (course == null) return "redirect:/courses";
@@ -110,6 +115,11 @@ public class ForumController {
 
         ForumPost post = forumService.findById(postId).orElse(null);
         if (post == null) return "redirect:/courses";
+        if (user.getRole() != User.Role.STUDENT) return "redirect:/access-denied";
+        if (!enrollmentService.isEnrolled(user.getId(), post.getCourse().getId())) {
+            ra.addFlashAttribute("error", "You must enroll in this course to comment.");
+            return "redirect:/forum?courseId=" + post.getCourse().getId();
+        }
 
         Comment comment = Comment.builder().post(post).author(user).content(content).build();
         forumService.addComment(comment);

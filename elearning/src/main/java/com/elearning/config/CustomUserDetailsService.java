@@ -22,6 +22,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.isLocked()) {
             throw new UsernameNotFoundException("Account is locked.");
         }
+        if (user.getRole() != User.Role.STUDENT) {
+            throw new UsernameNotFoundException("Only student accounts are enabled in this client scope.");
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

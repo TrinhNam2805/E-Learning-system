@@ -76,7 +76,7 @@
                         <tr th:each="c : ${courses}">
                             <td><span class="badge" th:text="${c.courseCode}"></span></td>
                             <td><strong th:text="${c.courseName}"></strong></td>
-                            <td th:text="${c.teacher?.fullName}"></td>
+                            <td th:text="${c.teacher != null ? c.teacher.fullName : ''}"></td>
                             <td th:text="${c.semester}"></td>
                             <td>
                                 <span class="badge"

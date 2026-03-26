@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body>
 <nav th:fragment="navbar" id="top-nav">
@@ -51,7 +51,6 @@
         </th:block>
         <th:block th:if="${currentUser == null}">
             <a th:href="@{/login}">Login</a>
-            <a th:href="@{/register}">Register</a>
         </th:block>
     </div>
 </nav>
@@ -73,7 +72,7 @@
     </div>
 </footer>
 <th:block th:fragment="scripts">
-    <script th:src="@{/js/app.js}"></script>
+    <script src="/js/app.js" th:src="@{/js/app.js}"></script>
 </th:block>
 </body>
 </html>

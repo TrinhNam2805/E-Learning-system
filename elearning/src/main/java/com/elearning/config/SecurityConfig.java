@@ -43,8 +43,8 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/favicon.ico", "/error"
                 ).permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
+                // Current scope only supports guest + student flows.
+                .antMatchers("/admin/**", "/teacher/**").denyAll()
                 .anyRequest().authenticated()
             .and()
             .formLogin()

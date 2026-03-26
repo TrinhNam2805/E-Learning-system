@@ -7,7 +7,7 @@
     <div class="page">
         <a class="back-link" th:href="@{/admin/dashboard}">← Admin Dashboard</a>
         <div class="page-header">
-            <h2 th:text="'Lessons – ' + ${course.courseCode} + ': ' + ${course.courseName}">Lessons</h2>
+            <h2 th:text="${'Lessons – ' + course.courseCode + ': ' + course.courseName}">Lessons</h2>
         </div>
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>

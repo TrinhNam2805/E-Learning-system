@@ -5,10 +5,13 @@
 <header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
 <main>
     <div class="page" style="text-align:center; padding:4rem 1rem;">
-        <div style="font-size:4rem; margin-bottom:1rem;">🚫</div>
-        <h2 style="color:#0a3d7a; margin-bottom:.5rem;">403 – Access Denied</h2>
-        <p style="color:#666; margin-bottom:1.5rem;">You don't have permission to access this page.</p>
-        <a th:href="@{/}" class="btn" style="width:auto; padding:.75rem 2rem;">Go Home</a>
+        <div style="font-size:4rem; margin-bottom:1rem;">&#128683;</div>
+        <h2 style="color:#0a3d7a; margin-bottom:.5rem;">Access Denied</h2>
+        <p style="color:#666; margin-bottom:1.5rem;">You don't have permission to view this page.</p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+            <a th:href="@{/}" class="btn">Go Home</a>
+            <a th:href="@{/dashboard}" class="btn btn-outline">Dashboard</a>
+        </div>
     </div>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>

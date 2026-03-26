@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Home')}"></head>
 <body>
@@ -6,7 +6,7 @@
 <main>
     <!-- Hero -->
     <section class="hero">
-        <img th:src="@{/images/e-learning.jpg}" alt="E-Learning" class="hero-img">
+        <img src="/images/e-learning.jpg" th:src="@{/images/e-learning.jpg}" alt="E-Learning" class="hero-img">
         <div class="hero-text">
             <h1>E-Learning Portal - Faculty of IT</h1>
             <p>Online learning platform: courses, lessons, assignments and progress tracking.</p>
@@ -103,7 +103,7 @@
                                     <span class="badge" th:text="${c.courseCode}"></span>
                                 </div>
                                 <h4 th:text="${c.courseName}"></h4>
-                                <div style="font-size:.8rem; color:#888;" th:text="${c.teacher?.fullName}"></div>
+                                <div style="font-size:.8rem; color:#888;" th:text="${c.teacher != null ? c.teacher.fullName : ''}"></div>
                                 <span class="btn-link">View details &rarr;</span>
                             </div>
                         </a>
@@ -113,22 +113,22 @@
                 <!-- Sidebar -->
                 <aside class="home-sidebar">
                     <div class="sidebar-card" th:if="${myRank != null}">
-                        <div style="font-weight:700; margin-bottom:.75rem;" th:text="${currentUser?.fullName}"></div>
+                        <div style="font-weight:700; margin-bottom:.75rem;" th:text="${currentUser != null ? currentUser.fullName : ''}"></div>
                         <div class="mini-stats">
                             <div class="mini-stat">
-                                <div class="mini-num" th:text="${myRank?.totalXp}">0</div>
+                                <div class="mini-num" th:text="${myRank != null ? myRank.totalXp : 0}">0</div>
                                 <div class="mini-label">XP</div>
                             </div>
                             <div class="mini-stat">
-                                <div class="mini-num" th:text="'Lv.' + ${myRank?.level}">Lv.1</div>
+                                <div class="mini-num" th:text="${'Lv.' + (myRank != null ? myRank.level : 1)}">Lv.1</div>
                                 <div class="mini-label">Level</div>
                             </div>
                             <div class="mini-stat">
-                                <div class="mini-num" th:text="'#' + ${myRank?.rank}">#-</div>
+                                <div class="mini-num" th:text="${'#' + (myRank != null ? myRank.rank : '-')}">#-</div>
                                 <div class="mini-label">Rank</div>
                             </div>
                             <div class="mini-stat">
-                                <div class="mini-num" th:text="${enrollments?.size()}">0</div>
+                                <div class="mini-num" th:text="${enrollments != null ? enrollments.size() : 0}">0</div>
                                 <div class="mini-label">Courses</div>
                             </div>
                         </div>
@@ -187,7 +187,7 @@
                         </div>
                         <h4 th:text="${c.courseName}"></h4>
                         <p th:text="${#strings.abbreviate(c.description, 100)}"></p>
-                        <div style="font-size:.8rem; color:#888;" th:text="${c.teacher?.fullName}"></div>
+                        <div style="font-size:.8rem; color:#888;" th:text="${c.teacher != null ? c.teacher.fullName : ''}"></div>
                         <span class="btn-link">View details &rarr;</span>
                     </div>
                 </a>

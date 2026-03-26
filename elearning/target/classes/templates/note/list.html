@@ -86,7 +86,7 @@
                                         <a th:href="@{/courses/{id}(id=${n.course.id})}" th:text="${n.course.courseCode}"></a>
                                     </span>
                                     <span th:if="${n.lesson != null}">
-                                        <a th:href="@{/lessons/{id}(id=${n.lesson.id}, courseId=${n.course?.id})}"
+                                        <a th:href="@{/lessons/{id}(id=${n.lesson.id}, courseId=${n.course != null ? n.course.id : null})}"
                                            th:text="${#strings.abbreviate(n.lesson.lessonTitle, 40)}"></a>
                                     </span>
                                     <span th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></span>

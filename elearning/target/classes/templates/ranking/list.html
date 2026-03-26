@@ -19,7 +19,7 @@
             </div>
             <div style="flex:1;">
                 <div style="font-size:1.1rem; font-weight:700;" th:text="${myRank.fullName} + ' (you)'"></div>
-                <div style="font-size:.9rem; opacity:.85;" th:text="'Level ' + ${myRank.level} + ' &middot; ' + ${myRank.totalXp} + ' XP'"></div>
+                <div style="font-size:.9rem; opacity:.85;" th:text="${'Level ' + myRank.level + ' · ' + myRank.totalXp + ' XP'}"></div>
                 <div style="margin-top:.5rem;">
                     <div style="font-size:.78rem; opacity:.7; margin-bottom:.25rem;"
                          th:text="${myRank.xpInLevel} + '/100 XP to Level ' + (${myRank.level} + 1)"></div>

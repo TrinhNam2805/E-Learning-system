@@ -16,7 +16,7 @@
             </div>
             <h2 style="color:#0a3d7a; margin:.5rem 0;" th:text="${assignment.title}"></h2>
             <div style="font-size:.88rem; color:#888; margin-bottom:.75rem;"
-                 th:text="'Due: ' + ${#temporals.format(assignment.dueDate, 'MM/dd/yyyy HH:mm')} + ' · Max Score: ' + ${assignment.maxScore}"></div>
+                 th:text="${'Due: ' + #temporals.format(assignment.dueDate, 'MM/dd/yyyy HH:mm') + ' · Max Score: ' + assignment.maxScore}"></div>
             <div th:if="${assignment.description != null}"
                  style="font-size:.93rem; color:#333; line-height:1.7; white-space:pre-wrap;" th:text="${assignment.description}"></div>
         </div>
@@ -25,7 +25,7 @@
         <div th:if="${mySubmission != null}" style="background:#f0fff4; border:1px solid #b7ebc8; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
             <div style="font-weight:700; color:#1a7f37; margin-bottom:.5rem;">✓ Submitted</div>
             <div style="font-size:.9rem; color:#333;" th:if="${mySubmission.score != null}"
-                 th:text="'Score: ' + ${mySubmission.score} + '/' + ${assignment.maxScore}"></div>
+                 th:text="${'Score: ' + mySubmission.score + '/' + assignment.maxScore}"></div>
             <div style="font-size:.9rem; color:#666;" th:if="${mySubmission.score == null}">Awaiting grading...</div>
             <div th:if="${mySubmission.feedback != null}"
                  style="margin-top:.5rem; font-size:.9rem; color:#333;">
@@ -43,7 +43,7 @@
                 <div th:each="q, stat : ${questions}"
                      style="background:#fff; border:1px solid #e0e7ef; border-radius:10px; padding:1.25rem; margin-bottom:1rem;">
                     <div style="font-weight:600; color:#0a3d7a; margin-bottom:.75rem;"
-                         th:text="${stat.index + 1} + '. ' + ${q.questionText}"></div>
+                         th:text="${(stat.index + 1) + '. ' + q.questionText}"></div>
                     <div style="display:flex; flex-direction:column; gap:.5rem;">
                         <label th:each="opt : ${ {'A','B','C','D'} }" style="display:flex; align-items:center; gap:.5rem; cursor:pointer; margin-top:0;">
                             <input type="radio" th:name="'q_' + ${q.id}" th:value="${opt}" required>

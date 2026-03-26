@@ -14,7 +14,7 @@
             <div>
                 <h2 th:text="'Students - ' + ${course.courseName}">Students</h2>
                 <p style="color:#666; font-size:.92rem; margin-top:.25rem;"
-                   th:text="${course.courseCode} + ' &middot; ' + ${enrollments.size()} + ' enrolled'"></p>
+                   th:text="${course.courseCode + ' · ' + enrollments.size() + ' enrolled'}"></p>
             </div>
             <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-outline btn-sm">View Course</a>
         </div>

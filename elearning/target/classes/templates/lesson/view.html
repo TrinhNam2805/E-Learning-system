@@ -16,7 +16,7 @@
                         <div class="badge-row">
                             <span class="badge" th:text="${course.courseCode}"></span>
                             <span class="badge badge-dark" th:text="${course.courseName}"></span>
-                            <span class="badge" th:text="'Lesson ' + ${lesson.lessonOrder} + '/' + ${allLessons.size()}"></span>
+                            <span class="badge" th:text="${'Lesson ' + lesson.lessonOrder + '/' + allLessons.size()}"></span>
                         </div>
                         <h2 th:text="${lesson.lessonTitle}"></h2>
                         <div style="font-size:.85rem; color:#888; margin-top:.35rem;"
@@ -106,7 +106,9 @@
                         <a class="lesson-item" th:each="l : ${allLessons}"
                            th:href="@{/lessons/{id}(id=${l.id}, courseId=${course.id})}"
                            th:style="${l.id == lesson.id} ? 'background:#e8f0fe; border-color:#0a66c2;' : ''">
-                            <div class="lesson-num" th:text="${l.lessonOrder}">1</div>
+                            <div class="lesson-num"
+                                 th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e; color:#fff;' : ''"
+                                 th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? '✓' : ${l.lessonOrder}">1</div>
                             <div class="lesson-info">
                                 <div class="lesson-title"
                                      th:style="${l.id == lesson.id} ? 'color:#0a66c2;' : ''"

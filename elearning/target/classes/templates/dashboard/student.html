@@ -65,7 +65,7 @@
                     </div>
                     <h4 th:text="${e.course.courseName}"></h4>
                     <div style="font-size:.82rem; color:#888; margin:.25rem 0;"
-                         th:text="${e.course.teacher?.fullName}"></div>
+                         th:text="${e.course.teacher != null ? e.course.teacher.fullName : ''}"></div>
                     <div style="margin:.5rem 0;">
                         <div style="display:flex; justify-content:space-between; font-size:.82rem; color:#666; margin-bottom:.3rem;">
                             <span>Progress</span>

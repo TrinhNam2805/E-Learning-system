@@ -61,6 +61,9 @@ public class AssignmentController {
 
         Assignment assignment = assignmentService.findById(id).orElse(null);
         if (assignment == null) return "redirect:/courses";
+        if (user.getRole() != User.Role.STUDENT) return "redirect:/access-denied";
+        boolean enrolled = enrollmentService.isEnrolled(user.getId(), assignment.getCourse().getId());
+        if (!enrolled) return "redirect:/courses/" + assignment.getCourse().getId();
 
         String submitContent = content;
 

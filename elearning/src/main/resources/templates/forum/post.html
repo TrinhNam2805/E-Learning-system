@@ -17,7 +17,7 @@
             <h2 style="color:#0a3d7a; font-size:1.2rem; margin-bottom:.75rem;" th:text="${post.title}"></h2>
             <div style="font-size:.93rem; color:#333; line-height:1.8; white-space:pre-wrap;" th:text="${post.content}"></div>
             <div style="margin-top:1rem; padding-top:.75rem; border-top:1px solid #f0f4fa; font-size:.85rem; color:#888;"
-                 th:text="${post.author?.fullName} + ' &middot; ' + ${#temporals.format(post.createdAt, 'MM/dd/yyyy HH:mm')} + ' &middot; ' + ${post.viewCount} + ' views'"></div>
+                 th:text="${(post.author != null ? post.author.fullName : '') + ' · ' + #temporals.format(post.createdAt, 'MM/dd/yyyy HH:mm') + ' · ' + post.viewCount + ' views'}"></div>
         </div>
 
         <!-- Comments -->

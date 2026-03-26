@@ -48,3 +48,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function showToast(msg, type) {
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + (type || 'success');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.classList.add('show'); }, 10);
+    setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 400); }, 3500);
+}
+
+function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+}

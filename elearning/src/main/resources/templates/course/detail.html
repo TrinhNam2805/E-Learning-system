@@ -23,7 +23,7 @@
                 <h3 th:text="${course.courseName}"></h3>
                 <p style="color:#555; margin:.5rem 0;" th:text="${course.description}"></p>
                 <div style="font-size:.88rem; color:#888;"
-                     th:text="${course.teacher?.fullName} + ' &middot; Max ' + ${course.maxStudents} + ' students'"></div>
+                     th:text="${(course.teacher != null ? course.teacher.fullName : '') + ' · Max ' + course.maxStudents + ' students'}"></div>
 
                 <!-- Enroll section -->
                 <div class="enroll-box">
@@ -58,7 +58,7 @@
         <h2>Lessons (<span th:text="${lessons.size()}"></span>)</h2>
         <div class="lesson-list" th:if="${!lessons.isEmpty()}">
             <a class="lesson-item" th:each="l : ${lessons}"
-               th:href="${enrolled or (currentUser != null and (currentUser.role.name() == 'TEACHER' or currentUser.role.name() == 'ADMIN'))} ? @{/lessons/{id}(id=${l.id}, courseId=${course.id})} : '#'">
+               th:href="${enrolled} ? @{/lessons/{id}(id=${l.id}, courseId=${course.id})} : '#'">
                 <div class="lesson-num"
                      th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e; color:#fff;' : ''"
                      th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? '✓' : ${l.lessonOrder}">1</div>
@@ -67,7 +67,7 @@
                     <div class="lesson-meta" th:text="${l.durationMinutes} + ' min'"></div>
                 </div>
                 <div class="lesson-arrow"
-                     th:text="${enrolled or (currentUser != null and (currentUser.role.name() == 'TEACHER' or currentUser.role.name() == 'ADMIN'))} ? '&rarr;' : '&#128274;'"></div>
+                     th:text="${enrolled} ? '&rarr;' : '&#128274;'"></div>
             </a>
         </div>
         <div class="empty-state" th:if="${lessons.isEmpty()}">
@@ -110,7 +110,7 @@
                     <span style="font-weight:600;" th:text="${p.title}"></span>
                 </div>
                 <div style="font-size:.82rem; color:#888;"
-                     th:text="${p.author?.fullName} + ' &middot; ' + ${#temporals.format(p.createdAt, 'MM/dd/yyyy')} + ' &middot; ' + ${p.viewCount} + ' views'"></div>
+                     th:text="${(p.author != null ? p.author.fullName : '') + ' · ' + #temporals.format(p.createdAt, 'MM/dd/yyyy') + ' · ' + p.viewCount + ' views'}"></div>
             </div>
         </div>
     </div>

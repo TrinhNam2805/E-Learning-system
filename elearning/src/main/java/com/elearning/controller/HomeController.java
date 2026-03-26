@@ -31,6 +31,9 @@ public class HomeController {
         if (userDetails != null) {
             User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
             if (user != null) {
+                if (user.getRole() != User.Role.STUDENT) {
+                    return "redirect:/access-denied";
+                }
                 model.addAttribute("currentUser", user);
                 List<Enrollment> enrollments = enrollmentService.findByStudentId(user.getId());
                 model.addAttribute("enrollments", enrollments);
