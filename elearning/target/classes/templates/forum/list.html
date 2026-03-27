@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Forum')}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <div class="page">
+        <a class="back-link" th:href="@{/courses/{id}(id=${course.id})}">&larr; Back to Course</a>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="page-header">
+            <h2 th:text="'Forum - ' + ${course.courseName}">Forum</h2>
+        </div>
+
+        <!-- Create post form -->
+        <div th:if="${canPost}" style="background:#fff; border:1px solid #e0e7ef; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
+            <h3 style="font-size:1rem; color:#0a3d7a; margin-bottom:.75rem;">Create New Post</h3>
+            <form th:action="@{/forum/create}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="courseId" th:value="${course.id}">
+                <label style="margin-top:0;">Title</label>
+                <input type="text" name="title" placeholder="Post title..." required>
+                <label>Post Type</label>
+                <select name="postType">
+                    <option value="QUESTION">Question</option>
+                    <option value="DISCUSSION">Discussion</option>
+                    <option value="ANNOUNCEMENT" th:if="${currentUser.role.name() != 'STUDENT'}">Announcement</option>
+                </select>
+                <label>Content</label>
+                <textarea name="content" placeholder="Post content..." required></textarea>
+                <button type="submit" class="btn" style="width:auto; margin-top:.75rem; padding:.65rem 1.5rem;">Post</button>
+            </form>
+        </div>
+        <div th:unless="${canPost}" class="alert alert-info" style="margin-bottom:1rem;">
+            Enroll in this course to participate in the forum.
+        </div>
+
+        <!-- Posts list -->
+        <div th:if="${posts.isEmpty()}" class="empty-state">
+            <p>No posts yet. Be the first to post!</p>
+        </div>
+        <div th:each="p : ${posts}" class="post-item"
+             th:onclick="'window.location.href=\'' + @{/forum/post/{id}(id=${p.id})} + '\''">
+            <div style="display:flex; align-items:flex-start; gap:.6rem; flex-wrap:wrap;">
+                <span class="badge" th:text="${p.postType}"></span>
+                <span style="font-weight:600; flex:1;" th:text="${p.title}"></span>
+            </div>
+            <div style="font-size:.82rem; color:#888; margin-top:.4rem;"
+                 th:text="${(p.author != null ? p.author.fullName : '') + ' · ' + #temporals.format(p.createdAt, 'MM/dd/yyyy') + ' · ' + p.viewCount + ' views'}"></div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${course.courseName})}"></head>
+<body>
+<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
+<main>
+    <div class="page">
+        <a class="back-link" th:href="@{/courses}">&larr; Back to Courses</a>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- Course hero -->
+        <div class="detail-hero">
+            <img th:src="${course.thumbnail}" th:alt="${course.courseName}" onerror="this.src='/images/e-learning.jpg'">
+            <div class="content">
+                <div class="badge-row">
+                    <span class="badge" th:text="${course.courseCode}"></span>
+                    <span class="badge badge-dark" th:text="${course.status}"></span>
+                    <span class="badge" th:text="${course.semester}"></span>
+                    <span class="badge badge-gray" th:if="${course.enrollPassword != null and !course.enrollPassword.trim().isEmpty()}">&#128274; Password required</span>
+                </div>
+                <h3 th:text="${course.courseName}"></h3>
+                <p style="color:#555; margin:.5rem 0;" th:text="${course.description}"></p>
+                <div style="font-size:.88rem; color:#888;"
+                     th:text="${(course.teacher != null ? course.teacher.fullName : '') + ' · Max ' + course.maxStudents + ' students'}"></div>
+
+                <!-- Enroll section -->
+                <div class="enroll-box">
+                    <th:block th:if="${currentUser == null}">
+                        <div class="alert alert-info">
+                            Please <a th:href="@{/login}">login</a> to enroll and view lessons.
+                        </div>
+                    </th:block>
+                    <th:block th:if="${currentUser != null}">
+                        <div th:if="${enrolled}">
+                            <span class="badge badge-green" style="font-size:.93rem; padding:.35rem .85rem;">&#10003; Enrolled</span>
+                        </div>
+                        <div th:unless="${enrolled}">
+                            <form th:action="@{/courses/{id}/enroll(id=${course.id})}" method="post"
+                                  style="display:flex; flex-direction:column; gap:.5rem; max-width:340px; margin-top:.75rem;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <div th:if="${course.enrollPassword != null and !course.enrollPassword.trim().isEmpty()}">
+                                    <label style="margin-top:0;">Course Password</label>
+                                    <input type="password" name="enrollPassword" placeholder="Enter course password">
+                                </div>
+                                <button type="submit" class="btn" style="width:auto; align-self:flex-start; padding:.7rem 1.75rem;">
+                                    Enroll Now
+                                </button>
+                            </form>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons -->
+        <h2>Lessons (<span th:text="${lessons.size()}"></span>)</h2>
+        <div class="lesson-list" th:if="${!lessons.isEmpty()}">
+            <a class="lesson-item" th:each="l : ${lessons}"
+               th:href="${enrolled} ? @{/lessons/{id}(id=${l.id}, courseId=${course.id})} : '#'">
+                <div class="lesson-num"
+                     th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e; color:#fff;' : ''"
+                     th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? '✓' : ${l.lessonOrder}">1</div>
+                <div class="lesson-info">
+                    <div class="lesson-title" th:text="${l.lessonTitle}"></div>
+                    <div class="lesson-meta" th:text="${l.durationMinutes} + ' min'"></div>
+                </div>
+                <div class="lesson-arrow"
+                     th:text="${enrolled} ? '&rarr;' : '&#128274;'"></div>
+            </a>
+        </div>
+        <div class="empty-state" th:if="${lessons.isEmpty()}">
+            <p>No lessons available yet.</p>
+        </div>
+
+        <!-- Assignments -->
+        <div style="margin-top:2rem;" th:if="${enrolled and !assignments.isEmpty()}">
+            <h2>Assignments &amp; Quizzes</h2>
+            <div class="table-wrap" style="margin-top:.75rem;">
+                <table>
+                    <thead>
+                        <tr><th>Title</th><th>Type</th><th>Due Date</th><th>Max Score</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${assignments}">
+                            <td th:text="${a.title}"></td>
+                            <td><span class="badge" th:text="${a.type}"></span></td>
+                            <td th:text="${#temporals.format(a.dueDate, 'MM/dd/yyyy')}"></td>
+                            <td th:text="${a.maxScore}"></td>
+                            <td><a th:href="@{/assignments/{id}(id=${a.id})}" class="btn btn-outline btn-sm">Start</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Forum preview -->
+        <div style="margin-top:2rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.75rem;">
+                <h2>Discussion Forum</h2>
+                <a th:if="${enrolled}" th:href="@{/forum(courseId=${course.id})}" class="btn btn-outline btn-sm">Open Forum &rarr;</a>
+            </div>
+            <div th:if="${recentPosts.isEmpty()}" class="empty-state">
+                <p>No posts yet.</p>
+            </div>
+            <div th:each="p : ${recentPosts}" class="post-item">
+                <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.35rem;">
+                    <span class="badge" th:text="${p.postType}"></span>
+                    <span style="font-weight:600;" th:text="${p.title}"></span>
+                </div>
+                <div style="font-size:.82rem; color:#888;"
+                     th:text="${(p.author != null ? p.author.fullName : '') + ' · ' + #temporals.format(p.createdAt, 'MM/dd/yyyy') + ' · ' + p.viewCount + ' views'}"></div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
