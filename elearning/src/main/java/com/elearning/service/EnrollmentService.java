@@ -69,8 +69,23 @@ public class EnrollmentService {
 
         int pct = total > 0 ? (int) Math.round((completed * 100.0) / total) : 0;
         enrollment.setProgressPercentage(pct);
-        enrollment.setTotalXp((int) completed * 20);
+        int lessonXp = (int) (completed * 20);
+        enrollment.setTotalXp(lessonXp + enrollment.getActivityXp());
         enrollmentRepository.save(enrollment);
+    }
+
+    /** Cộng XP hoạt động (quiz, chấm bài) rồi tính lại tổng. */
+    @Transactional
+    public void addActivityXp(Long studentId, Long courseId, int delta) {
+        if (delta <= 0) {
+            return;
+        }
+        Enrollment enrollment = enrollmentRepository
+                .findByStudentIdAndCourseId(studentId, courseId)
+                .orElseThrow(() -> new IllegalStateException("Not enrolled."));
+        enrollment.setActivityXp(enrollment.getActivityXp() + delta);
+        enrollmentRepository.save(enrollment);
+        recalcProgress(studentId, courseId);
     }
 
     public boolean isLessonCompleted(Long studentId, Long lessonId) {

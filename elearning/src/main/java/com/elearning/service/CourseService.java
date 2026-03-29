@@ -3,20 +3,34 @@ package com.elearning.service;
 import com.elearning.model.entity.Course;
 import com.elearning.model.entity.User;
 import com.elearning.repository.CourseRepository;
+import com.elearning.repository.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     public List<Course> findAllPublished() {
         return courseRepository.findByStatusOrderByIdDesc(Course.Status.PUBLISHED);
+    }
+
+    /** Top N khóa đã xuất bản theo số lượt ghi danh (giảm dần). */
+    public List<Course> findTopPublishedByEnrollmentCount(int limit) {
+        int n = Math.max(1, limit);
+        List<Course> published = courseRepository.findByStatusOrderByIdDesc(Course.Status.PUBLISHED);
+        return published.stream()
+                .sorted(Comparator.comparingLong((Course c) -> enrollmentRepository.countByCourseId(c.getId())).reversed())
+                .limit(n)
+                .collect(Collectors.toList());
     }
 
     public List<Course> findAll() {

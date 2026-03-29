@@ -1,6 +1,10 @@
 package com.elearning.controller;
 
-import com.elearning.model.entity.*;
+import com.elearning.model.entity.Course;
+import com.elearning.model.entity.Department;
+import com.elearning.model.entity.Lesson;
+import com.elearning.model.entity.User;
+import com.elearning.repository.DepartmentRepository;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,7 @@ public class AdminController {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final LessonService lessonService;
+    private final DepartmentRepository departmentRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -62,6 +67,7 @@ public class AdminController {
         if (user == null) return "redirect:/login";
         model.addAttribute("currentUser", user);
         model.addAttribute("teachers", userService.findAllTeachers());
+        model.addAttribute("departments", departmentRepository.findAll());
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
         return "admin/course-form";
     }
@@ -71,6 +77,10 @@ public class AdminController {
                                @RequestParam String courseName,
                                @RequestParam String description,
                                @RequestParam Long teacherId,
+                               @RequestParam(required = false) Long departmentId,
+                               @RequestParam(required = false) Integer credits,
+                               @RequestParam(required = false) Integer theoryHours,
+                               @RequestParam(required = false) Integer practiceHours,
                                @RequestParam(required = false) String enrollPassword,
                                @RequestParam String semester,
                                @RequestParam String academicYear,
@@ -81,11 +91,21 @@ public class AdminController {
         User teacher = userRepository.findById(teacherId).orElse(null);
         if (teacher == null) { ra.addFlashAttribute("error", "Teacher not found."); return "redirect:/admin/courses/create"; }
 
+        Department department = null;
+        if (departmentId != null) {
+            department = departmentRepository.findById(departmentId).orElse(null);
+        }
+
+        int cr = credits != null ? credits : 3;
+        int th = theoryHours != null ? theoryHours : 30;
+        int ph = practiceHours != null ? practiceHours : 15;
+
         Course course = Course.builder()
                 .courseCode(courseCode).courseName(courseName).description(description)
-                .teacher(teacher).enrollPassword(enrollPassword).semester(semester)
+                .teacher(teacher).department(department).enrollPassword(enrollPassword).semester(semester)
                 .academicYear(academicYear).status(Course.Status.valueOf(status))
-                .maxStudents(maxStudents).thumbnail(thumbnail != null && !thumbnail.trim().isEmpty() ? thumbnail : "/images/e-learning.jpg")
+                .maxStudents(maxStudents).credits(cr).theoryHours(th).practiceHours(ph)
+                .thumbnail(thumbnail != null && !thumbnail.trim().isEmpty() ? thumbnail : "/images/e-learning.jpg")
                 .build();
         courseService.save(course);
         ra.addFlashAttribute("success", "Course created successfully!");

@@ -11,7 +11,14 @@
                     class="btn">+ New Note</button>
         </div>
 
+        <form th:action="@{/notes}" method="get" style="margin-bottom:1rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+            <input type="search" name="tag" th:value="${filterTag}" placeholder="Filter by tag (contains)..." style="max-width:280px;">
+            <button type="submit" class="btn btn-sm">Filter</button>
+            <a th:href="@{/notes}" class="btn btn-outline btn-sm" th:if="${filterTag != null and !filterTag.isEmpty()}">Clear</a>
+        </form>
+
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
         <!-- Create standalone note form -->
         <div id="new-note-form" style="display:none; background:#fff; border:1px solid #e0e7ef; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
@@ -55,8 +62,11 @@
                     <div th:each="n : ${standaloneNotes}"
                          th:style="'background:#fff; border:1px solid #e0e7ef; border-radius:10px; padding:1rem; border-top:4px solid ' + ${n.highlightColor} + ';'">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; margin-bottom:.5rem;">
-                            <div style="font-weight:600; color:#0a3d7a; font-size:.95rem;"
-                                 th:text="${n.title != null and !n.title.trim().isEmpty() ? n.title : 'Note'}"></div>
+                            <div>
+                                <a th:href="@{/notes/{id}(id=${n.id})}" style="font-size:.78rem; color:#0a66c2;">Open detail &rarr;</a>
+                                <div style="font-weight:600; color:#0a3d7a; font-size:.95rem;"
+                                     th:text="${n.title != null and !n.title.trim().isEmpty() ? n.title : 'Note'}"></div>
+                            </div>
                             <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post" style="flex-shrink:0;">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                 <button type="submit" class="btn btn-danger btn-sm"
@@ -76,7 +86,7 @@
             <div>
                 <h3 style="font-size:1rem; color:#0a3d7a; margin-bottom:.75rem;">&#128218; Lesson Notes</h3>
                 <div style="display:flex; flex-direction:column; gap:.6rem;">
-                    <div th:each="n : ${allNotes}" th:if="${n.noteType.name() == 'LESSON'}"
+                    <div th:each="n : ${allNotes}" th:if="${n.noteType != null and n.noteType.name() == 'LESSON'}"
                          class="note-item" th:style="'border-left:4px solid ' + ${n.highlightColor} + '; background:#fff; border-radius:0 8px 8px 0; padding:.85rem 1rem;'">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem;">
                             <div style="flex:1;">

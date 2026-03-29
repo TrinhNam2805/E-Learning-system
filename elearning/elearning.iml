@@ -68,7 +68,6 @@
     <orderEntry type="library" name="Maven: org.glassfish.jaxb:jaxb-runtime:2.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jaxb:txw2:2.3.9" level="project" />
     <orderEntry type="library" name="Maven: com.sun.istack:istack-commons-runtime:3.0.12" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.activation:jakarta.activation:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-jpa:2.7.18" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:2.7.18" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:5.3.31" level="project" />
@@ -79,6 +78,10 @@
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-el:9.0.83" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.validator:hibernate-validator:6.2.5.Final" level="project" />
     <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-mail:2.7.18" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context-support:5.3.31" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.mail:jakarta.mail:1.6.7" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.30" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.springframework.boot:spring-boot-devtools:2.7.18" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.7.18" level="project" />

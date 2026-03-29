@@ -19,31 +19,29 @@
         </div>
     </section>
 
-    <!-- Features (guest only) -->
-    <th:block th:if="${currentUser == null}">
-        <section class="features">
-            <div class="feature-card">
-                <div class="feature-icon">&#128218;</div>
-                <h3>Diverse Courses</h3>
-                <p>IT subjects from beginner to advanced level.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#128221;</div>
-                <h3>Assignments &amp; Quizzes</h3>
-                <p>Submit work, take quizzes and get feedback from instructors.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#127942;</div>
-                <h3>Gamification</h3>
-                <p>Earn XP, badges and compete on the leaderboard.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">&#128211;</div>
-                <h3>Smart Notes</h3>
-                <p>Highlight and take notes directly inside lessons.</p>
-            </div>
-        </section>
-    </th:block>
+    <!-- Features: hiển thị cho mọi người (khách vẫn thấy phần giới thiệu / xem thông tin khóa học) -->
+    <section class="features">
+        <a th:href="@{/courses}" class="feature-card feature-card-link">
+            <div class="feature-icon">&#128218;</div>
+            <h3>Diverse Courses</h3>
+            <p>IT subjects from beginner to advanced level.</p>
+        </a>
+        <div class="feature-card">
+            <div class="feature-icon">&#128221;</div>
+            <h3>Assignments &amp; Quizzes</h3>
+            <p>Submit work, take quizzes and get feedback from instructors.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#127942;</div>
+            <h3>Gamification</h3>
+            <p>Earn XP, badges and compete on the leaderboard.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#128211;</div>
+            <h3>Smart Notes</h3>
+            <p>Highlight and take notes directly inside lessons.</p>
+        </div>
+    </section>
 
     <div class="page">
         <th:block th:if="${currentUser != null}">
@@ -88,9 +86,12 @@
                         </div>
                     </div>
 
-                    <!-- Featured courses -->
+                    <!-- Featured courses (top 5 by enrollment) -->
                     <div class="page-header" style="margin-bottom:.75rem;">
-                        <h2>Featured Courses</h2>
+                        <div>
+                            <h2>Featured Courses</h2>
+                            <p style="font-size:.85rem;color:#666;margin-top:.25rem;">Top 5 by enrollment.</p>
+                        </div>
                         <a th:href="@{/courses}" class="btn btn-outline btn-sm">View all &rarr;</a>
                     </div>
                     <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
@@ -173,7 +174,10 @@
         <!-- Guest: featured courses -->
         <th:block th:if="${currentUser == null}">
             <div class="page-header" style="margin-top:.5rem;">
-                <h2>Featured Courses</h2>
+                <div>
+                    <h2>Featured Courses</h2>
+                    <p style="font-size:.85rem;color:#666;margin-top:.25rem;">Top 5 by enrollment.</p>
+                </div>
                 <a th:href="@{/courses}" class="btn btn-outline btn-sm">View all &rarr;</a>
             </div>
             <div class="card-grid">

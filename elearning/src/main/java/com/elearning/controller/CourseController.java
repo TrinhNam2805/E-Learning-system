@@ -55,6 +55,7 @@ public class CourseController {
         model.addAttribute("assignments", assignments);
 
         User user = addUserToModel(userDetails, model);
+        model.addAttribute("enrolled", false);
         if (user != null) {
             boolean enrolled = enrollmentService.isEnrolled(user.getId(), id);
             model.addAttribute("enrolled", enrolled);

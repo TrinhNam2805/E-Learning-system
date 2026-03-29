@@ -33,6 +33,11 @@ public class Enrollment {
     @Builder.Default
     private int progressPercentage = 0;
 
+    /** XP từ hoạt động: quiz, bài tập được chấm (không ghi đè khi tính lại tiến độ bài học) */
+    @Column(nullable = false)
+    @Builder.Default
+    private int activityXp = 0;
+
     @Builder.Default
     private int totalXp = 0;
 

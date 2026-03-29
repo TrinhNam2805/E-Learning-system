@@ -49,6 +49,7 @@ public class LessonController {
 
         boolean isCompleted = enrollmentService.isLessonCompleted(user.getId(), lessonId);
         List<Note> lessonNotes = noteService.findByStudentAndLesson(user.getId(), lessonId);
+        List<Note> noteLinkCandidates = noteService.findByStudentId(user.getId());
 
         model.addAttribute("course", course);
         model.addAttribute("lesson", lesson);
@@ -57,6 +58,7 @@ public class LessonController {
         model.addAttribute("next", next);
         model.addAttribute("isCompleted", isCompleted);
         model.addAttribute("lessonNotes", lessonNotes);
+        model.addAttribute("noteLinkCandidates", noteLinkCandidates);
         model.addAttribute("currentUser", user);
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
 

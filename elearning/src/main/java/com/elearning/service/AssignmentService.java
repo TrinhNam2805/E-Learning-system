@@ -16,6 +16,8 @@ public class AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final SubmissionRepository submissionRepository;
     private final QuizQuestionRepository quizQuestionRepository;
+    private final GamificationService gamificationService;
+    private final EnrollmentService enrollmentService;
 
     public List<Assignment> findByCourseId(Long courseId) {
         return assignmentRepository.findByCourseIdOrderByDueDateAsc(courseId);
@@ -57,10 +59,24 @@ public class AssignmentService {
     public Submission grade(Long submissionId, double score, String feedback) {
         Submission sub = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new IllegalArgumentException("Submission not found."));
+        boolean firstGrade = sub.getScore() == null;
+        Assignment a = sub.getAssignment();
         sub.setScore(score);
         sub.setFeedback(feedback);
         sub.setStatus(Submission.SubmissionStatus.GRADED);
-        return submissionRepository.save(sub);
+        Submission saved = submissionRepository.save(sub);
+
+        if (firstGrade
+                && enrollmentService.isEnrolled(sub.getStudent().getId(), a.getCourse().getId())
+                && a.getType() != Assignment.AssignmentType.QUIZ) {
+            gamificationService.awardGradedAssignmentXp(
+                    sub.getStudent().getId(),
+                    a.getCourse().getId(),
+                    score,
+                    a.getMaxScore(),
+                    a.getType());
+        }
+        return saved;
     }
 
     // Quiz questions

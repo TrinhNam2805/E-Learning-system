@@ -16,11 +16,34 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                     <div>
                         <label style="margin-top:0;">Course Code</label>
-                        <input type="text" name="courseCode" placeholder="e.g. SE-101" required>
+                        <input type="text" name="courseCode" placeholder="e.g. CS201" required>
                     </div>
                     <div>
                         <label style="margin-top:0;">Semester</label>
-                        <input type="text" name="semester" placeholder="e.g. 2026-1" required>
+                        <input type="text" name="semester" placeholder="e.g. HK1" required>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div>
+                        <label style="margin-top:0;">Department</label>
+                        <select name="departmentId">
+                            <option value="">— Optional —</option>
+                            <option th:each="d : ${departments}" th:value="${d.id}" th:text="|${d.name} (${d.code})|"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="margin-top:0;">Credits (tín chỉ)</label>
+                        <input type="number" name="credits" value="3" min="1" max="30">
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div>
+                        <label style="margin-top:0;">Theory hours (giờ LT)</label>
+                        <input type="number" name="theoryHours" value="30" min="0">
+                    </div>
+                    <div>
+                        <label style="margin-top:0;">Practice hours (giờ TH)</label>
+                        <input type="number" name="practiceHours" value="15" min="0">
                     </div>
                 </div>
                 <label>Course Name</label>
@@ -56,7 +79,7 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                     <div>
                         <label>Academic Year</label>
-                        <input type="text" name="academicYear" placeholder="e.g. 2026">
+                        <input type="text" name="academicYear" placeholder="e.g. 2024-2025" required>
                     </div>
                     <div>
                         <label>Thumbnail URL</label>

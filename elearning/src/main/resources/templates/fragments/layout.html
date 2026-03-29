@@ -16,9 +16,11 @@
     <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('open')">&#9776;</button>
     <div class="links">
         <a th:href="@{/courses}">Courses</a>
-        <a th:href="@{/rankings}">Rankings</a>
+        <a th:if="${currentUser == null}" th:href="@{/announcements}">Announcements</a>
+        <a th:if="${currentUser != null}" th:href="@{/rankings}">Rankings</a>
         <th:block th:if="${currentUser != null}">
             <a th:href="@{/dashboard}">Dashboard</a>
+            <a th:href="@{/notes}">Notes</a>
             <div class="account-menu">
                 <button class="icon-btn notification-btn" onclick="toggleNotif()" title="Notifications">
                     &#128276;
@@ -63,7 +65,8 @@
             </div>
             <div style="display:flex;gap:1.5rem;font-size:.88rem;">
                 <a th:href="@{/courses}" style="color:#888;">Courses</a>
-                <a th:href="@{/rankings}" style="color:#888;">Rankings</a>
+                <a th:if="${currentUser == null}" th:href="@{/announcements}" style="color:#888;">Announcements</a>
+                <a th:if="${currentUser != null}" th:href="@{/rankings}" style="color:#888;">Rankings</a>
             </div>
         </div>
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #e8eef6;text-align:center;font-size:.85rem;color:#aaa;">

@@ -3,6 +3,7 @@ package com.elearning.controller;
 import com.elearning.model.entity.User;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
+import com.elearning.validation.PasswordPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -72,8 +73,9 @@ public class ProfileController {
             ra.addFlashAttribute("error", "Passwords do not match.");
             return "redirect:/change-password";
         }
-        if (newPassword.length() < 6) {
-            ra.addFlashAttribute("error", "New password must be at least 6 characters.");
+        String pwdErr = PasswordPolicy.validate(newPassword).orElse(null);
+        if (pwdErr != null) {
+            ra.addFlashAttribute("error", pwdErr);
             return "redirect:/change-password";
         }
         userService.changePassword(user.getId(), newPassword);

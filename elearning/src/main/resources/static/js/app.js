@@ -23,7 +23,26 @@ document.addEventListener('click', function(e) {
 });
 
 // Auto-hide flash messages after 4 seconds
+function initPasswordToggles() {
+    document.querySelectorAll('.password-field').forEach(function(wrap) {
+        var input = wrap.querySelector('input');
+        var btn = wrap.querySelector('.password-toggle');
+        if (!input || !btn) return;
+        btn.addEventListener('click', function() {
+            var show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            wrap.classList.toggle('is-visible', show);
+            btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+            var hideLabel = 'Hide password';
+            var showLabel = 'Show password';
+            btn.setAttribute('aria-label', show ? hideLabel : showLabel);
+            btn.setAttribute('title', show ? hideLabel : showLabel);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    initPasswordToggles();
     const alerts = document.querySelectorAll('.alert-success, .alert-error, .alert-info');
     alerts.forEach(function(alert) {
         setTimeout(function() {
