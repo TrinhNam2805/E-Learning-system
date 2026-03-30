@@ -36,12 +36,12 @@
                 <div>
                     <span style="font-weight:700; color:#0a3d7a; font-size:1rem;">Level <span th:text="${myRank.level}"></span></span>
                     <span style="font-size:.85rem; color:#888; margin-left:.5rem;"
-                          th:text="${myRank.xpInLevel} + '/100 XP to Level ' + (${myRank.level} + 1)"></span>
+                          th:text="|${myRank.xpInLevel}/100 XP to Level ${myRank.level + 1}|"></span>
                 </div>
                 <a th:href="@{/rankings}" class="btn btn-outline btn-sm">&#127942; Leaderboard</a>
             </div>
             <div class="progress-bar-wrap" style="height:12px;">
-                <div class="progress-bar" th:style="'width:' + ${myRank.xpInLevel} + '%; background:#f59e0b;'"></div>
+                <div class="progress-bar" th:style="|width:${myRank.xpInLevel}%; background:#f59e0b;|"></div>
             </div>
         </div>
 
@@ -50,10 +50,10 @@
             <h2>My Courses</h2>
             <a th:href="@{/courses}" class="btn btn-outline btn-sm">Explore more &rarr;</a>
         </div>
-        <div th:if="${enrollments.isEmpty()}" class="empty-state">
+        <div th:if="${enrollments == null or enrollments.isEmpty()}" class="empty-state">
             <p>You have not enrolled in any courses yet. <a th:href="@{/courses}">Browse courses</a></p>
         </div>
-        <div class="card-grid" th:unless="${enrollments.isEmpty()}">
+        <div class="card-grid" th:unless="${enrollments == null or enrollments.isEmpty()}">
             <div class="card" th:each="e : ${enrollments}">
                 <div class="card-thumb">
                     <img th:src="${e.course.thumbnail}" th:alt="${e.course.courseName}" onerror="this.src='/images/e-learning.jpg'">
@@ -69,10 +69,10 @@
                     <div style="margin:.5rem 0;">
                         <div style="display:flex; justify-content:space-between; font-size:.82rem; color:#666; margin-bottom:.3rem;">
                             <span>Progress</span>
-                            <span th:text="${e.progressPercentage} + '%'"></span>
+                            <span th:text="|${e.progressPercentage}%|"></span>
                         </div>
                         <div class="progress-bar-wrap">
-                            <div class="progress-bar" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
+                            <div class="progress-bar" th:style="|width:${e.progressPercentage}%|"></div>
                         </div>
                     </div>
                     <div style="font-size:.82rem; color:#0a66c2; margin-bottom:.5rem;"
@@ -86,7 +86,7 @@
         </div>
 
         <!-- Upcoming assignments -->
-        <div style="margin-top:2rem;" th:if="${!upcomingAssignments.isEmpty()}">
+        <div style="margin-top:2rem;" th:if="${upcomingAssignments != null and !upcomingAssignments.isEmpty()}">
             <h2>Upcoming Assignments</h2>
             <div class="table-wrap" style="margin-top:.75rem;">
                 <table>
@@ -96,7 +96,10 @@
                             <td th:text="${a.title}"></td>
                             <td><span class="badge" th:text="${a.course.courseCode}"></span></td>
                             <td><span class="badge" th:text="${a.type}"></span></td>
-                            <td th:text="${#temporals.format(a.dueDate, 'MM/dd/yyyy')}"></td>
+                            <td>
+                                <span th:if="${a.dueDate != null}" th:text="${#temporals.format(a.dueDate, 'MM/dd/yyyy')}"></span>
+                                <span th:if="${a.dueDate == null}">—</span>
+                            </td>
                             <td><a th:href="@{/assignments/{id}(id=${a.id})}" class="btn btn-outline btn-sm">Start</a></td>
                         </tr>
                     </tbody>
@@ -110,11 +113,12 @@
                 <h2>Recent Notifications</h2>
                 <a th:href="@{/notifications}" class="btn btn-outline btn-sm">View all</a>
             </div>
-            <div th:if="${notifications.isEmpty()}" class="empty-state"><p>No notifications.</p></div>
+            <div th:if="${notifications == null or notifications.isEmpty()}" class="empty-state"><p>No notifications.</p></div>
             <div th:each="n : ${notifications}" class="post-item" style="margin-bottom:.5rem;">
                 <div style="font-weight:600;" th:text="${n.title}"></div>
                 <div style="font-size:.88rem; color:#666; margin-top:.25rem;" th:text="${n.message}"></div>
                 <div style="font-size:.8rem; color:#aaa; margin-top:.25rem;"
+                     th:if="${n.createdAt != null}"
                      th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy')}"></div>
             </div>
         </div>

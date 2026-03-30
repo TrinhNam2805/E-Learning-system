@@ -9,16 +9,19 @@
             <h2>Login</h2>
 
             <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
             <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
-            <div th:if="${param.error}" class="alert alert-error">Invalid email or password.</div>
-            <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
 
             <form th:action="@{/login}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="redirect" th:if="${redirectAfterLogin != null}" th:value="${redirectAfterLogin}">
                 <label>Email</label>
                 <input type="email" name="email" placeholder="example@email.com" required autofocus>
                 <label>Password</label>
-                <input type="password" name="password" placeholder="••••••••" required>
+                <div class="password-field">
+                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    <button th:replace="~{fragments/password-toggle-button :: toggleBtn}"></button>
+                </div>
                 <div style="display:flex; align-items:center; gap:.5rem; margin-top:.75rem;">
                     <input type="checkbox" name="remember-me" id="remember-me">
                     <label for="remember-me" style="margin-top:0; font-weight:400; font-size:.9rem;">Remember me</label>
@@ -28,7 +31,8 @@
 
             <div class="auth-links">
                 <a th:href="@{/forgot-password}">Forgot password?</a> &nbsp;&middot;&nbsp;
-                <a th:href="@{/register}">Create new account</a>
+                <a th:if="${redirectAfterLogin == null}" th:href="@{/register}">Create new account</a>
+                <a th:if="${redirectAfterLogin != null}" th:href="@{/register(redirect=${redirectAfterLogin})}">Create new account</a>
             </div>
 
         </div>

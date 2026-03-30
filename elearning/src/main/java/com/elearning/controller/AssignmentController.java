@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ public class AssignmentController {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final EnrollmentService enrollmentService;
+    private final GamificationService gamificationService;
 
     @GetMapping("/{id}")
     public String view(@PathVariable Long id,
@@ -41,9 +43,12 @@ public class AssignmentController {
         Submission mySubmission = assignmentService.findSubmission(id, user.getId()).orElse(null);
         List<QuizQuestion> questions = assignmentService.findQuestions(id);
 
+        boolean pastDue = isPastDue(assignment);
+
         model.addAttribute("assignment", assignment);
         model.addAttribute("mySubmission", mySubmission);
         model.addAttribute("questions", questions);
+        model.addAttribute("pastDue", pastDue);
         model.addAttribute("currentUser", user);
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
         return "assignment/view";
@@ -65,6 +70,19 @@ public class AssignmentController {
         boolean enrolled = enrollmentService.isEnrolled(user.getId(), assignment.getCourse().getId());
         if (!enrolled) return "redirect:/courses/" + assignment.getCourse().getId();
 
+        if (assignmentService.findSubmission(id, user.getId()).isPresent()) {
+            ra.addFlashAttribute("error", "You have already submitted this assignment.");
+            return "redirect:/assignments/" + id;
+        }
+
+        boolean pastDue = isPastDue(assignment);
+        boolean confirmLate = "true".equalsIgnoreCase(allParams.get("confirmLate"));
+        if (pastDue && !confirmLate) {
+            ra.addFlashAttribute("error",
+                    "This assignment is past the due date. Check \"Late submission\" to confirm you still want to submit.");
+            return "redirect:/assignments/" + id;
+        }
+
         String submitContent = content;
 
         // For QUIZ: auto-grade
@@ -80,21 +98,35 @@ public class AssignmentController {
             submitContent = answers.toString();
             double score = questions.isEmpty() ? 0 : (correct * assignment.getMaxScore() / questions.size());
 
+            Submission.SubmissionStatus quizStatus = pastDue
+                    ? Submission.SubmissionStatus.LATE
+                    : Submission.SubmissionStatus.GRADED;
+
             Submission sub = Submission.builder()
                     .assignment(assignment).student(user)
                     .content(submitContent).score(score)
-                    .status(Submission.SubmissionStatus.GRADED).build();
+                    .status(quizStatus).build();
             assignmentService.submit(sub);
+            int xpGained = gamificationService.awardQuizXp(user.getId(), assignment.getCourse().getId(), score, assignment.getMaxScore());
             notificationService.send(user, "Quiz Result",
-                    "You scored " + String.format("%.1f", score) + "/" + assignment.getMaxScore() + " in quiz: " + assignment.getTitle(),
+                    "You scored " + String.format("%.1f", score) + "/" + assignment.getMaxScore()
+                            + " in quiz: " + assignment.getTitle() + ". +" + xpGained + " XP.",
                     Notification.NotifType.GRADE);
-            ra.addFlashAttribute("success", "Quiz submitted! Score: " + String.format("%.1f", score));
+            String lateNote = pastDue ? " (late submission)" : "";
+            ra.addFlashAttribute("success", "Quiz submitted! Score: " + String.format("%.1f", score)
+                    + lateNote + ". +" + xpGained + " XP.");
         } else {
+            Submission.SubmissionStatus hwStatus = pastDue
+                    ? Submission.SubmissionStatus.LATE
+                    : Submission.SubmissionStatus.SUBMITTED;
             Submission sub = Submission.builder()
                     .assignment(assignment).student(user)
-                    .content(submitContent).build();
+                    .content(submitContent)
+                    .status(hwStatus)
+                    .build();
             assignmentService.submit(sub);
-            ra.addFlashAttribute("success", "Assignment submitted! Awaiting grading.");
+            String lateNote = pastDue ? " (marked as late)" : "";
+            ra.addFlashAttribute("success", "Assignment submitted! Awaiting grading." + lateNote);
         }
 
         return "redirect:/assignments/" + id;
@@ -136,5 +168,13 @@ public class AssignmentController {
                 Notification.NotifType.GRADE);
         ra.addFlashAttribute("success", "Graded successfully!");
         return "redirect:/assignments/" + sub.getAssignment().getId() + "/submissions";
+    }
+
+    private static boolean isPastDue(Assignment assignment) {
+        LocalDateTime due = assignment.getDueDate();
+        if (due == null) {
+            return false;
+        }
+        return LocalDateTime.now().isAfter(due);
     }
 }

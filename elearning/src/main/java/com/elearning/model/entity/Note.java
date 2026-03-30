@@ -44,6 +44,14 @@ public class Note {
     @Builder.Default
     private NoteType noteType = NoteType.LESSON;
 
+    /** Đoạn trích từ bài giảng (truy vết nguồn học thuật). */
+    @Column(columnDefinition = "TEXT")
+    private String sourceExcerpt;
+
+    /** Nhãn phân loại, phân tách bằng dấu phẩy — ví dụ: chuẩn-hóa, ôn-tập, lab */
+    @Column(length = 500)
+    private String tags;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

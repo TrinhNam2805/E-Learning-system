@@ -25,8 +25,8 @@ public class HomeController {
 
     @GetMapping({"/", "/home"})
     public String home(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        List<Course> featured = courseService.findAllPublished();
-        model.addAttribute("featuredCourses", featured.stream().limit(4).collect(Collectors.toList()));
+        List<Course> featured = courseService.findTopPublishedByEnrollmentCount(5);
+        model.addAttribute("featuredCourses", featured);
 
         if (userDetails != null) {
             User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);

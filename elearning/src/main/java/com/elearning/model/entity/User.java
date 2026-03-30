@@ -3,11 +3,16 @@ package com.elearning.model.entity;
 import javax.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -42,6 +47,19 @@ public class User {
     private boolean locked = false;
 
     private LocalDate createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    /** MSSV — chỉ dùng cho sinh viên */
+    @Column(unique = true, length = 20)
+    private String studentCode;
+
+    @Column(length = 100, unique = true)
+    private String passwordResetToken;
+
+    private LocalDateTime passwordResetExpires;
 
     @PrePersist
     protected void onCreate() {

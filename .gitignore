@@ -1,0 +1,39 @@
+# Maven / Java
+**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+*~
+
+# Local secrets & overrides (do not commit real passwords)
+**/application-local.properties
+**/application-local.yml
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Extracted / temp artifacts (SRS doc extract, etc.)
+_srs_extract/
+_srs_temp.zip
+*.zip.bak
