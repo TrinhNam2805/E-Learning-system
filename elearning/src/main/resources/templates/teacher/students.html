@@ -1,61 +1,56 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Students - ' + ${course.courseName})}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <a class="back-link" th:href="@{/teacher/dashboard}">&larr; Back to Dashboard</a>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Students')}"></head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<main class="flex-1 overflow-y-auto pt-16 p-4 md:p-8 bg-background">
+    <div class="max-w-5xl mx-auto space-y-6">
+        <a th:href="@{/teacher/dashboard}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
+            <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Dashboard
+        </a>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
+        <div th:if="${error}" class="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100" th:text="${error}"></div>
 
-        <div class="page-header">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h2 th:text="'Students - ' + ${course.courseName}">Students</h2>
-                <p style="color:#666; font-size:.92rem; margin-top:.25rem;"
-                   th:text="${course.courseCode + ' · ' + enrollments.size() + ' enrolled'}"></p>
+                <h1 class="text-2xl font-extrabold font-headline text-on-background" th:text="'Students — ' + ${course.courseName}">Students</h1>
+                <p class="text-sm text-on-surface-variant mt-1" th:text="${course.courseCode + ' · ' + enrollments.size() + ' enrolled'}"></p>
             </div>
-            <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-outline btn-sm">View Course</a>
+            <a th:href="@{/courses/{id}(id=${course.id})}" class="px-4 py-2 text-xs font-bold border border-primary text-primary rounded-lg hover:bg-primary/5 no-underline">View Course</a>
         </div>
 
-        <div class="table-wrap" style="margin-top:1rem;">
-            <table>
+        <div class="it-table-wrap">
+            <table class="it-data-table">
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Student</th>
-                        <th>Email</th>
-                        <th>Enrolled At</th>
-                        <th>Progress</th>
-                        <th>XP</th>
-                    </tr>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Email</th>
+                    <th>Enrolled At</th>
+                    <th>Progress</th>
+                    <th>XP</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr th:if="${enrollments.isEmpty()}">
-                        <td colspan="6" style="text-align:center; color:#aaa; padding:2rem;">No students enrolled yet.</td>
-                    </tr>
-                    <tr th:each="e, stat : ${enrollments}">
-                        <td th:text="${stat.count}"></td>
-                        <td>
-                            <div style="font-weight:600;" th:text="${e.student.fullName}"></div>
-                        </td>
-                        <td style="color:#666; font-size:.88rem;" th:text="${e.student.email}"></td>
-                        <td style="font-size:.88rem; color:#888;"
-                            th:text="${#temporals.format(e.enrolledAt, 'MM/dd/yyyy')}"></td>
-                        <td>
-                            <div style="display:flex; align-items:center; gap:.5rem; min-width:120px;">
-                                <div class="progress-bar-wrap" style="flex:1;">
-                                    <div class="progress-bar" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
-                                </div>
-                                <span style="font-size:.82rem; color:#666; white-space:nowrap;"
-                                      th:text="${e.progressPercentage} + '%'"></span>
+                <tr th:if="${enrollments.isEmpty()}">
+                    <td colspan="6" class="text-center text-slate-400 py-12">No students enrolled yet.</td>
+                </tr>
+                <tr th:each="e, stat : ${enrollments}">
+                    <td th:text="${stat.count}"></td>
+                    <td class="font-semibold" th:text="${e.student.fullName}"></td>
+                    <td class="text-sm text-on-surface-variant" th:text="${e.student.email}"></td>
+                    <td class="text-sm text-slate-500" th:text="${#temporals.format(e.enrolledAt, 'MM/dd/yyyy')}"></td>
+                    <td>
+                        <div class="flex items-center gap-2 min-w-[140px]">
+                            <div class="flex-1 h-2 rounded-full bg-surface-container overflow-hidden">
+                                <div class="h-full rounded-full bg-gradient-to-r from-primary to-primary-container" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
                             </div>
-                        </td>
-                        <td>
-                            <span class="badge badge-green" th:text="${e.totalXp} + ' XP'"></span>
-                        </td>
-                    </tr>
+                            <span class="text-xs text-on-surface-variant whitespace-nowrap" th:text="${e.progressPercentage} + '%'"></span>
+                        </div>
+                    </td>
+                    <td><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800" th:text="${e.totalXp} + ' XP'"></span></td>
+                </tr>
                 </tbody>
             </table>
         </div>

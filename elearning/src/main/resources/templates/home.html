@@ -1,204 +1,202 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Home')}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <!-- Hero -->
-    <section class="hero">
-        <img src="/images/e-learning.jpg" th:src="@{/images/e-learning.jpg}" alt="E-Learning" class="hero-img">
-        <div class="hero-text">
-            <h1>E-Learning Portal - Faculty of IT</h1>
-            <p>Online learning platform: courses, lessons, assignments and progress tracking.</p>
-            <div class="hero-actions">
-                <a th:href="@{/courses}" class="btn">Browse Courses</a>
-                <th:block th:if="${currentUser == null}">
-                    <a th:href="@{/register}" class="btn btn-outline">Get Started</a>
-                </th:block>
-            </div>
-        </div>
-    </section>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
 
-    <!-- Features: hiển thị cho mọi người (khách vẫn thấy phần giới thiệu / xem thông tin khóa học) -->
-    <section class="features">
-        <a th:href="@{/courses}" class="feature-card feature-card-link">
-            <div class="feature-icon">&#128218;</div>
-            <h3>Diverse Courses</h3>
-            <p>IT subjects from beginner to advanced level.</p>
-        </a>
-        <div class="feature-card">
-            <div class="feature-icon">&#128221;</div>
-            <h3>Assignments &amp; Quizzes</h3>
-            <p>Submit work, take quizzes and get feedback from instructors.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">&#127942;</div>
-            <h3>Gamification</h3>
-            <p>Earn XP, badges and compete on the leaderboard.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">&#128211;</div>
-            <h3>Smart Notes</h3>
-            <p>Highlight and take notes directly inside lessons.</p>
-        </div>
-    </section>
-
-    <div class="page">
-        <th:block th:if="${currentUser != null}">
-            <div class="home-layout">
-                <div class="home-main">
-                    <div style="margin-bottom:1.5rem;">
-                        <h2 th:text="'Welcome back, ' + ${currentUser.fullName} + '!'">Welcome!</h2>
-                        <p style="color:#666; font-size:.92rem;">Continue your learning journey today.</p>
-                    </div>
-
-                    <!-- Continue learning -->
-                    <div th:if="${enrollments != null and !enrollments.isEmpty()}" style="margin-bottom:1.75rem;">
-                        <div class="page-header" style="margin-bottom:.75rem;">
-                            <h2>Continue Learning</h2>
-                            <a th:href="@{/student/dashboard}" class="btn btn-outline btn-sm">All courses &rarr;</a>
-                        </div>
-                        <div th:each="e, stat : ${enrollments}" th:if="${stat.index < 2 and e.progressPercentage < 100}">
-                            <div class="continue-card">
-                                <div class="continue-thumb">
-                                    <img th:src="${e.course.thumbnail}" th:alt="${e.course.courseName}"
-                                         onerror="this.src='/images/e-learning.jpg'">
-                                </div>
-                                <div class="continue-info">
-                                    <div class="badge-row">
-                                        <span class="badge" th:text="${e.course.courseCode}"></span>
-                                    </div>
-                                    <div class="continue-title" th:text="${e.course.courseName}"></div>
-                                    <div style="margin:.5rem 0;">
-                                        <div style="display:flex; justify-content:space-between; font-size:.8rem; color:#666; margin-bottom:.25rem;">
-                                            <span>Progress</span>
-                                            <span th:text="${e.progressPercentage} + '%'"></span>
-                                        </div>
-                                        <div class="progress-bar-wrap">
-                                            <div class="progress-bar" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="continue-action">
-                                    <a th:href="@{/courses/{id}(id=${e.course.id})}" class="btn btn-sm">Continue</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Featured courses (top 5 by enrollment) -->
-                    <div class="page-header" style="margin-bottom:.75rem;">
-                        <div>
-                            <h2>Featured Courses</h2>
-                            <p style="font-size:.85rem;color:#666;margin-top:.25rem;">Top 5 by enrollment.</p>
-                        </div>
-                        <a th:href="@{/courses}" class="btn btn-outline btn-sm">View all &rarr;</a>
-                    </div>
-                    <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
-                        <a class="card" th:each="c : ${featuredCourses}" th:href="@{/courses/{id}(id=${c.id})}">
-                            <div class="card-thumb">
-                                <img th:src="${c.thumbnail}" th:alt="${c.courseName}" onerror="this.src='/images/e-learning.jpg'">
-                            </div>
-                            <div class="content">
-                                <div class="badge-row">
-                                    <span class="badge" th:text="${c.courseCode}"></span>
-                                </div>
-                                <h4 th:text="${c.courseName}"></h4>
-                                <div style="font-size:.8rem; color:#888;" th:text="${c.teacher != null ? c.teacher.fullName : ''}"></div>
-                                <span class="btn-link">View details &rarr;</span>
-                            </div>
-                        </a>
-                    </div>
+<th:block th:if="${currentUser == null}">
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <main class="flex-1 overflow-y-auto pt-16">
+        <section class="relative min-h-[280px] flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary-container/30 border-b border-slate-100/80">
+            <img src="/images/e-learning.jpg" th:src="@{/images/e-learning.jpg}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-25">
+            <div class="relative z-10 max-w-3xl mx-auto px-6 py-16 text-center">
+                <h1 class="text-3xl md:text-4xl font-extrabold font-headline text-on-background tracking-tight">E-Learning Portal — Faculty of IT</h1>
+                <p class="mt-3 text-on-surface-variant font-body text-sm md:text-base max-w-xl mx-auto">Online learning: courses, lessons, assignments and progress tracking.</p>
+                <div class="mt-8 flex flex-wrap gap-3 justify-center">
+                    <a th:href="@{/courses}" class="inline-flex items-center justify-center px-5 py-2.5 bg-primary text-on-primary font-semibold rounded-lg shadow-md hover:opacity-90 no-underline text-sm">Browse Courses</a>
+                    <a th:href="@{/register}" class="inline-flex items-center justify-center px-5 py-2.5 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary/5 no-underline text-sm">Get Started</a>
                 </div>
-
-                <!-- Sidebar -->
-                <aside class="home-sidebar">
-                    <div class="sidebar-card" th:if="${myRank != null}">
-                        <div style="font-weight:700; margin-bottom:.75rem;" th:text="${currentUser != null ? currentUser.fullName : ''}"></div>
-                        <div class="mini-stats">
-                            <div class="mini-stat">
-                                <div class="mini-num" th:text="${myRank != null ? myRank.totalXp : 0}">0</div>
-                                <div class="mini-label">XP</div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="mini-num" th:text="${'Lv.' + (myRank != null ? myRank.level : 1)}">Lv.1</div>
-                                <div class="mini-label">Level</div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="mini-num" th:text="${'#' + (myRank != null ? myRank.rank : '-')}">#-</div>
-                                <div class="mini-label">Rank</div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="mini-num" th:text="${enrollments != null ? enrollments.size() : 0}">0</div>
-                                <div class="mini-label">Courses</div>
-                            </div>
-                        </div>
-                        <a th:href="@{/dashboard}" class="btn btn-outline btn-sm btn-full" style="margin-top:.85rem;">Go to Dashboard &rarr;</a>
-                    </div>
-
-                    <!-- Rankings -->
-                    <div class="sidebar-card">
-                        <div class="sidebar-card-title">&#127942; XP Leaderboard</div>
-                        <div style="display:flex; flex-direction:column; gap:.4rem;">
-                            <div class="rank-item" th:each="r, stat : ${rankings}"
-                                 th:classappend="${currentUser != null and r.userId == currentUser.id} ? 'rank-me' : ''">
-                                <span th:if="${stat.index == 0}">&#129351;</span>
-                                <span th:if="${stat.index == 1}">&#129352;</span>
-                                <span th:if="${stat.index == 2}">&#129353;</span>
-                                <span th:if="${stat.index >= 3}" style="color:#aaa; font-size:.85rem; width:1.2rem; text-align:center;"
-                                      th:text="${r.rank}"></span>
-                                <div style="flex:1; font-size:.88rem;" th:text="${r.fullName}"></div>
-                                <div style="font-size:.82rem; font-weight:600; color:#f59e0b;"
-                                     th:text="${r.totalXp} + ' XP'"></div>
-                            </div>
-                        </div>
-                        <a th:href="@{/rankings}" class="btn btn-outline btn-sm btn-full" style="margin-top:.75rem;">Full Rankings &rarr;</a>
-                    </div>
-
-                    <!-- Recent notes -->
-                    <div class="sidebar-card" th:if="${recentNotes != null and !recentNotes.isEmpty()}">
-                        <div class="sidebar-card-title">&#128211; Recent Notes</div>
-                        <div style="display:flex; flex-direction:column; gap:.5rem;">
-                            <div class="note-item" th:each="n : ${recentNotes}"
-                                 th:style="'border-left:3px solid ' + ${n.highlightColor} + ';'">
-                                <div style="font-size:.83rem; color:#333; line-height:1.5;"
-                                     th:text="${#strings.abbreviate(n.content, 80)}"></div>
-                            </div>
-                        </div>
-                        <a th:href="@{/notes}" class="btn btn-outline btn-sm btn-full" style="margin-top:.75rem;">All Notes &rarr;</a>
-                    </div>
-                </aside>
             </div>
-        </th:block>
-
-        <!-- Guest: featured courses -->
-        <th:block th:if="${currentUser == null}">
-            <div class="page-header" style="margin-top:.5rem;">
-                <div>
-                    <h2>Featured Courses</h2>
-                    <p style="font-size:.85rem;color:#666;margin-top:.25rem;">Top 5 by enrollment.</p>
-                </div>
-                <a th:href="@{/courses}" class="btn btn-outline btn-sm">View all &rarr;</a>
-            </div>
-            <div class="card-grid">
-                <a class="card" th:each="c : ${featuredCourses}" th:href="@{/courses/{id}(id=${c.id})}">
-                    <div class="card-thumb">
-                        <img th:src="${c.thumbnail}" th:alt="${c.courseName}" onerror="this.src='/images/e-learning.jpg'">
-                    </div>
-                    <div class="content">
-                        <div class="badge-row">
-                            <span class="badge" th:text="${c.courseCode}"></span>
-                        </div>
-                        <h4 th:text="${c.courseName}"></h4>
-                        <p th:text="${#strings.abbreviate(c.description, 100)}"></p>
-                        <div style="font-size:.8rem; color:#888;" th:text="${c.teacher != null ? c.teacher.fullName : ''}"></div>
-                        <span class="btn-link">View details &rarr;</span>
-                    </div>
+        </section>
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 py-12 space-y-10">
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a th:href="@{/courses}" class="bg-surface-container-lowest rounded-xl p-5 border border-slate-100/80 shadow-sm hover:border-primary-container/50 transition-colors no-underline text-inherit">
+                    <div class="text-2xl mb-2">&#128218;</div>
+                    <h3 class="font-bold font-headline text-on-surface text-sm">Diverse Courses</h3>
+                    <p class="text-xs text-on-surface-variant mt-1 font-body">IT subjects from beginner to advanced.</p>
                 </a>
+                <div class="bg-surface-container-lowest rounded-xl p-5 border border-slate-100/80 shadow-sm">
+                    <div class="text-2xl mb-2">&#128221;</div>
+                    <h3 class="font-bold font-headline text-on-surface text-sm">Assignments &amp; Quizzes</h3>
+                    <p class="text-xs text-on-surface-variant mt-1 font-body">Submit work and get feedback from instructors.</p>
+                </div>
+                <div class="bg-surface-container-lowest rounded-xl p-5 border border-slate-100/80 shadow-sm">
+                    <div class="text-2xl mb-2">&#127942;</div>
+                    <h3 class="font-bold font-headline text-on-surface text-sm">Gamification</h3>
+                    <p class="text-xs text-on-surface-variant mt-1 font-body">Earn XP and compete on the leaderboard.</p>
+                </div>
+                <div class="bg-surface-container-lowest rounded-xl p-5 border border-slate-100/80 shadow-sm">
+                    <div class="text-2xl mb-2">&#128211;</div>
+                    <h3 class="font-bold font-headline text-on-surface text-sm">Smart Notes</h3>
+                    <p class="text-xs text-on-surface-variant mt-1 font-body">Take notes inside lessons.</p>
+                </div>
+            </section>
+            <section>
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold font-headline text-on-background">Featured Courses</h2>
+                        <p class="text-sm text-on-surface-variant mt-1">Top 5 by enrollment.</p>
+                    </div>
+                    <a th:href="@{/courses}" class="text-primary font-bold text-xs hover:underline shrink-0">View all</a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <a class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md hover:border-primary-container/40 transition-all no-underline text-inherit"
+                       th:each="c : ${featuredCourses}" th:href="@{/courses/{id}(id=${c.id})}">
+                        <div class="aspect-video overflow-hidden bg-surface-container">
+                            <img th:src="${c.thumbnail}" th:alt="${c.courseName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/images/e-learning.jpg'">
+                        </div>
+                        <div class="p-4">
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-primary-container/30 text-primary mb-2" th:text="${c.courseCode}"></span>
+                            <h4 class="font-bold text-sm text-on-surface line-clamp-2" th:text="${c.courseName}"></h4>
+                            <p class="text-xs text-on-surface-variant mt-2 line-clamp-2" th:text="${#strings.abbreviate(c.description, 100)}"></p>
+                            <span class="text-primary text-xs font-semibold mt-3 inline-block">View details →</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+</th:block>
+
+<th:block th:if="${currentUser != null}">
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+    <div class="flex flex-1 overflow-hidden pt-16 min-h-0">
+        <aside th:replace="~{fragments/layout :: studentSidebar('home')}"></aside>
+        <main class="flex-1 overflow-y-auto bg-background p-6 md:p-8">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div class="space-y-1">
+                        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-on-background font-headline"
+                            th:text="'Welcome back, ' + ${currentUser.fullName}">Welcome</h1>
+                        <p class="text-sm text-on-surface-variant font-body">Continue your learning journey today.</p>
+                    </div>
+                    <div th:if="${myRank != null}" class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-lowest rounded-full shadow-sm border border-slate-100">
+                        <span class="material-symbols-outlined text-primary text-lg">bolt</span>
+                        <span class="font-label font-bold text-xs text-on-surface">Level <span th:text="${myRank.level}">1</span> · <span th:text="${myRank.totalXp}">0</span> XP</span>
+                    </div>
+                </div>
+
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6" th:if="${myRank != null}">
+                    <div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between min-h-[100px]">
+                        <span class="text-on-surface-variant font-label text-[10px] font-semibold uppercase tracking-widest">Total XP</span>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-primary" th:text="${myRank.totalXp}">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between min-h-[100px]">
+                        <span class="text-on-surface-variant font-label text-[10px] font-semibold uppercase tracking-widest">Active Courses</span>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-on-surface" th:text="${enrollments != null ? enrollments.size() : 0}">0</span>
+                            <span class="text-secondary-fixed-dim text-xs font-bold">enrolled</span>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between min-h-[100px]">
+                        <span class="text-on-surface-variant font-label text-[10px] font-semibold uppercase tracking-widest">Global Rank</span>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-tertiary" th:text="${'#' + myRank.rank}">#—</span>
+                            <span class="text-tertiary-fixed-dim text-xs font-bold">Leaderboard</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div class="lg:col-span-8 space-y-8">
+                        <section th:if="${enrollments != null and !enrollments.isEmpty()}">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-xl font-bold font-headline text-on-background">Continue Learning</h2>
+                                <a th:href="@{/student/dashboard}" class="text-primary font-bold text-xs hover:underline">View Dashboard</a>
+                            </div>
+                            <th:block th:each="e, stat : ${enrollments}" th:if="${stat.index < 2 and e.progressPercentage < 100}">
+                                <div class="bg-surface-container-lowest rounded-xl p-1 shadow-sm overflow-hidden group mb-4">
+                                    <div class="relative h-48 md:h-56 rounded-lg overflow-hidden">
+                                        <img th:src="${e.course.thumbnail}" th:alt="${e.course.courseName}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='/images/e-learning.jpg'">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class="px-2 py-0.5 bg-primary text-white text-[9px] font-bold rounded-full uppercase tracking-tighter">In progress</span>
+                                                <span class="px-2 py-0.5 bg-white/20 backdrop-blur-md text-white text-[9px] font-bold rounded-full uppercase tracking-tighter" th:text="${e.course.courseCode}"></span>
+                                            </div>
+                                            <h3 class="text-lg font-bold text-white mb-1" th:text="${e.course.courseName}"></h3>
+                                        </div>
+                                    </div>
+                                    <div class="p-5">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-on-surface font-bold text-sm">Course progress</span>
+                                            <span class="text-primary font-bold text-sm" th:text="${e.progressPercentage} + '%'">0%</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-container rounded-full transition-all" th:style="'width:' + ${e.progressPercentage} + '%'"></div>
+                                        </div>
+                                        <a th:href="@{/courses/{id}(id=${e.course.id})}" class="mt-4 inline-flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg hover:opacity-90 no-underline">Continue</a>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </section>
+
+                        <section th:if="${recentNotes != null and !recentNotes.isEmpty()}">
+                            <h2 class="text-xl font-bold font-headline text-on-background mb-4">Recent Notes</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <a th:each="n : ${recentNotes}" th:href="@{/notes/{id}(id=${n.id})}"
+                                   class="bg-surface-container-low p-4 rounded-xl border border-transparent hover:border-primary-container transition-colors cursor-pointer group no-underline text-inherit">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="p-1.5 bg-white rounded-lg group-hover:bg-primary-container/30 transition-colors">
+                                            <span class="material-symbols-outlined text-primary text-xl">description</span>
+                                        </div>
+                                        <span class="text-[10px] text-on-surface-variant font-label uppercase"
+                                              th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'MM/dd/yyyy') : ''}"></span>
+                                    </div>
+                                    <h4 class="font-bold text-sm mb-1 text-on-surface" th:text="${n.title != null and !n.title.isEmpty() ? n.title : 'Note'}">Note</h4>
+                                    <p class="text-xs text-on-surface-variant line-clamp-2 leading-relaxed" th:text="${#strings.abbreviate(n.content, 120)}"></p>
+                                </a>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="lg:col-span-4 space-y-8">
+                        <section class="bg-surface-container-lowest rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div class="p-4 pb-2">
+                                <h3 class="font-bold font-headline text-sm text-on-background">Leaderboard</h3>
+                            </div>
+                            <table class="w-full">
+                                <thead>
+                                <tr class="text-left text-[9px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-slate-100">
+                                    <th class="px-5 py-2">Rank</th>
+                                    <th class="px-3 py-2">Scholar</th>
+                                    <th class="px-5 py-2 text-right">XP</th>
+                                </tr>
+                                </thead>
+                                <tbody class="text-xs">
+                                <tr th:each="r, stat : ${rankings}" th:if="${stat.index < 5}"
+                                    th:classappend="${currentUser != null and r.userId == currentUser.id} ? ' bg-primary/5' : ' hover:bg-surface'"
+                                    class="transition-colors">
+                                    <td class="px-5 py-2.5 font-black text-primary" th:text="${r.rank}">1</td>
+                                    <td class="px-3 py-2.5">
+                                        <span class="font-medium text-[11px] text-on-surface" th:classappend="${currentUser != null and r.userId == currentUser.id} ? ' font-bold text-primary' : ''"
+                                              th:text="${r.fullName}"></span>
+                                    </td>
+                                    <td class="px-5 py-2.5 text-right font-bold text-slate-700" th:text="${r.totalXp}">0</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="p-3 text-center border-t border-slate-50">
+                                <a th:href="@{/rankings}" class="text-[10px] font-bold text-primary hover:underline uppercase tracking-tighter">View Rankings Detail</a>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </div>
-        </th:block>
+        </main>
     </div>
-</main>
+</th:block>
+
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>

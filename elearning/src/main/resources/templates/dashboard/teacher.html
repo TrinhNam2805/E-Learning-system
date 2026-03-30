@@ -1,59 +1,67 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Teacher Dashboard')}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <div style="margin-bottom:1.5rem;">
-            <h2 th:text="'Teacher Dashboard - ' + ${currentUser.fullName}">Dashboard</h2>
-            <p style="color:#666; font-size:.93rem;">Manage your courses and track student progress.</p>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<main class="flex-1 overflow-y-auto pt-16 p-4 md:p-8 bg-background">
+    <div class="max-w-7xl mx-auto space-y-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-extrabold font-headline text-on-background" th:text="'Teacher Dashboard — ' + ${currentUser.fullName}">Dashboard</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Manage your courses and track student progress.</p>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-num" th:text="${myCourses.size()}">0</div>
-                <div class="stat-label">My Courses</div>
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-surface-container-low p-5 rounded-xl">
+                <span class="text-on-surface-variant font-label text-[10px] font-semibold uppercase tracking-widest">My Courses</span>
+                <div class="mt-1 text-3xl font-black text-primary" th:text="${myCourses.size()}">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-num" th:text="${totalStudents}">0</div>
-                <div class="stat-label">Total Students</div>
+            <div class="bg-surface-container-low p-5 rounded-xl">
+                <span class="text-on-surface-variant font-label text-[10px] font-semibold uppercase tracking-widest">Total Students</span>
+                <div class="mt-1 text-3xl font-black text-on-surface" th:text="${totalStudents}">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-num" th:text="${totalLessons}">0</div>
-                <div class="stat-label">Total Lessons</div>
+            <div class="bg-surface-container-low p-5 rounded-xl">
+                <span class="text-on-surface-variant font-label text-[10px] font-semibold uppercase tracking-widest">Total Lessons</span>
+                <div class="mt-1 text-3xl font-black text-tertiary" th:text="${totalLessons}">0</div>
             </div>
-        </div>
+        </section>
 
-        <h2 style="margin-top:1.5rem;">My Courses</h2>
-        <div class="table-wrap" style="margin-top:1rem;">
-            <table>
-                <thead>
-                    <tr><th>Code</th><th>Course Name</th><th>Semester</th><th>Status</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
+        <section>
+            <h2 class="text-lg font-bold font-headline text-on-background mb-4">My Courses</h2>
+            <div class="it-table-wrap">
+                <table class="it-data-table">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Course Name</th>
+                        <th>Semester</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
                     <tr th:each="c : ${myCourses}">
-                        <td><span class="badge" th:text="${c.courseCode}"></span></td>
-                        <td><strong th:text="${c.courseName}"></strong></td>
+                        <td><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/20 text-primary" th:text="${c.courseCode}"></span></td>
+                        <td class="font-semibold" th:text="${c.courseName}"></td>
                         <td th:text="${c.semester}"></td>
                         <td>
-                            <span class="badge"
-                                  th:classappend="${c.status.name() == 'PUBLISHED'} ? 'badge-green' : 'badge-gray'"
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold"
+                                  th:classappend="${c.status.name() == 'PUBLISHED'} ? ' bg-emerald-100 text-emerald-800' : ' bg-slate-100 text-on-surface'"
                                   th:text="${c.status}"></span>
                         </td>
                         <td>
-                            <div style="display:flex; gap:.4rem; flex-wrap:wrap;">
-                                <a th:href="@{/courses/{id}(id=${c.id})}" class="btn btn-outline btn-sm">View</a>
-                                <a th:href="@{/teacher/courses/{id}/lessons(id=${c.id})}" class="btn btn-outline btn-sm">Lessons</a>
-                                <a th:href="@{/teacher/courses/{id}/assignments(id=${c.id})}" class="btn btn-outline btn-sm">Assignments</a>
-                                <a th:href="@{/teacher/courses/{id}/students(id=${c.id})}" class="btn btn-outline btn-sm">Students</a>
-                                <a th:href="@{/forum(courseId=${c.id})}" class="btn btn-outline btn-sm">Forum</a>
+                            <div class="flex flex-wrap gap-1">
+                                <a th:href="@{/courses/{id}(id=${c.id})}" class="text-[11px] font-bold text-primary no-underline hover:underline">View</a>
+                                <a th:href="@{/teacher/courses/{id}/lessons(id=${c.id})}" class="text-[11px] font-bold text-primary no-underline hover:underline">Lessons</a>
+                                <a th:href="@{/teacher/courses/{id}/assignments(id=${c.id})}" class="text-[11px] font-bold text-primary no-underline hover:underline">Assignments</a>
+                                <a th:href="@{/teacher/courses/{id}/students(id=${c.id})}" class="text-[11px] font-bold text-primary no-underline hover:underline">Students</a>
+                                <a th:href="@{/forum(courseId=${c.id})}" class="text-[11px] font-bold text-primary no-underline hover:underline">Forum</a>
                             </div>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>

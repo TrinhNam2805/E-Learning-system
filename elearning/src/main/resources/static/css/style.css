@@ -21,39 +21,24 @@ body {
   display: flex;
   flex-direction: column;
   font-family: var(--font);
-  background: var(--bg);
-  color: #222;
   line-height: 1.65;
   font-size: 16px;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+/* Pages dùng Tailwind (body.bg-background) — không ghi đè màu nền/chữ */
+body:not(.bg-background) {
+  background: var(--bg);
+  color: #222;
 }
 main { flex: 1; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; }
 
-/* ===== HEADER ===== */
-header {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 4px rgba(10,102,194,.07);
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-}
-nav {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
+/* ===== TOP NAV =====
+   Never use bare `header { }` or bare `nav { }` here: they would affect inner page headers and sidebar <nav>.
+   Top bar + desktop links use Tailwind on #top-nav in fragments/layout.html. */
 .logo a { font-size: 1.3rem; font-weight: 700; color: var(--primary); text-decoration: none; }
 .nav-toggle { display: none; cursor: pointer; font-size: 1.5rem; color: var(--primary); padding: .25rem; background: none; border: none; font-family: inherit; }
 .links { display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap; }
@@ -69,13 +54,16 @@ nav {
 
 /* ===== FOOTER ===== */
 footer {
+  margin-top: auto;
+}
+/* Trang cũ không có layout Tailwind */
+body:not(.bg-background) footer {
   text-align: center;
   padding: 1.25rem 1rem;
   font-size: .88rem;
   color: #888;
   background: #fff;
   border-top: 1px solid var(--border);
-  margin-top: auto;
 }
 
 /* ===== TOAST ===== */
@@ -692,6 +680,68 @@ tr:hover td { background: #f8faff; }
 /* Note items */
 .note-item { padding: .5rem .65rem; border-radius: 6px; background: #fafafa; }
 
+/* My Notes — lesson rows: whole row opens lesson */
+.note-list-lesson-row {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border-radius: 0 8px 8px 0;
+  overflow: hidden;
+}
+.note-list-lesson-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  padding: .85rem 1rem;
+  border-radius: 0 8px 8px 0;
+  transition: background .15s ease;
+  cursor: pointer;
+}
+.note-list-lesson-link:hover {
+  background: #f0f6ff;
+}
+.note-list-lesson-hint {
+  font-size: .75rem;
+  color: #0a66c2;
+  font-weight: 600;
+  margin-bottom: .35rem;
+}
+
+/* Lesson page — note row anchor + scroll highlight */
+.lesson-note-card {
+  scroll-margin-top: 5.5rem;
+}
+.lesson-note-hit {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: .5rem .25rem .5rem 0;
+  border-radius: 0 6px 6px 0;
+  transition: background .15s ease;
+  cursor: pointer;
+}
+.lesson-note-hit:hover {
+  background: #f5f9ff;
+}
+.lesson-note-jump-hint {
+  font-size: .72rem;
+  color: #0a66c2;
+  display: block;
+  margin-bottom: .2rem;
+}
+.lesson-note-flash {
+  animation: lessonNoteFlash 1.8s ease;
+}
+@keyframes lessonNoteFlash {
+  0%, 100% { box-shadow: none; }
+  15% { box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.35); }
+}
+
 /* Continue learning card */
 .continue-card { display: flex; gap: .85rem; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: .85rem 1rem; margin-bottom: .6rem; }
 .continue-thumb img { width: 64px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
@@ -718,3 +768,41 @@ tr:hover td { background: #f8faff; }
   .auth-card, .container { padding: 1.5rem 1.25rem; }
   .auth-wrapper { align-items: flex-start; padding-top: 2rem; }
 }
+
+/* ===== IT Scholar / Tailwind pages: data tables (<th> headers) ===== */
+.it-table-wrap {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+table.it-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+table.it-data-table thead th {
+  text-align: left;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4e5a81;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0.5rem 1rem;
+  font-family: Inter, system-ui, sans-serif;
+}
+table.it-data-table tbody td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f8fafc;
+  vertical-align: middle;
+  color: #202d51;
+}
+table.it-data-table tbody tr:hover {
+  background: #f6f5ff;
+}
+.lesson-content-html {
+  line-height: 1.65;
+  color: #202d51;
+}
+.lesson-content-html img { max-width: 100%; height: auto; }

@@ -1,35 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Announcements')}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <a class="back-link" th:href="@{/}">&larr; Home</a>
-        <div class="page-header" style="margin-bottom:1rem;">
-            <h2>Announcements</h2>
-            <p style="color:#666;font-size:.92rem;margin-top:.35rem;">Official notices from courses (forum posts marked as announcement).</p>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<main class="flex-1 overflow-y-auto pt-16 p-4 md:p-8 bg-background">
+    <div class="max-w-3xl mx-auto space-y-6">
+        <a th:href="@{/}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
+            <span class="material-symbols-outlined text-lg">arrow_back</span> Home
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold font-headline text-on-background">Announcements</h1>
+            <p class="text-sm text-on-surface-variant mt-2">Official notices from courses (forum posts marked as announcement).</p>
         </div>
 
-        <div th:if="${posts == null or posts.isEmpty()}" class="empty-state">
-            <p>No announcements yet.</p>
+        <div th:if="${posts == null or posts.isEmpty()}" class="text-center py-16 text-on-surface-variant rounded-xl border border-dashed border-slate-200">
+            No announcements yet.
         </div>
 
-        <div th:each="p : ${posts}" class="post-item" style="margin-bottom:.75rem;">
-            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;flex-wrap:wrap;">
-                <span class="post-type-badge type-ANNOUNCEMENT">ANNOUNCEMENT</span>
-                <span class="post-title" th:text="${p.title}">Title</span>
+        <article th:each="p : ${posts}" class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 uppercase tracking-wide">Announcement</span>
+                <h2 class="text-lg font-bold font-headline text-on-background" th:text="${p.title}">Title</h2>
             </div>
-            <div style="font-size:.82rem;color:#888;margin-bottom:.5rem;">
+            <div class="text-xs text-on-surface-variant mb-3">
                 <span th:if="${p.course != null}" th:text="${p.course.courseCode}"></span>
                 <span th:if="${p.author != null}" th:text="' · ' + ${p.author.fullName}"></span>
                 <span th:if="${p.createdAt != null}" th:text="' · ' + ${#temporals.format(p.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
             </div>
-            <div style="font-size:.9rem;color:#444;line-height:1.55;" th:text="${p.content}">Content</div>
-            <div th:if="${p.course != null}" style="margin-top:.65rem;">
-                <a th:href="@{/courses/{id}(id=${p.course.id})}" class="btn-link" style="font-size:.88rem;">Go to course &rarr;</a>
+            <div class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap" th:text="${p.content}">Content</div>
+            <div th:if="${p.course != null}" class="mt-4">
+                <a th:href="@{/courses/{id}(id=${p.course.id})}" class="text-sm font-bold text-primary no-underline hover:underline">Go to course →</a>
             </div>
-        </div>
+        </article>
     </div>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>

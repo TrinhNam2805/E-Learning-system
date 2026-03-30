@@ -18,6 +18,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoteController {
 
+    /** Giới hạn theo cột TEXT / UX; mỗi user một bộ ghi chú (student_id trong DB). */
+    private static final int MAX_NOTE_CONTENT_LENGTH = 50_000;
+    private static final int MAX_SOURCE_EXCERPT_LENGTH = 20_000;
+    private static final int MAX_NOTE_TITLE_LENGTH = 200;
+    private static final int MAX_TAGS_LENGTH = 500;
+    /** Số ghi chú tối đa mỗi tài khoản (tránh lạm dụng). */
+    private static final long MAX_NOTES_PER_USER = 10_000L;
+
     private final NoteService noteService;
     private final CourseService courseService;
     private final LessonService lessonService;
@@ -68,6 +76,28 @@ public class NoteController {
         return "note/detail";
     }
 
+    /**
+     * Mở đúng bài học chứa ghi chú (tránh lỗi URL/ghi chú thiếu course trên client).
+     * Nếu không gắn lesson → về trang chi tiết ghi chú.
+     */
+    @GetMapping("/{id}/open-lesson")
+    public String openLesson(@PathVariable Long id,
+                             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) return "redirect:/login";
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+        if (user == null) return "redirect:/login";
+
+        Note note = noteService.findByIdAndStudentId(id, user.getId()).orElse(null);
+        if (note == null) return "redirect:/notes";
+        if (note.getLesson() == null) {
+            return "redirect:/notes/" + id;
+        }
+        Long courseId = note.getCourse() != null
+                ? note.getCourse().getId()
+                : note.getLesson().getCourse().getId();
+        return "redirect:/lessons/" + note.getLesson().getId() + "?courseId=" + courseId + "&noteId=" + id;
+    }
+
     @PostMapping("/save")
     public String save(@RequestParam(required = false) Long lessonId,
                        @RequestParam(required = false) Long courseId,
@@ -85,6 +115,28 @@ public class NoteController {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
 
+        if (content.length() > MAX_NOTE_CONTENT_LENGTH) {
+            ra.addFlashAttribute("error", "Note content is too long (max " + MAX_NOTE_CONTENT_LENGTH + " characters).");
+            return redirectAfterSave(lessonId, courseId, null);
+        }
+        if (title != null && title.length() > MAX_NOTE_TITLE_LENGTH) {
+            ra.addFlashAttribute("error", "Title is too long (max " + MAX_NOTE_TITLE_LENGTH + " characters).");
+            return redirectAfterSave(lessonId, courseId, null);
+        }
+        if (sourceExcerpt != null && sourceExcerpt.length() > MAX_SOURCE_EXCERPT_LENGTH) {
+            ra.addFlashAttribute("error", "Source excerpt is too long (max " + MAX_SOURCE_EXCERPT_LENGTH + " characters).");
+            return redirectAfterSave(lessonId, courseId, null);
+        }
+        String tagsNorm = normalizeTags(tags);
+        if (tagsNorm != null && tagsNorm.length() > MAX_TAGS_LENGTH) {
+            ra.addFlashAttribute("error", "Tags are too long (max " + MAX_TAGS_LENGTH + " characters).");
+            return redirectAfterSave(lessonId, courseId, null);
+        }
+        if (noteService.countByStudentId(user.getId()) >= MAX_NOTES_PER_USER) {
+            ra.addFlashAttribute("error", "Storage limit reached: maximum " + MAX_NOTES_PER_USER + " notes per account.");
+            return redirectAfterSave(lessonId, courseId, null);
+        }
+
         Note.NoteType type = Note.NoteType.valueOf(noteType);
         Note.NoteBuilder builder = Note.builder()
                 .student(user)
@@ -93,7 +145,7 @@ public class NoteController {
                 .noteType(type)
                 .title(title)
                 .sourceExcerpt(sourceExcerpt != null && !sourceExcerpt.trim().isEmpty() ? sourceExcerpt.trim() : null)
-                .tags(normalizeTags(tags));
+                .tags(tagsNorm);
 
         if (lessonId != null) {
             lessonService.findById(lessonId).ifPresent(builder::lesson);
@@ -109,17 +161,24 @@ public class NoteController {
                 noteService.linkNotes(saved.getId(), linkToNoteId, user, linkLabel);
             } catch (Exception ex) {
                 ra.addFlashAttribute("error", "Note saved, but link failed: " + ex.getMessage());
-                return redirectAfterSave(lessonId, courseId);
+                return redirectAfterSave(lessonId, courseId, saved.getId());
             }
         }
 
         ra.addFlashAttribute("success", "Note saved!");
-        return redirectAfterSave(lessonId, courseId);
+        return redirectAfterSave(lessonId, courseId, saved.getId());
     }
 
-    private static String redirectAfterSave(Long lessonId, Long courseId) {
+    private static String redirectAfterSave(Long lessonId, Long courseId, Long savedNoteId) {
         if (lessonId != null && courseId != null) {
-            return "redirect:/lessons/" + lessonId + "?courseId=" + courseId;
+            StringBuilder sb = new StringBuilder("redirect:/lessons/")
+                    .append(lessonId)
+                    .append("?courseId=")
+                    .append(courseId);
+            if (savedNoteId != null) {
+                sb.append("&noteId=").append(savedNoteId);
+            }
+            return sb.toString();
         }
         return "redirect:/notes";
     }
@@ -179,13 +238,31 @@ public class NoteController {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
 
+        if (content.length() > MAX_NOTE_CONTENT_LENGTH) {
+            ra.addFlashAttribute("error", "Note content is too long (max " + MAX_NOTE_CONTENT_LENGTH + " characters).");
+            return "redirect:/notes/" + id;
+        }
+        if (title != null && title.length() > MAX_NOTE_TITLE_LENGTH) {
+            ra.addFlashAttribute("error", "Title is too long (max " + MAX_NOTE_TITLE_LENGTH + " characters).");
+            return "redirect:/notes/" + id;
+        }
+        if (sourceExcerpt != null && sourceExcerpt.length() > MAX_SOURCE_EXCERPT_LENGTH) {
+            ra.addFlashAttribute("error", "Source excerpt is too long (max " + MAX_SOURCE_EXCERPT_LENGTH + " characters).");
+            return "redirect:/notes/" + id;
+        }
+        String tagsNorm = normalizeTags(tags);
+        if (tagsNorm != null && tagsNorm.length() > MAX_TAGS_LENGTH) {
+            ra.addFlashAttribute("error", "Tags are too long (max " + MAX_TAGS_LENGTH + " characters).");
+            return "redirect:/notes/" + id;
+        }
+
         noteService.findById(id).ifPresent(note -> {
             if (note.getStudent().getId().equals(user.getId())) {
                 note.setContent(content);
                 note.setHighlightColor(highlightColor);
                 if (title != null) note.setTitle(title);
                 note.setSourceExcerpt(sourceExcerpt != null && !sourceExcerpt.trim().isEmpty() ? sourceExcerpt.trim() : null);
-                note.setTags(normalizeTags(tags));
+                note.setTags(tagsNorm);
                 noteService.save(note);
             }
         });

@@ -3,21 +3,21 @@
 function toggleNotif() {
     const d = document.getElementById('notif-dropdown');
     const a = document.getElementById('account-dropdown');
-    if (a) a.style.display = 'none';
-    if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    if (a) a.classList.add('hidden');
+    if (d) d.classList.toggle('hidden');
 }
 
 function toggleAccount() {
     const d = document.getElementById('account-dropdown');
     const n = document.getElementById('notif-dropdown');
-    if (n) n.style.display = 'none';
-    if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    if (n) n.classList.add('hidden');
+    if (d) d.classList.toggle('hidden');
 }
 
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.account-menu')) {
-        document.querySelectorAll('.dropdown-menu').forEach(function(m) {
-            m.style.display = 'none';
+        document.querySelectorAll('#notif-dropdown, #account-dropdown').forEach(function(m) {
+            if (m) m.classList.add('hidden');
         });
     }
 });

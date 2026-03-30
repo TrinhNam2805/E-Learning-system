@@ -27,6 +27,7 @@ public class LessonController {
     @GetMapping("/{lessonId}")
     public String view(@PathVariable Long lessonId,
                        @RequestParam Long courseId,
+                       @RequestParam(required = false) Long noteId,
                        @AuthenticationPrincipal UserDetails userDetails,
                        Model model) {
         if (userDetails == null) return "redirect:/login";
@@ -68,6 +69,11 @@ public class LessonController {
                 .map(Lesson::getId)
                 .collect(java.util.stream.Collectors.toList());
         model.addAttribute("completedLessonIds", completedLessonIds);
+        Long scrollNote = null;
+        if (noteId != null && noteService.isNoteOnLesson(user.getId(), lessonId, noteId)) {
+            scrollNote = noteId;
+        }
+        model.addAttribute("scrollToNoteId", scrollNote);
 
         return "lesson/view";
     }
