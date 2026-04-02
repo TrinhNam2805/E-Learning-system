@@ -7,69 +7,135 @@
     <title th:text="${title} + ' | E-Learning IT'">E-Learning IT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body>
 <nav th:fragment="navbar" id="top-nav">
-    <div class="logo"><a th:href="@{/}">E-Learning IT</a></div>
-    <button class="nav-toggle" onclick="this.closest('nav').classList.toggle('open')">&#9776;</button>
-    <div class="links">
-        <a th:href="@{/courses}">Courses</a>
-        <a th:if="${currentUser == null}" th:href="@{/announcements}">Announcements</a>
-        <a th:if="${currentUser != null}" th:href="@{/rankings}">Rankings</a>
-        <th:block th:if="${currentUser != null}">
-            <a th:href="@{/dashboard}">Dashboard</a>
-            <a th:href="@{/notes}">Notes</a>
-            <div class="account-menu">
-                <button class="icon-btn notification-btn" onclick="toggleNotif()" title="Notifications">
-                    &#128276;
-                    <span class="notif-badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
-                </button>
-                <div id="notif-dropdown" class="dropdown-menu" style="display:none; min-width:300px;">
-                    <div style="padding:.75rem 1rem; font-weight:600; border-bottom:1px solid #eee;">Notifications</div>
-                    <div style="padding:.5rem 1rem; font-size:.88rem; color:#888;">
-                        <a th:href="@{/notifications}">View all &rarr;</a>
-                    </div>
-                </div>
+    <div class="nav-shell">
+        <div class="nav-main">
+            <div class="logo">
+                <a th:href="@{/}" data-nav-match="/" data-nav-mode="home">
+                    <span class="logo-mark">E</span>
+                    <span class="logo-copy">
+                        <span>E-Learning IT</span>
+                        <small>Education Platform</small>
+                    </span>
+                </a>
             </div>
-            <div class="account-menu">
-                <button class="icon-btn account-btn" onclick="toggleAccount()" title="Account">
-                    &#128100; <span style="font-size:.88rem;font-weight:600;" th:text="${currentUser.fullName}"></span>
-                </button>
-                <div id="account-dropdown" class="dropdown-menu" style="display:none;">
-                    <div style="padding:.75rem 1rem; border-bottom:1px solid #eee;">
-                        <div style="font-weight:600;" th:text="${currentUser.fullName}"></div>
-                        <div style="font-size:.82rem;color:#888;" th:text="${currentUser.role}"></div>
-                    </div>
-                    <a th:href="@{/profile}" class="dropdown-item">&#128100; My Profile</a>
-                    <a th:href="@{/dashboard}" class="dropdown-item">&#128202; Dashboard</a>
-                    <a th:href="@{/notes}" class="dropdown-item">&#128211; My Notes</a>
-                    <a th:href="@{/change-password}" class="dropdown-item">&#128274; Change Password</a>
-                    <hr style="margin:.25rem 0;border:none;border-top:1px solid #eee;">
-                    <a th:href="@{/logout}" class="dropdown-item logout-item">&#128682; Logout</a>
-                </div>
+            <div class="nav-main-actions">
+                <a th:href="@{/courses}" class="nav-search-link" data-nav-match="/courses">
+                    <span class="nav-search-icon">&#128269;</span>
+                    <span>Search courses</span>
+                </a>
+                <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" onclick="toggleNavMenu(this)">&#9776;</button>
             </div>
-        </th:block>
-        <th:block th:if="${currentUser == null}">
-            <a th:href="@{/login}">Login</a>
-        </th:block>
+        </div>
+
+        <div class="nav-panel">
+            <div class="nav-primary">
+                <a th:href="@{/}" class="nav-link" data-nav-match="/" data-nav-mode="home">Home</a>
+                <a th:href="@{/courses}" class="nav-link" data-nav-match="/courses">Courses</a>
+                <a th:if="${currentUser == null}" th:href="@{/announcements}" class="nav-link" data-nav-match="/announcements">Announcements</a>
+                <a th:if="${currentUser != null}" th:href="@{/rankings}" class="nav-link" data-nav-match="/rankings">Rankings</a>
+                <a th:if="${currentUser != null}" th:href="@{/notes}" class="nav-link" data-nav-match="/notes">Notes</a>
+            </div>
+
+            <div class="nav-utility">
+                <th:block th:if="${currentUser != null}">
+                    <a th:href="@{/dashboard}" class="nav-cta nav-dashboard-link" data-nav-match="/dashboard|/student/dashboard|/teacher/dashboard|/admin/dashboard">Dashboard</a>
+                    <div class="account-menu">
+                        <button class="icon-btn notification-btn nav-icon-btn" onclick="toggleNotif()" title="Notifications" type="button">
+                            <span aria-hidden="true">&#128276;</span>
+                            <span class="nav-icon-label">Alerts</span>
+                            <span class="notif-badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
+                        </button>
+                        <div id="notif-dropdown" class="dropdown-menu" hidden>
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-footer">
+                                <a th:href="@{/notifications}" data-nav-match="/notifications">View all &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account-menu">
+                        <button class="icon-btn account-btn nav-account-btn" onclick="toggleAccount()" title="Account" type="button">
+                            <span class="nav-avatar-mini" th:text="${#strings.toUpperCase(#strings.substring(currentUser.fullName, 0, 1))}">A</span>
+                            <span class="nav-account-copy">
+                                <strong th:text="${currentUser.fullName}"></strong>
+                                <small th:text="${currentUser.role}"></small>
+                            </span>
+                        </button>
+                        <div id="account-dropdown" class="dropdown-menu" hidden>
+                            <div class="dropdown-header">
+                                <div class="dropdown-profile">
+                                    <strong th:text="${currentUser.fullName}"></strong>
+                                    <span th:text="${currentUser.role}"></span>
+                                </div>
+                            </div>
+                            <div class="dropdown-list">
+                                <a th:href="@{/profile}" class="dropdown-item" data-nav-match="/profile">&#128100; My Profile</a>
+                                <a th:href="@{/dashboard}" class="dropdown-item" data-nav-match="/dashboard|/student/dashboard|/teacher/dashboard|/admin/dashboard">&#128202; Dashboard</a>
+                                <a th:href="@{/notes}" class="dropdown-item" data-nav-match="/notes">&#128211; My Notes</a>
+                                <a th:href="@{/change-password}" class="dropdown-item" data-nav-match="/change-password">&#128274; Change Password</a>
+                                <a th:href="@{/logout}" class="dropdown-item logout-item">&#128682; Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${currentUser == null}">
+                    <a th:href="@{/login}" class="nav-link" data-nav-match="/login">Login</a>
+                    <a th:href="@{/register}" class="nav-cta" data-nav-match="/register">Create account</a>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="nav-rolebar" th:if="${currentUser != null}">
+            <div class="nav-role-summary">
+                <span class="nav-role-badge" th:text="${currentUser.role.name() == 'STUDENT'} ? 'Student Workspace' : (${currentUser.role.name() == 'TEACHER'} ? 'Lecturer Workspace' : 'Administrator Workspace')">Workspace</span>
+                <span class="nav-role-text">Quick access for your current role</span>
+            </div>
+
+            <div class="nav-role-links" th:if="${currentUser.role.name() == 'STUDENT'}">
+                <a th:href="@{/student/dashboard}" class="nav-role-link" data-nav-match="/dashboard|/student/dashboard">Learning Hub</a>
+                <a th:href="@{/courses}" class="nav-role-link" data-nav-match="/courses">Courses</a>
+                <a th:href="@{/notes}" class="nav-role-link" data-nav-match="/notes">Notes</a>
+                <a th:href="@{/rankings}" class="nav-role-link" data-nav-match="/rankings">Rankings</a>
+                <a th:href="@{/notifications}" class="nav-role-link" data-nav-match="/notifications">Notifications</a>
+            </div>
+
+            <div class="nav-role-links" th:if="${currentUser.role.name() == 'TEACHER'}">
+                <a th:href="@{/teacher/dashboard}" class="nav-role-link" data-nav-match="/dashboard|/teacher/dashboard">Teaching Hub</a>
+                <a th:href="@{/courses}" class="nav-role-link" data-nav-match="/courses">Courses</a>
+                <a th:href="@{/notes}" class="nav-role-link" data-nav-match="/notes">Notes</a>
+                <a th:href="@{/forum}" class="nav-role-link" data-nav-match="/forum">Forum</a>
+                <a th:href="@{/rankings}" class="nav-role-link" data-nav-match="/rankings">Rankings</a>
+            </div>
+
+            <div class="nav-role-links" th:if="${currentUser.role.name() == 'ADMIN'}">
+                <a th:href="@{/admin/dashboard}" class="nav-role-link" data-nav-match="/dashboard|/admin/dashboard">Admin Home</a>
+                <a th:href="@{/courses}" class="nav-role-link" data-nav-match="/courses">Courses</a>
+                <a th:href="@{/admin/courses/create}" class="nav-role-link" data-nav-match="/admin/courses/create">Create Course</a>
+                <a th:href="@{/notes}" class="nav-role-link" data-nav-match="/notes">Notes</a>
+                <a th:href="@{/rankings}" class="nav-role-link" data-nav-match="/rankings">Rankings</a>
+            </div>
+        </div>
     </div>
 </nav>
 <footer th:fragment="footer">
-    <div style="max-width:1200px;margin:0 auto;padding:0 5%;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
-            <div>
-                <div style="font-weight:700;color:#0a66c2;font-size:1rem;margin-bottom:.25rem;">E-Learning IT</div>
-                <div style="color:#888;font-size:.88rem;">Online Learning Platform &mdash; Faculty of Information Technology</div>
+    <div class="footer-shell">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <strong>E-Learning IT</strong>
+                <span>Online learning platform for a focused, modern education experience.</span>
             </div>
-            <div style="display:flex;gap:1.5rem;font-size:.88rem;">
-                <a th:href="@{/courses}" style="color:#888;">Courses</a>
-                <a th:if="${currentUser == null}" th:href="@{/announcements}" style="color:#888;">Announcements</a>
-                <a th:if="${currentUser != null}" th:href="@{/rankings}" style="color:#888;">Rankings</a>
+            <div class="footer-links">
+                <a th:href="@{/courses}">Courses</a>
+                <a th:if="${currentUser == null}" th:href="@{/announcements}">Announcements</a>
+                <a th:if="${currentUser != null}" th:href="@{/rankings}">Rankings</a>
             </div>
         </div>
-        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #e8eef6;text-align:center;font-size:.85rem;color:#aaa;">
+        <div class="footer-bottom">
             &copy; 2026 E-Learning IT. All rights reserved.
         </div>
     </div>

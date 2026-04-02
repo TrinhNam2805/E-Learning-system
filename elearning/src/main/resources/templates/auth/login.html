@@ -6,7 +6,11 @@
 <main>
     <div class="auth-wrapper">
         <div class="auth-card">
-            <h2>Login</h2>
+            <div class="auth-card-header">
+                <div class="eyebrow">Welcome back</div>
+                <h2>Sign in to continue learning</h2>
+                <p>Access your courses, progress, assignments, and personal workspace.</p>
+            </div>
 
             <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
             <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
@@ -19,14 +23,14 @@
                 <input type="email" name="email" placeholder="example@email.com" required autofocus>
                 <label>Password</label>
                 <div class="password-field">
-                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    <input type="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
                     <button th:replace="~{fragments/password-toggle-button :: toggleBtn}"></button>
                 </div>
-                <div style="display:flex; align-items:center; gap:.5rem; margin-top:.75rem;">
+                <div class="field-inline">
                     <input type="checkbox" name="remember-me" id="remember-me">
-                    <label for="remember-me" style="margin-top:0; font-weight:400; font-size:.9rem;">Remember me</label>
+                    <label for="remember-me" class="mt-0" style="font-weight:400;">Remember me</label>
                 </div>
-                <button type="submit" class="btn btn-full" style="margin-top:1rem;">Login</button>
+                <button type="submit" class="btn btn-full mt-1">Login</button>
             </form>
 
             <div class="auth-links">
@@ -34,7 +38,6 @@
                 <a th:if="${redirectAfterLogin == null}" th:href="@{/register}">Create new account</a>
                 <a th:if="${redirectAfterLogin != null}" th:href="@{/register(redirect=${redirectAfterLogin})}">Create new account</a>
             </div>
-
         </div>
     </div>
 </main>

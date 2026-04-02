@@ -4,138 +4,144 @@
 <body>
 <header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
 <main>
-    <div class="page">
+    <div class="page section-stack">
         <a class="back-link" th:href="@{/courses/{id}(id=${course.id})}">&larr; Back to Course</a>
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-        <div style="display:grid; grid-template-columns:1fr 280px; gap:1.5rem; align-items:start;">
-            <!-- Main lesson content -->
-            <div>
+        <div class="lesson-layout">
+            <div class="section-stack">
                 <div class="lesson-view">
                     <div class="lesson-view-header">
                         <div class="badge-row">
                             <span class="badge" th:text="${course.courseCode}"></span>
                             <span class="badge badge-dark" th:text="${course.courseName}"></span>
                             <span class="badge" th:text="${'Lesson ' + lesson.lessonOrder + '/' + allLessons.size()}"></span>
+                            <span class="badge badge-green" th:if="${isCompleted}">Completed</span>
                         </div>
                         <h2 th:text="${lesson.lessonTitle}"></h2>
-                        <div style="font-size:.85rem; color:#888; margin-top:.35rem;"
-                             th:text="${lesson.durationMinutes} + ' min'"></div>
+                        <div class="section-note mt-1" th:text="${lesson.durationMinutes} + ' min'"></div>
                     </div>
 
                     <div class="lesson-view-body">
-                        <!-- Nội dung lưu trong DB (HTML từ GV/admin). Không nhập HTML từ người dùng chưa lọc. -->
                         <div class="lesson-content-box lesson-content-html" th:utext="${lesson.lessonContent}"></div>
                     </div>
 
                     <div class="lesson-view-footer">
-                        <div style="display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; width:100%;">
-                            <a th:if="${prev != null}" th:href="@{/lessons/{id}(id=${prev.id}, courseId=${course.id})}"
-                               class="btn btn-outline btn-sm">&larr; Previous</a>
+                        <div class="button-row" style="width:100%;">
+                            <a th:if="${prev != null}" th:href="@{/lessons/{id}(id=${prev.id}, courseId=${course.id})}" class="btn btn-outline btn-sm">&larr; Previous</a>
                             <div style="flex:1;"></div>
-                            <span th:if="${isCompleted}" class="badge badge-green" style="font-size:.93rem; padding:.4rem .9rem;">&#10003; Completed</span>
                             <form th:unless="${isCompleted}" th:action="@{/lessons/{id}/complete(id=${lesson.id})}" method="post" style="display:inline;">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                 <input type="hidden" name="courseId" th:value="${course.id}">
-                                <button type="submit" class="btn btn-success" style="padding:.7rem 1.75rem;">&#10003; Mark Complete</button>
+                                <button type="submit" class="btn btn-success btn-sm">&#10003; Mark Complete</button>
                             </form>
-                            <a th:if="${next != null}" th:href="@{/lessons/{id}(id=${next.id}, courseId=${course.id})}"
-                               class="btn btn-sm">Next &rarr;</a>
+                            <a th:if="${next != null}" th:href="@{/lessons/{id}(id=${next.id}, courseId=${course.id})}" class="btn btn-sm">Next &rarr;</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Notes section -->
-                <div style="margin-top:1.5rem; background:#fff; border:1px solid #e0e7ef; border-radius:12px; padding:1.25rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                        <h3 style="font-size:1rem; color:#0a3d7a;">&#128211; Lesson Notes</h3>
-                        <button onclick="document.getElementById('note-form').style.display = document.getElementById('note-form').style.display === 'none' ? 'block' : 'none'"
-                                class="btn btn-outline btn-sm">+ Add Note</button>
+                <div class="section-card">
+                    <div class="section-heading">
+                        <div>
+                            <h3>Lesson Notes</h3>
+                            <p>Capture summaries, key quotes, and linked ideas while you study.</p>
+                        </div>
+                        <button onclick="document.getElementById('note-form').classList.toggle('hidden')" class="btn btn-outline btn-sm" type="button">+ Add Note</button>
                     </div>
 
-                    <div id="note-form" style="display:none; margin-bottom:1rem; padding:1rem; background:#f8faff; border-radius:8px; border:1px solid #dce8fb;">
+                    <div id="note-form" class="surface-card hidden mb-1">
                         <form th:action="@{/notes/save}" method="post">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                             <input type="hidden" name="lessonId" th:value="${lesson.id}">
                             <input type="hidden" name="courseId" th:value="${course.id}">
                             <input type="hidden" name="noteType" value="LESSON">
-                            <label style="margin-top:0;">Title (optional)</label>
-                            <input type="text" name="title" placeholder="e.g. Key definitions">
-                            <label>Tags (comma-separated)</label>
-                            <input type="text" name="tags" placeholder="e.g. big-o, sorting">
-                            <label>Source excerpt — quote from lesson (optional, for traceability)</label>
-                            <textarea name="sourceExcerpt" rows="2" placeholder="Paste a short quote from the lesson text above..."></textarea>
-                            <label>Note Content</label>
-                            <textarea name="content" placeholder="Your summary, ideas, links..." required style="min-height:80px;"></textarea>
-                            <label>Link to another note (optional)</label>
-                            <select name="linkToNoteId" style="max-width:100%;">
-                                <option value="">— None —</option>
-                                <option th:each="cn : ${noteLinkCandidates}" th:value="${cn.id}"
-                                        th:text="${(cn.title != null and !cn.title.isEmpty() ? cn.title : 'Note') + ' · ' + #temporals.format(cn.createdAt, 'MM/dd')}"></option>
-                            </select>
-                            <label>Relation label (if linking)</label>
-                            <input type="text" name="linkLabel" placeholder="e.g. builds on, contrasts with">
-                            <div style="display:flex; gap:1rem; align-items:center; margin-top:.75rem; flex-wrap:wrap;">
+
+                            <div class="form-grid">
+                                <div class="form-col-6">
+                                    <label class="mt-0">Title (optional)</label>
+                                    <input type="text" name="title" placeholder="For example: Key definitions">
+                                </div>
+                                <div class="form-col-6">
+                                    <label class="mt-0">Tags</label>
+                                    <input type="text" name="tags" placeholder="For example: big-o, sorting">
+                                </div>
+                                <div class="form-col-12">
+                                    <label>Source excerpt</label>
+                                    <textarea name="sourceExcerpt" rows="2" placeholder="Paste a short quote from the lesson for traceability"></textarea>
+                                </div>
+                                <div class="form-col-12">
+                                    <label>Note Content</label>
+                                    <textarea name="content" placeholder="Write your summary, ideas, reminders, or useful links" required style="min-height:100px;"></textarea>
+                                </div>
+                                <div class="form-col-6">
+                                    <label>Link to another note</label>
+                                    <select name="linkToNoteId">
+                                        <option value="">None</option>
+                                        <option th:each="cn : ${noteLinkCandidates}" th:value="${cn.id}" th:text="${(cn.title != null and !cn.title.isEmpty() ? cn.title : 'Note') + ' � ' + #temporals.format(cn.createdAt, 'MM/dd')}"></option>
+                                    </select>
+                                </div>
+                                <div class="form-col-6">
+                                    <label>Relation label</label>
+                                    <input type="text" name="linkLabel" placeholder="For example: builds on, contrasts with">
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
                                 <div>
-                                    <label style="margin-top:0; font-size:.85rem;">Highlight Color</label>
-                                    <div style="display:flex; gap:.5rem; margin-top:.35rem;">
-                                        <label th:each="color : ${ {'#FFFF00','#90EE90','#FFB6C1','#87CEEB','#FFA500'} }"
-                                               style="cursor:pointer;">
-                                            <input type="radio" name="highlightColor" th:value="${color}"
-                                                   th:checked="${color == '#FFFF00'}" style="display:none;">
+                                    <label class="mt-0">Highlight Color</label>
+                                    <div class="button-row mt-1">
+                                        <label th:each="color : ${ {'#FFFF00','#90EE90','#FFB6C1','#87CEEB','#FFA500'} }">
+                                            <input type="radio" name="highlightColor" th:value="${color}" th:checked="${color == '#FFFF00'}" style="display:none;">
                                             <span th:style="'display:inline-block; width:24px; height:24px; border-radius:50%; background:' + ${color} + '; border:2px solid #ccc;'"></span>
                                         </label>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-sm" style="margin-top:auto;">Save Note</button>
+                                <button type="submit" class="btn btn-sm">Save Note</button>
                             </div>
                         </form>
                     </div>
 
-                    <div th:if="${lessonNotes.isEmpty()}" style="font-size:.88rem; color:#aaa; text-align:center; padding:.5rem 0;">
-                        No notes for this lesson yet.
+                    <div th:if="${lessonNotes.isEmpty()}" class="empty-state">
+                        <div class="empty-state-icon">&#128211;</div>
+                        <h3>No notes yet</h3>
+                        <p>Create your first note for this lesson to keep important ideas close at hand.</p>
                     </div>
-                    <div th:each="n : ${lessonNotes}" class="note-item"
-                         th:style="'border-left:3px solid ' + ${n.highlightColor} + '; margin-bottom:.5rem;'">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem;">
-                            <div style="flex:1;">
-                                <a th:href="@{/notes/{id}(id=${n.id})}" style="font-size:.78rem; color:#0a66c2;">Open / link &rarr;</a>
-                                <div th:if="${n.sourceExcerpt != null and !n.sourceExcerpt.isEmpty()}"
-                                     style="font-size:.82rem; color:#555; font-style:italic; margin:.25rem 0; white-space:pre-wrap;"
-                                     th:text="'“' + ${n.sourceExcerpt} + '”'"></div>
-                                <div th:if="${n.tags != null and !n.tags.isEmpty()}" style="margin:.25rem 0; font-size:.78rem; color:#64748b;"
-                                     th:text="${n.tags}"></div>
-                                <div style="font-size:.9rem; color:#333; line-height:1.6;" th:text="${n.content}"></div>
+
+                    <div class="section-stack" th:unless="${lessonNotes.isEmpty()}">
+                        <div th:each="n : ${lessonNotes}" class="note-item" th:style="'border-left:4px solid ' + ${n.highlightColor} + ';'">
+                            <div class="section-toolbar">
+                                <div class="stack-sm" style="flex:1;">
+                                    <a th:href="@{/notes/{id}(id=${n.id})}" class="btn-link">Open detail &rarr;</a>
+                                    <div th:if="${n.sourceExcerpt != null and !n.sourceExcerpt.isEmpty()}" class="helper" style="font-style:italic; white-space:pre-wrap;" th:text="'�' + ${n.sourceExcerpt} + '�'"></div>
+                                    <div th:if="${n.tags != null and !n.tags.isEmpty()}" class="badge-row">
+                                        <span class="badge badge-gray" th:each="tag : ${#strings.arraySplit(n.tags, ',')}" th:text="${#strings.trim(tag)}"></span>
+                                    </div>
+                                    <div class="text-body" th:text="${n.content}"></div>
+                                </div>
+                                <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this note?')">&#10005;</button>
+                                </form>
                             </div>
-                            <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post" style="flex-shrink:0;">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Delete this note?')" style="padding:.25rem .5rem;">&#10005;</button>
-                            </form>
+                            <div class="text-soft mt-1" th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
                         </div>
-                        <div style="font-size:.75rem; color:#aaa; margin-top:.25rem;"
-                             th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar: lesson list -->
-            <aside style="position:sticky; top:calc(56px + 12px);">
-                <div style="background:#fff; border:1px solid #e0e7ef; border-radius:12px; padding:1rem;">
-                    <div style="font-size:.9rem; font-weight:700; color:#0a3d7a; margin-bottom:.75rem;">
-                        Course Lessons
+            <aside class="lesson-sidebar">
+                <div class="section-card">
+                    <div class="section-heading">
+                        <div>
+                            <h3>Course Lessons</h3>
+                            <p>Move between lessons without losing context.</p>
+                        </div>
                     </div>
-                    <div class="lesson-list" style="margin-top:0;">
-                        <a class="lesson-item" th:each="l : ${allLessons}"
-                           th:href="@{/lessons/{id}(id=${l.id}, courseId=${course.id})}"
-                           th:style="${l.id == lesson.id} ? 'background:#e8f0fe; border-color:#0a66c2;' : ''">
-                            <div class="lesson-num"
-                                 th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e; color:#fff;' : ''"
-                                 th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? '✓' : ${l.lessonOrder}">1</div>
+                    <div class="lesson-list mt-0">
+                        <a class="lesson-item" th:each="l : ${allLessons}" th:classappend="${l.id == lesson.id} ? 'active' : ''" th:href="@{/lessons/{id}(id=${l.id}, courseId=${course.id})}">
+                            <div class="lesson-num" th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e; color:#fff;' : ''" th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? '?' : ${l.lessonOrder}">1</div>
                             <div class="lesson-info">
-                                <div class="lesson-title"
-                                     th:style="${l.id == lesson.id} ? 'color:#0a66c2;' : ''"
-                                     th:text="${l.lessonTitle}"></div>
+                                <div class="lesson-title" th:text="${l.lessonTitle}"></div>
                                 <div class="lesson-meta" th:text="${l.durationMinutes} + ' min'"></div>
                             </div>
                             <div class="lesson-arrow" th:text="${l.id == lesson.id} ? '&#9654;' : '&rarr;'"></div>

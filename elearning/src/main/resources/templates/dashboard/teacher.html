@@ -4,45 +4,40 @@
 <body>
 <header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
 <main>
-    <div class="page">
-        <div style="margin-bottom:1.5rem;">
-            <h2 th:text="'Teacher Dashboard - ' + ${currentUser.fullName}">Dashboard</h2>
-            <p style="color:#666; font-size:.93rem;">Manage your courses and track student progress.</p>
+    <div class="page section-stack">
+        <div class="page-header">
+            <div class="page-header-copy">
+                <h2 th:text="'Teacher Dashboard - ' + ${currentUser.fullName}">Dashboard</h2>
+                <p>Manage your courses, lessons, assignments, and student progress from a single workspace.</p>
+            </div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-num" th:text="${myCourses.size()}">0</div>
-                <div class="stat-label">My Courses</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num" th:text="${totalStudents}">0</div>
-                <div class="stat-label">Total Students</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num" th:text="${totalLessons}">0</div>
-                <div class="stat-label">Total Lessons</div>
-            </div>
+            <div class="stat-card"><span class="stat-num" th:text="${myCourses.size()}">0</span><span class="stat-label">My courses</span></div>
+            <div class="stat-card"><span class="stat-num" th:text="${totalStudents}">0</span><span class="stat-label">Total students</span></div>
+            <div class="stat-card"><span class="stat-num" th:text="${totalLessons}">0</span><span class="stat-label">Total lessons</span></div>
         </div>
 
-        <h2 style="margin-top:1.5rem;">My Courses</h2>
-        <div class="table-wrap" style="margin-top:1rem;">
-            <table>
-                <thead>
+        <div class="section-card">
+            <div class="section-heading">
+                <div>
+                    <h3>Managed Courses</h3>
+                    <p>Open the tools you need without leaving the overview.</p>
+                </div>
+            </div>
+            <div class="table-wrap responsive-cards">
+                <table>
+                    <thead>
                     <tr><th>Code</th><th>Course Name</th><th>Semester</th><th>Status</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     <tr th:each="c : ${myCourses}">
-                        <td><span class="badge" th:text="${c.courseCode}"></span></td>
-                        <td><strong th:text="${c.courseName}"></strong></td>
-                        <td th:text="${c.semester}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${c.status.name() == 'PUBLISHED'} ? 'badge-green' : 'badge-gray'"
-                                  th:text="${c.status}"></span>
-                        </td>
-                        <td>
-                            <div style="display:flex; gap:.4rem; flex-wrap:wrap;">
+                        <td data-label="Code"><span class="badge" th:text="${c.courseCode}"></span></td>
+                        <td data-label="Course Name"><strong th:text="${c.courseName}"></strong></td>
+                        <td data-label="Semester" th:text="${c.semester}"></td>
+                        <td data-label="Status"><span class="badge" th:classappend="${c.status.name() == 'PUBLISHED'} ? 'badge-green' : 'badge-gray'" th:text="${c.status}"></span></td>
+                        <td data-label="Actions" class="actions-cell">
+                            <div class="button-row">
                                 <a th:href="@{/courses/{id}(id=${c.id})}" class="btn btn-outline btn-sm">View</a>
                                 <a th:href="@{/teacher/courses/{id}/lessons(id=${c.id})}" class="btn btn-outline btn-sm">Lessons</a>
                                 <a th:href="@{/teacher/courses/{id}/assignments(id=${c.id})}" class="btn btn-outline btn-sm">Assignments</a>
@@ -51,8 +46,9 @@
                             </div>
                         </td>
                     </tr>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </main>

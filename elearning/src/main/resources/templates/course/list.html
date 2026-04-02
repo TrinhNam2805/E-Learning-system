@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Courses')}"></head>
 <body>
 <header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
 <main>
-    <div class="page">
+    <div class="page section-stack">
         <div class="page-header">
-            <h2>All Courses</h2>
+            <div class="page-header-copy">
+                <h2>All Courses</h2>
+                <p>Browse available courses and quickly find the learning path you need.</p>
+            </div>
             <form class="search-form" th:action="@{/courses}" method="get">
-                <input type="text" name="q" th:value="${q}" placeholder="Search by name, code...">
+                <input type="text" name="q" th:value="${q}" placeholder="Search by course name or code">
                 <button type="submit" class="btn">Search</button>
             </form>
         </div>
 
-        <div th:if="${q != null and !q.trim().isEmpty()}" style="font-size:.88rem; color:#666; margin-bottom:.75rem;">
-            Results for "<strong th:text="${q}"></strong>":
-            <span th:text="${courses.size()}"></span> course(s).
-            <a th:href="@{/courses}">Clear filter</a>
+        <div th:if="${q != null and !q.trim().isEmpty()}" class="surface-card">
+            <div class="section-note">
+                Results for <strong th:text="${q}"></strong>:
+                <span th:text="${courses.size()}"></span> course(s).
+                <a th:href="@{/courses}">Clear filter</a>
+            </div>
         </div>
 
         <div th:if="${courses.isEmpty()}" class="empty-state">
@@ -33,12 +37,11 @@
                     <div class="badge-row">
                         <span class="badge" th:text="${c.courseCode}"></span>
                         <span class="badge badge-dark" th:text="${c.semester}"></span>
-                        <span class="badge badge-gray" th:if="${c.enrollPassword != null and !c.enrollPassword.trim().isEmpty()}">&#128274; Password required</span>
+                        <span class="badge badge-gray" th:if="${c.enrollPassword != null and !c.enrollPassword.trim().isEmpty()}">Password required</span>
                     </div>
                     <h4 th:text="${c.courseName}"></h4>
                     <p th:text="${#strings.abbreviate(c.description, 120)}"></p>
-                    <div style="font-size:.82rem; color:#888; margin-top:.25rem;"
-                         th:text="${(c.teacher != null ? c.teacher.fullName : '') + ' Â· Max ' + c.maxStudents + ' students'}"></div>
+                    <div class="card-meta" th:text="${(c.teacher != null ? c.teacher.fullName : '') + ' · Max ' + c.maxStudents + ' students'}"></div>
                     <span class="btn-link">View details &rarr;</span>
                 </div>
             </a>

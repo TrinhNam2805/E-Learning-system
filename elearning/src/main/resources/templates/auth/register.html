@@ -6,7 +6,11 @@
 <main>
     <div class="auth-wrapper">
         <div class="auth-card">
-            <h2>Create Account</h2>
+            <div class="auth-card-header">
+                <div class="eyebrow">Get started</div>
+                <h2>Create your learning account</h2>
+                <p>Set up a secure account to access courses, assignments, notes, and progress tracking.</p>
+            </div>
 
             <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
             <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
@@ -19,9 +23,9 @@
                 <label>Email</label>
                 <input type="email" name="email" placeholder="example@email.com" required>
                 <label>Password</label>
-                <p style="font-size:.8rem; color:#666; margin:.25rem 0 .5rem;">At least 8 characters, uppercase, lowercase, a digit, and a special character.</p>
+                <p class="helper">Use at least 8 characters, including uppercase, lowercase, a digit, and a special character.</p>
                 <div class="password-field">
-                    <input type="password" name="password" placeholder="Strong password" required autocomplete="new-password">
+                    <input type="password" name="password" placeholder="Create a strong password" required autocomplete="new-password">
                     <button th:replace="~{fragments/password-toggle-button :: toggleBtn}"></button>
                 </div>
                 <label>Confirm Password</label>
@@ -29,7 +33,7 @@
                     <input type="password" name="confirm" placeholder="Re-enter password" required autocomplete="new-password">
                     <button th:replace="~{fragments/password-toggle-button :: toggleBtn}"></button>
                 </div>
-                <button type="submit" class="btn btn-full" style="margin-top:1rem;">Register</button>
+                <button type="submit" class="btn btn-full mt-1">Register</button>
             </form>
 
             <div class="auth-links">

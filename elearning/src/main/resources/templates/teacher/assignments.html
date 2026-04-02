@@ -4,60 +4,77 @@
 <body>
 <header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
 <main>
-    <div class="page">
-        <a class="back-link" th:href="@{/teacher/dashboard}">← Dashboard</a>
+    <div class="page section-stack">
+        <a class="back-link" th:href="@{/teacher/dashboard}">&larr; Dashboard</a>
+
         <div class="page-header">
-            <h2 th:text="'Assignments – ' + ${course.courseCode}">Assignments</h2>
+            <div class="page-header-copy">
+                <h2 th:text="'Assignments - ' + ${course.courseCode}">Assignments</h2>
+                <p>Create and manage assessments for this course without changing the existing workflow.</p>
+            </div>
         </div>
 
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-        <div style="background:#fff; border:1px solid #e0e7ef; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
-            <h3 style="font-size:1rem; color:#0a3d7a; margin-bottom:.75rem;">Add Assignment / Quiz</h3>
+        <div class="section-card">
+            <div class="section-heading">
+                <div>
+                    <h3>Add Assignment or Quiz</h3>
+                    <p>Keep titles, due dates, and scoring criteria clear for students.</p>
+                </div>
+            </div>
             <form th:action="@{/teacher/courses/{id}/assignments/add(id=${course.id})}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <label style="margin-top:0;">Title</label>
-                <input type="text" name="title" placeholder="Assignment title..." required>
+                <label class="mt-0">Title</label>
+                <input type="text" name="title" placeholder="Assignment title" required>
                 <label>Description</label>
-                <textarea name="description" placeholder="Requirements..."></textarea>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
-                    <div>
+                <textarea name="description" placeholder="Requirements, instructions, or grading notes"></textarea>
+                <div class="form-grid">
+                    <div class="form-col-4">
                         <label>Type</label>
                         <select name="type">
-                            <option value="HOMEWORK">📌 Homework</option>
-                            <option value="QUIZ">📝 Quiz</option>
-                            <option value="EXAM">📋 Exam</option>
+                            <option value="HOMEWORK">Homework</option>
+                            <option value="QUIZ">Quiz</option>
+                            <option value="EXAM">Exam</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="form-col-4">
                         <label>Due Date</label>
                         <input type="date" name="dueDate" required>
                     </div>
-                    <div>
+                    <div class="form-col-4">
                         <label>Max Score</label>
                         <input type="number" name="maxScore" value="10" min="1" step="0.5">
                     </div>
                 </div>
-                <button type="submit" class="btn" style="width:auto; margin-top:.75rem; padding:.65rem 1.5rem;">Add Assignment</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Add assignment</button>
+                </div>
             </form>
         </div>
 
         <div th:if="${assignments.isEmpty()}" class="empty-state"><p>No assignments yet.</p></div>
-        <div class="table-wrap" th:unless="${assignments.isEmpty()}">
-            <table>
-                <thead><tr><th>Title</th><th>Type</th><th>Due Date</th><th>Score</th><th>Actions</th></tr></thead>
-                <tbody>
+        <div class="section-card" th:unless="${assignments.isEmpty()}">
+            <div class="section-heading">
+                <div>
+                    <h3>Published Assignments</h3>
+                    <p>Review due dates and jump directly to submissions.</p>
+                </div>
+            </div>
+            <div class="table-wrap responsive-cards">
+                <table>
+                    <thead><tr><th>Title</th><th>Type</th><th>Due Date</th><th>Score</th><th>Actions</th></tr></thead>
+                    <tbody>
                     <tr th:each="a : ${assignments}">
-                        <td th:text="${a.title}"></td>
-                        <td><span class="badge" th:text="${a.type}"></span></td>
-                        <td th:text="${#temporals.format(a.dueDate, 'MM/dd/yyyy')}"></td>
-                        <td th:text="${a.maxScore}"></td>
-                        <td>
-                            <a th:href="@{/assignments/{id}/submissions(id=${a.id})}" class="btn btn-outline btn-sm">View Submissions</a>
-                        </td>
+                        <td data-label="Title" th:text="${a.title}"></td>
+                        <td data-label="Type"><span class="badge" th:text="${a.type}"></span></td>
+                        <td data-label="Due Date" th:text="${#temporals.format(a.dueDate, 'MM/dd/yyyy')}"></td>
+                        <td data-label="Score" th:text="${a.maxScore}"></td>
+                        <td data-label="Actions" class="actions-cell"><a th:href="@{/assignments/{id}/submissions(id=${a.id})}" class="btn btn-outline btn-sm">View submissions</a></td>
                     </tr>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </main>

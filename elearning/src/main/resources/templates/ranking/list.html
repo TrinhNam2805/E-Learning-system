@@ -4,59 +4,79 @@
 <body>
 <header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
 <main>
-    <div class="page">
+    <div class="page section-stack">
         <div class="page-header">
-            <h2>&#127942; XP Leaderboard</h2>
-        </div>
-
-        <!-- My rank card -->
-        <div th:if="${myRank != null}" style="background:linear-gradient(135deg,#0a66c2,#004fa3); color:#fff; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-            <div style="font-size:2.5rem;">
-                <span th:if="${myRank.rank == 1}">&#129351;</span>
-                <span th:if="${myRank.rank == 2}">&#129352;</span>
-                <span th:if="${myRank.rank == 3}">&#129353;</span>
-                <span th:if="${myRank.rank > 3}" th:text="'#' + ${myRank.rank}"></span>
-            </div>
-            <div style="flex:1;">
-                <div style="font-size:1.1rem; font-weight:700;" th:text="${myRank.fullName} + ' (you)'"></div>
-                <div style="font-size:.9rem; opacity:.85;" th:text="${'Level ' + myRank.level + ' Â· ' + myRank.totalXp + ' XP'}"></div>
-                <div style="margin-top:.5rem;">
-                    <div style="font-size:.78rem; opacity:.7; margin-bottom:.25rem;"
-                         th:text="${myRank.xpInLevel} + '/100 XP to Level ' + (${myRank.level} + 1)"></div>
-                    <div style="background:rgba(255,255,255,.3); border-radius:999px; height:6px;">
-                        <div th:style="'width:' + ${myRank.xpInLevel} + '%; background:#f59e0b; height:6px; border-radius:999px;'"></div>
-                    </div>
-                </div>
+            <div class="page-header-copy">
+                <h2>XP Leaderboard</h2>
+                <p>Track learning momentum, levels, and top performers across the platform.</p>
             </div>
         </div>
 
-        <!-- Leaderboard -->
-        <div style="background:#fff; border:1px solid #e0e7ef; border-radius:12px; overflow:hidden;">
-            <div style="padding:1rem 1.25rem; border-bottom:1px solid #e8eef6; font-weight:700; color:#0a3d7a;">
-                Top Students
-            </div>
-            <div th:each="r, stat : ${rankings}"
-                 th:style="'display:flex; align-items:center; gap:1rem; padding:.85rem 1.25rem; border-bottom:1px solid #f0f4fa;' + (${currentUser != null and r.userId == currentUser.id} ? 'background:#e8f0fe;' : '')">
-                <div style="width:2.5rem; text-align:center; flex-shrink:0;">
-                    <span th:if="${stat.index == 0}" style="font-size:1.5rem;">&#129351;</span>
-                    <span th:if="${stat.index == 1}" style="font-size:1.5rem;">&#129352;</span>
-                    <span th:if="${stat.index == 2}" style="font-size:1.5rem;">&#129353;</span>
-                    <span th:if="${stat.index >= 3}" style="font-size:1rem; font-weight:700; color:#888;"
-                          th:text="${r.rank}"></span>
-                </div>
-                <div class="avatar" style="width:40px; height:40px; font-size:.9rem; flex-shrink:0;"
-                     th:text="${#strings.toUpperCase(#strings.substring(r.fullName, 0, 1))}">A</div>
-                <div style="flex:1; min-width:0;">
-                    <div style="font-weight:600; color:#0a3d7a;"
-                         th:text="${r.fullName} + (${currentUser != null and r.userId == currentUser.id} ? ' (you)' : '')"></div>
-                    <div style="font-size:.82rem; color:#888;" th:text="'Level ' + ${r.level}"></div>
-                </div>
-                <div style="width:120px; flex-shrink:0;">
-                    <div style="font-size:.82rem; color:#666; text-align:right; margin-bottom:.2rem;"
-                         th:text="${r.totalXp} + ' XP'"></div>
-                    <div class="progress-bar-wrap" style="height:6px;">
-                        <div class="progress-bar" th:style="'width:' + ${r.xpInLevel} + '%; background:#f59e0b;'"></div>
+        <div th:if="${myRank != null}" class="rank-highlight">
+            <div class="button-row" style="align-items:center; width:100%; justify-content:space-between;">
+                <div class="button-row" style="align-items:center;">
+                    <div style="font-size:2.3rem; line-height:1;">
+                        <span th:if="${myRank.rank == 1}">&#129351;</span>
+                        <span th:if="${myRank.rank == 2}">&#129352;</span>
+                        <span th:if="${myRank.rank == 3}">&#129353;</span>
+                        <span th:if="${myRank.rank > 3}" th:text="'#' + ${myRank.rank}"></span>
                     </div>
+                    <div>
+                        <h3 th:text="${myRank.fullName} + ' (you)'">You</h3>
+                        <p th:text="${'Level ' + myRank.level + ' · ' + myRank.totalXp + ' XP'}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-1 text-body" style="color:rgba(255,255,255,.82);" th:text="${myRank.xpInLevel} + '/100 XP to Level ' + (${myRank.level} + 1)"></div>
+            <div class="progress-bar-wrap mt-1" style="height:8px; background:rgba(255,255,255,.22);">
+                <div class="progress-bar" th:style="'width:' + ${myRank.xpInLevel} + '%; background:#f59e0b;'"></div>
+            </div>
+        </div>
+
+        <div class="section-card" th:if="${myRank == null}">
+            <div class="empty-state">
+                <div class="empty-state-icon">&#127942;</div>
+                <h3>No personal ranking yet</h3>
+                <p>Start completing lessons and assignments to earn XP and appear on the leaderboard.</p>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-heading">
+                <div>
+                    <h3>Top Students</h3>
+                    <p>See who is leading and how close everyone is to the next level.</p>
+                </div>
+            </div>
+
+            <div th:if="${rankings == null or rankings.isEmpty()}" class="empty-state">
+                <div class="empty-state-icon">&#127942;</div>
+                <h3>No leaderboard data yet</h3>
+                <p>Ranking data will appear once users start earning XP.</p>
+            </div>
+
+            <div class="section-stack" th:unless="${rankings == null or rankings.isEmpty()}">
+                <div th:each="r, stat : ${rankings}" class="rank-item" th:classappend="${currentUser != null and r.userId == currentUser.id} ? 'rank-me' : ''" style="padding:.95rem 1rem; grid-template-columns:56px 52px minmax(0, 1fr) 140px; background:#fff; border:1px solid #e5edf7;">
+                    <div class="rank-position">
+                        <span th:if="${stat.index == 0}" style="font-size:1.5rem;">&#129351;</span>
+                        <span th:if="${stat.index == 1}" style="font-size:1.5rem;">&#129352;</span>
+                        <span th:if="${stat.index == 2}" style="font-size:1.5rem;">&#129353;</span>
+                        <span th:if="${stat.index >= 3}" th:text="${r.rank}"></span>
+                    </div>
+                    <div class="avatar" style="width:44px; height:44px; font-size:1rem; border-radius:16px;" th:text="${#strings.toUpperCase(#strings.substring(r.fullName, 0, 1))}">A</div>
+                    <div class="stack-xs">
+                        <div class="button-row" style="justify-content:space-between; align-items:flex-start; gap:.75rem;">
+                            <div>
+                                <div class="heading-sm" th:text="${r.fullName} + (${currentUser != null and r.userId == currentUser.id} ? ' (you)' : '')"></div>
+                                <div class="text-muted" th:text="'Level ' + ${r.level}"></div>
+                            </div>
+                            <span class="badge badge-warning" th:text="${r.totalXp} + ' XP'"></span>
+                        </div>
+                        <div class="progress-bar-wrap" style="height:6px;">
+                            <div class="progress-bar" th:style="'width:' + ${r.xpInLevel} + '%; background:#f59e0b;'"></div>
+                        </div>
+                    </div>
+                    <div class="text-muted text-center" th:text="${r.xpInLevel} + '% to next level'"></div>
                 </div>
             </div>
         </div>
