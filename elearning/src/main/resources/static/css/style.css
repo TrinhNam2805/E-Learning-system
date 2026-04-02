@@ -222,7 +222,7 @@ button {
   cursor: pointer;
   border: none;
   background: none;
-  padding: 0;
+  padding: 15;
 }
 /* Utility class for styled buttons */
 .btn {
@@ -265,7 +265,7 @@ form button[type=submit]:active { transform: scale(.98); }
 .btn-outline:hover { background: #e8f0fe; }
 .btn-danger { background: var(--danger); }
 .btn-danger:hover { background: #8a0018; }
-.btn-sm { padding: .4rem .85rem; font-size: .85rem; }
+.btn-sm { padding: .4rem .85rem;; font-size: .85rem; }
 .btn-success { background: var(--success); }
 .btn-success:hover { background: #145d28; }
 
@@ -1491,8 +1491,35 @@ td { padding-top: .95rem; padding-bottom: .95rem; }
 .btn-group {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
+  gap: .7rem;
   flex-wrap: wrap;
+}
+
+.button-row,
+.form-actions,
+.inline-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.button-row > .btn,
+.button-row > a.btn,
+.button-row > button.btn,
+.form-actions > .btn,
+.form-actions > a.btn,
+.form-actions > button.btn,
+.inline-actions > .btn,
+.inline-actions > a.btn,
+.inline-actions > button.btn {
+  flex-shrink: 0;
+}
+
+.sidebar-card-action {
+  width: 100%;
+  margin-top: 1rem;
+  justify-content: center;
 }
 
 /* ===== DESIGN SYSTEM FORMS ===== */

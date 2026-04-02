@@ -147,7 +147,7 @@
                                 <span class="mini-label">Courses</span>
                             </div>
                         </div>
-                        <a th:href="@{/dashboard}" class="btn btn-outline btn-sm btn-full mt-1">Go to dashboard</a>
+                        <a th:href="@{/dashboard}" class="btn btn-outline btn-sm sidebar-card-action">Go to dashboard</a>
                     </div>
 
                     <div class="sidebar-card">
@@ -164,7 +164,7 @@
                                 <div class="rank-score" th:text="${r.totalXp} + ' XP'"></div>
                             </div>
                         </div>
-                        <a th:href="@{/rankings}" class="btn btn-outline btn-sm btn-full mt-1">Full rankings</a>
+                        <a th:href="@{/rankings}" class="btn btn-outline btn-sm sidebar-card-action">Full rankings</a>
                     </div>
 
                     <div class="sidebar-card" th:if="${recentNotes != null and !recentNotes.isEmpty()}">
@@ -174,7 +174,7 @@
                                 <div th:text="${#strings.abbreviate(n.content, 80)}"></div>
                             </div>
                         </div>
-                        <a th:href="@{/notes}" class="btn btn-outline btn-sm btn-full mt-1">Open notes</a>
+                        <a th:href="@{/notes}" class="btn btn-outline btn-sm sidebar-card-action">Open notes</a>
                     </div>
                 </aside>
             </div>
