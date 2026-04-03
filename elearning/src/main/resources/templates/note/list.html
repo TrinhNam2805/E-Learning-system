@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('My Notes')}"></head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
+<div class="flex flex-1 overflow-hidden pt-16 min-h-0">
     <aside th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}"
            th:replace="~{fragments/layout :: studentSidebar('notes')}"></aside>
-    <main class="flex-1 min-w-0 bg-background p-6 md:p-8">
+    <main class="flex-1 overflow-y-auto bg-background p-6 md:p-8">
         <div class="max-w-5xl mx-auto space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -31,7 +31,7 @@
 
             <div id="new-note-form" class="hidden bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm">
                 <h3 class="text-sm font-bold text-on-background mb-4 font-headline">Create New Note</h3>
-                <form th:action="@{/notes/save}" method="post" class="space-y-3">
+                <form id="standalone-note-form" th:action="@{/notes/save}" method="post" class="space-y-3">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <input type="hidden" name="noteType" value="STANDALONE">
                     <div>
@@ -49,7 +49,7 @@
                         <label class="block text-xs font-semibold text-on-surface-variant mb-1">Content</label>
                         <textarea name="content" placeholder="Note content..." required rows="5" class="w-full rounded-lg border-slate-200 text-sm px-3 py-2"></textarea>
                     </div>
-                    <div class="flex flex-wrap items-end gap-4">
+                    <div class="flex flex-wrap items-end justify-between gap-4">
                         <div>
                             <span class="block text-xs font-semibold text-on-surface-variant mb-2">Highlight Color</span>
                             <div class="flex gap-2">
@@ -59,7 +59,11 @@
                                 </label>
                             </div>
                         </div>
-                        <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Save Note</button>
+                        <div class="flex gap-2">
+                            <button type="button" id="standalone-note-cancel"
+                                    class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white text-on-surface hover:bg-slate-50 cursor-pointer">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Save</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -77,19 +81,19 @@
                              th:style="'border-top-width:4px;border-top-style:solid;border-top-color:' + ${n.highlightColor}">
                             <div class="flex justify-between items-start gap-2 mb-2">
                                 <div class="min-w-0">
-                                    <a th:href="@{/notes/{id}(id=${n.id})}" class="text-[11px] text-primary font-semibold no-underline">Open detail</a>
+                                    <a th:href="@{/notes/{id}(id=${n.id})}" class="text-[11px] text-primary font-semibold no-underline">Open detail →</a>
                                     <div class="font-semibold text-on-surface text-sm mt-1"
                                          th:text="${n.title != null and !n.title.trim().isEmpty() ? n.title : 'Note'}"></div>
                                 </div>
                                 <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post">
                                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                     <button type="submit" class="text-xs px-2 py-1 rounded bg-red-50 text-red-700 hover:bg-red-100 border-0 cursor-pointer"
-                                            onclick="return confirm('Delete this note?')">x</button>
+                                            onclick="return confirm('Delete this note?')">×</button>
                                 </form>
                             </div>
                             <div class="text-sm text-on-surface whitespace-pre-wrap" th:text="${n.content}"></div>
                             <div class="mt-2 text-[11px] text-slate-400">
-                                <span th:if="${n.course != null}" th:text="${n.course.courseCode} + ' | '"></span>
+                                <span th:if="${n.course != null}" th:text="${n.course.courseCode} + ' · '"></span>
                                 <span th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy')}"></span>
                             </div>
                         </div>
@@ -104,7 +108,7 @@
                              th:style="'border-left:4px solid ' + ${n.highlightColor}">
                             <a th:href="@{/notes/{id}/open-lesson(id=${n.id})}"
                                class="note-list-lesson-link flex-1 min-w-0 no-underline text-inherit">
-                                <span class="note-list-lesson-hint">Open lesson</span>
+                                <span class="note-list-lesson-hint">Open lesson →</span>
                                 <div class="text-sm text-on-surface whitespace-pre-wrap mt-1" th:text="${n.content}"></div>
                                 <div class="mt-2 text-[11px] text-on-surface-variant flex flex-wrap gap-2">
                                     <span th:if="${n.course != null}" th:text="${n.course.courseCode}"></span>
@@ -115,7 +119,7 @@
                             <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post" class="p-2 shrink-0">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                 <button type="submit" class="text-xs px-2 py-1 rounded bg-red-50 text-red-700 border-0 cursor-pointer"
-                                        onclick="return confirm('Delete this note?')">x</button>
+                                        onclick="return confirm('Delete this note?')">×</button>
                             </form>
                         </div>
                     </div>
@@ -126,6 +130,20 @@
 </div>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+(function () {
+    var cancel = document.getElementById('standalone-note-cancel');
+    if (!cancel) return;
+    cancel.addEventListener('click', function () {
+        var panel = document.getElementById('new-note-form');
+        if (panel) panel.classList.add('hidden');
+        var f = document.getElementById('standalone-note-form');
+        if (f) f.reset();
+        var y = document.querySelector('#standalone-note-form input[name="highlightColor"][value="#FFFF00"]');
+        if (y) y.checked = true;
+    });
+})();
+</script>
 </body>
 </html>
 

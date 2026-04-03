@@ -32,7 +32,7 @@ body:not(.bg-background) {
   background: var(--bg);
   color: #222;
 }
-main { flex: 1; min-width: 0; }
+main { flex: 1; min-width: 0; min-height: 0; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; }
@@ -554,6 +554,25 @@ a.feature-card-link:hover {
   font-size: .86rem;
   line-height: 1.55;
   margin: .75rem 0;
+}
+.lesson-content-html iframe,
+.lesson-content-html video,
+.lesson-content-html img {
+  max-width: 100%;
+  height: auto;
+}
+.lesson-content-html iframe {
+  width: 100%;
+  min-height: 320px;
+  border: 0;
+}
+.lesson-content-html table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+.lesson-content-html * {
+  max-width: 100%;
 }
 .lesson-content-html .material-hint {
   margin-top: 1rem;

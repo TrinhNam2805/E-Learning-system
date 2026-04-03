@@ -1,9 +1,11 @@
 package com.elearning.controller;
 
+import com.elearning.model.dto.CurriculumSectionDto;
 import com.elearning.model.entity.*;
 import com.elearning.model.dto.lesson.LessonAccessDto;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
+import com.elearning.util.VideoEmbedUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,11 +50,24 @@ public class CourseController {
         Course course = courseService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found."));
         List<Lesson> lessons = lessonService.findPublishedByCourseId(id);
+        List<CurriculumSectionDto> curriculumSections = lessonService.buildCurriculumSections(lessons);
+        int totalMinutes = lessons.stream().mapToInt(Lesson::getDurationMinutes).sum();
+        model.addAttribute("courseDurationLabel", formatDurationShort(totalMinutes));
+        String previewEmbed = lessons.stream()
+                .filter(l -> l.getVideoUrl() != null && !l.getVideoUrl().trim().isEmpty())
+                .findFirst()
+                .map(l -> VideoEmbedUtil.embedUrl(l.getVideoUrl()))
+                .orElse(null);
+
         List<ForumPost> recentPosts = forumService.findByCourseId(id).stream().limit(3).collect(Collectors.toList());
         List<Assignment> assignments = assignmentService.findByCourseId(id);
 
         model.addAttribute("course", course);
         model.addAttribute("lessons", lessons);
+        model.addAttribute("curriculumSections", curriculumSections);
+        model.addAttribute("totalCourseMinutes", totalMinutes);
+        model.addAttribute("totalLectures", lessons.size());
+        model.addAttribute("previewVideoEmbedUrl", previewEmbed);
         model.addAttribute("recentPosts", recentPosts);
         model.addAttribute("assignments", assignments);
 
@@ -103,6 +118,15 @@ public class CourseController {
             ra.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/courses/" + id;
+    }
+
+    private static String formatDurationShort(int totalMinutes) {
+        if (totalMinutes <= 0) return "0m";
+        int h = totalMinutes / 60;
+        int m = totalMinutes % 60;
+        if (h == 0) return m + "m";
+        if (m == 0) return h + "h";
+        return h + "h " + m + "m";
     }
 
     private User addUserToModel(UserDetails userDetails, Model model) {

@@ -3,28 +3,74 @@
 <head th:replace="~{fragments/layout :: head('Assessment Results')}"></head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<main class="flex-1 pt-16 p-4 md:p-8 bg-background">
-    <div class="max-w-6xl mx-auto space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold font-headline text-on-background">Assignment and quiz results</h1>
-                <p class="text-sm text-on-surface-variant">Track your submissions, scores, feedback, and activity XP.</p>
+<div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
+    <aside th:replace="~{fragments/layout :: studentSidebar('assignments')}"></aside>
+    <main class="flex-1 min-w-0 min-h-0 p-4 md:p-8 bg-background">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <section class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="p-5 md:p-6 border-b border-slate-100">
+                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-extrabold font-headline text-on-background">Assignment and quiz results</h1>
+                        <p class="text-sm text-on-surface-variant mt-2">Track course-by-course performance, attempt history, feedback, and activity XP in one dashboard.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <form method="get" th:action="@{/assignments/results}" class="flex flex-wrap items-center gap-2">
+                            <select name="courseId" class="rounded-lg border-slate-200 text-sm px-3 py-2 bg-white">
+                                <option value="">All courses</option>
+                                <option th:each="card : ${progressCards}"
+                                        th:value="${card.courseId}"
+                                        th:selected="${selectedCourseId != null and selectedCourseId == card.courseId}"
+                                        th:text="${card.courseCode + ' - ' + card.courseName}"></option>
+                            </select>
+                            <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Filter</button>
+                        </form>
+                        <a th:href="@{/student/dashboard}" class="text-sm font-semibold text-primary hover:underline no-underline">Back to dashboard</a>
+                    </div>
+                </div>
             </div>
-            <a th:href="@{/student/dashboard}" class="text-sm font-semibold text-primary hover:underline no-underline">Back to dashboard</a>
-        </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 p-5 md:p-6 bg-surface-container-low/50">
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Courses tracked</div>
+                    <div class="mt-2 text-2xl font-black text-primary" th:text="${progressCards.size()}">0</div>
+                    <div class="text-sm text-on-surface-variant mt-1">Courses with assessment data</div>
+                </div>
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Records shown</div>
+                    <div class="mt-2 text-2xl font-black text-on-surface" th:text="${submissionHistory.size()}">0</div>
+                    <div class="text-sm text-on-surface-variant mt-1" th:text="${selectedCourseId != null ? 'Filtered submission list' : 'All submissions'}"></div>
+                </div>
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Pending grading</div>
+                    <div class="mt-2 text-2xl font-black text-primary" th:text="${#aggregates.sum(progressCards.![pendingGradeAssignments])}">0</div>
+                    <div class="text-sm text-on-surface-variant mt-1">Across all tracked courses</div>
+                </div>
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Activity XP</div>
+                    <div class="mt-2 text-2xl font-black text-tertiary" th:text="${#aggregates.sum(progressCards.![activityXp])}">0</div>
+                    <div class="text-sm text-on-surface-variant mt-1">Earned from assessments</div>
+                </div>
+            </div>
+        </section>
 
         <section th:if="${progressCards.isEmpty()}" class="rounded-xl border border-dashed border-slate-200 bg-surface-container-low/50 px-4 py-8 text-center text-sm text-on-surface-variant">
             You do not have assessment data in your enrolled courses yet.
         </section>
 
         <section th:unless="${progressCards.isEmpty()}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            <div th:each="card : ${progressCards}" class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm space-y-4">
+            <div th:each="card : ${progressCards}" class="bg-surface-container-lowest rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4">
                 <div>
                     <div class="flex flex-wrap gap-2 mb-2">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/25 text-primary" th:text="${card.courseCode}"></span>
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:text="${card.completionPercentage + '% complete'}"></span>
                     </div>
                     <h2 class="font-bold text-on-background" th:text="${card.courseName}"></h2>
+                </div>
+                <div>
+                    <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div class="h-full bg-primary rounded-full" th:style="${'width:' + card.completionPercentage + '%'}"></div>
+                    </div>
+                    <div class="text-[11px] text-on-surface-variant mt-2" th:text="${card.gradedAssignments + ' graded | ' + card.pendingGradeAssignments + ' pending'}"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-sm">
                     <div class="rounded-lg bg-surface-container-low p-3">
@@ -44,29 +90,30 @@
                         <div class="mt-1 font-black text-tertiary" th:text="${card.activityXp}"></div>
                     </div>
                 </div>
-                <div class="text-xs text-on-surface-variant">
-                    <span th:text="${'Overdue and not submitted: ' + card.overdueAssignments}"></span>
-                    <span th:text="${' | Late submissions: ' + card.lateSubmissions}"></span>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-lg bg-surface-container-low p-3">
+                        <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Overdue</div>
+                        <div class="mt-1 font-black text-on-surface" th:text="${card.overdueAssignments}"></div>
+                    </div>
+                    <div class="rounded-lg bg-surface-container-low p-3">
+                        <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Late submissions</div>
+                        <div class="mt-1 font-black text-on-surface" th:text="${card.lateSubmissions}"></div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                    <a th:href="@{/courses/{id}(id=${card.courseId})}" class="font-semibold text-primary hover:underline no-underline">Open course</a>
+                    <a th:href="@{/assignments/results(courseId=${card.courseId})}" class="font-semibold text-primary hover:underline no-underline">View filtered history</a>
                 </div>
             </div>
         </section>
 
-        <section class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <section class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="px-5 md:px-6 py-4 border-b border-slate-100">
                 <h2 class="text-xl font-bold font-headline text-on-background">Submission history</h2>
-                <form method="get" th:action="@{/assignments/results}" class="flex items-center gap-2">
-                    <select name="courseId" class="rounded-lg border-slate-200 text-sm px-3 py-2 bg-white">
-                        <option value="">All courses</option>
-                        <option th:each="card : ${progressCards}"
-                                th:value="${card.courseId}"
-                                th:selected="${selectedCourseId != null and selectedCourseId == card.courseId}"
-                                th:text="${card.courseCode + ' - ' + card.courseName}"></option>
-                    </select>
-                    <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Filter</button>
-                </form>
+                <p class="text-sm text-on-surface-variant mt-1">Each row captures the course, activity, attempt number, grading status, and downloadable evidence when available.</p>
             </div>
 
-            <div th:if="${submissionHistory.isEmpty()}" class="rounded-xl border border-dashed border-slate-200 bg-surface-container-low/50 px-4 py-8 text-center text-sm text-on-surface-variant">
+            <div th:if="${submissionHistory.isEmpty()}" class="px-5 md:px-6 py-10 text-center text-sm text-on-surface-variant">
                 No submissions match the current filter.
             </div>
 
@@ -76,25 +123,35 @@
                     <tr>
                         <th>Course</th>
                         <th>Assignment</th>
-                        <th>Attempt</th>
-                        <th>Time</th>
+                        <th>Attempt and time</th>
                         <th>Score</th>
-                        <th>Feedback</th>
+                        <th>Response and feedback</th>
                         <th>File</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="item : ${submissionHistory}">
-                        <td th:text="${item.courseCode}"></td>
                         <td>
-                            <div class="font-semibold text-on-surface" th:text="${item.assignmentTitle}"></div>
+                            <div class="font-semibold text-on-surface" th:text="${item.courseCode}"></div>
+                            <a th:href="@{/courses/{id}(id=${item.courseId})}" class="text-[11px] text-primary no-underline hover:underline">Open course</a>
+                        </td>
+                        <td>
+                            <a th:href="@{/assignments/{id}(id=${item.assignmentId})}" class="font-semibold text-on-surface no-underline hover:text-primary" th:text="${item.assignmentTitle}"></a>
                             <div class="text-[11px] text-on-surface-variant" th:text="${item.graded ? 'Graded' : 'Pending grading'}"></div>
                             <div th:if="${item.lateSubmission}" class="text-[11px] text-amber-800">Late</div>
+                            <div th:if="${item.autoGraded}" class="text-[11px] text-sky-700">Auto-graded</div>
                         </td>
-                        <td th:text="${'#' + item.attemptNumber}"></td>
-                        <td th:text="${#temporals.format(item.submittedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <div class="font-semibold text-on-surface" th:text="${'#' + item.attemptNumber}"></div>
+                            <div class="text-[11px] text-on-surface-variant mt-1" th:text="${#temporals.format(item.submittedAt, 'dd/MM/yyyy HH:mm')}"></div>
+                            <div class="text-[11px] text-on-surface-variant" th:text="${item.gradedAt != null ? 'Reviewed ' + #temporals.format(item.gradedAt, 'dd/MM/yyyy HH:mm') : 'Review pending'}"></div>
+                        </td>
                         <td th:text="${item.score != null ? item.score : 'N/A'}"></td>
-                        <td class="max-w-[260px] whitespace-pre-wrap" th:text="${item.feedback != null ? item.feedback : 'No feedback yet'}"></td>
+                        <td class="max-w-[280px] align-top">
+                            <div th:if="${item.content != null and !item.content.isEmpty()}" class="text-sm text-on-surface whitespace-pre-wrap" th:text="${item.content}"></div>
+                            <div th:if="${item.feedback != null and !item.feedback.isEmpty()}" class="mt-2 text-[12px] text-on-surface-variant whitespace-pre-wrap" th:text="${'Feedback: ' + item.feedback}"></div>
+                            <div th:if="${(item.content == null or item.content.isEmpty()) and (item.feedback == null or item.feedback.isEmpty())}" class="text-sm text-on-surface-variant">No response text or feedback.</div>
+                        </td>
                         <td>
                             <a th:if="${item.fileName != null}" th:href="@{/assignments/submissions/{id}/file(id=${item.id})}" class="text-xs font-bold text-primary no-underline hover:underline" th:text="${item.fileName}">file</a>
                             <span th:if="${item.fileName == null}" class="text-xs text-on-surface-variant">None</span>
@@ -105,7 +162,8 @@
             </div>
         </section>
     </div>
-</main>
+    </main>
+</div>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>

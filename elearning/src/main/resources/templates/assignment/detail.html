@@ -3,97 +3,162 @@
 <head th:replace="~{fragments/layout :: head(${assignment.title})}"></head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<main class="flex-1 pt-16 p-4 md:p-8 bg-background">
-    <div class="max-w-5xl mx-auto space-y-6">
+<div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
+    <aside th:if="${currentUser.role.name() == 'STUDENT'}"
+           th:replace="~{fragments/layout :: studentSidebar('assignments')}"></aside>
+    <main class="flex-1 min-w-0 min-h-0 p-4 md:p-8 bg-background">
+    <div class="max-w-6xl mx-auto space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <a th:href="@{/courses/{id}(id=${assignment.courseId})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
                 <span class="material-symbols-outlined text-lg">arrow_back</span> Back to course
             </a>
-            <a th:if="${currentUser.role.name() == 'STUDENT'}" th:href="@{/assignments/results}" class="text-sm font-semibold text-primary hover:underline no-underline">
-                View all results
-            </a>
+            <div class="flex flex-wrap items-center gap-3">
+                <a th:if="${currentUser.role.name() == 'STUDENT'}" th:href="@{/assignments/results}" class="text-sm font-semibold text-primary hover:underline no-underline">
+                    View all results
+                </a>
+                <a th:if="${currentUser.role.name() != 'STUDENT'}" th:href="@{/assignments/{id}/submissions(id=${assignment.id})}" class="text-sm font-semibold text-primary hover:underline no-underline">
+                    Review submissions
+                </a>
+            </div>
         </div>
 
         <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
         <div th:if="${error}" class="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100" th:text="${error}"></div>
 
-        <section class="bg-surface-container-lowest rounded-xl border border-slate-100 p-6 shadow-sm space-y-4">
-            <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/25 text-primary" th:text="${assignment.courseCode}"></span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white"
-                      th:text="${assignment.type == 'QUIZ' ? 'Quiz' : (assignment.type == 'EXAM' ? 'Exam' : 'Assignment')}"></span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:text="'Up to ' + ${assignment.maxAttempts} + ' submissions'"></span>
-                <span th:if="${assignment.allowLateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800">Late submission allowed</span>
-                <span th:unless="${assignment.allowLateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800">Late submission not allowed</span>
+        <section class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="p-5 md:p-6 border-b border-slate-100">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/25 text-primary" th:text="${assignment.courseCode}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:text="${assignment.courseName}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white"
+                          th:text="${assignment.type == 'QUIZ' ? 'Quiz' : (assignment.type == 'EXAM' ? 'Exam' : 'Assignment')}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:text="${'Up to ' + assignment.maxAttempts + ' attempts'}"></span>
+                    <span th:if="${assignment.allowLateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800">Late submission allowed</span>
+                    <span th:unless="${assignment.allowLateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800">Late submission locked</span>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-extrabold font-headline text-on-background" th:text="${assignment.title}"></h1>
+                <p class="text-sm text-on-surface-variant mt-2 leading-relaxed">
+                    Review the brief, manage attempts, and track scores and feedback without leaving this page.
+                </p>
+                <div th:if="${assignment.description != null}" class="mt-4 text-sm text-on-surface leading-relaxed whitespace-pre-wrap" th:text="${assignment.description}"></div>
             </div>
-            <div>
-                <h1 class="text-2xl font-bold font-headline text-on-background" th:text="${assignment.title}"></h1>
-                <p class="text-sm text-on-surface-variant mt-2" th:if="${assignment.dueDate != null}"
-                   th:text="${'Due: ' + #temporals.format(assignment.dueDate, 'dd/MM/yyyy HH:mm') + ' | Max score: ' + assignment.maxScore}"></p>
-                <p class="text-sm text-on-surface-variant mt-2" th:if="${assignment.dueDate == null}"
-                   th:text="${'No due date | Max score: ' + assignment.maxScore}"></p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 p-5 md:p-6 bg-surface-container-low/50">
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Due date</div>
+                    <div class="mt-2 font-bold text-on-background" th:if="${assignment.dueDate != null}" th:text="${#temporals.format(assignment.dueDate, 'dd/MM/yyyy HH:mm')}"></div>
+                    <div class="mt-2 font-bold text-on-background" th:if="${assignment.dueDate == null}">No deadline</div>
+                    <div class="text-sm text-on-surface-variant mt-1" th:text="${assignment.pastDue ? 'Past due' : 'Open for submission'}"></div>
+                </div>
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Max score</div>
+                    <div class="mt-2 font-bold text-on-background" th:text="${assignment.maxScore}"></div>
+                    <div class="text-sm text-on-surface-variant mt-1"
+                         th:text="${assignment.type == 'QUIZ' ? ((assignment.questions != null ? assignment.questions.size() : 0) + ' questions') : 'Written response'}"></div>
+                </div>
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Attempts used</div>
+                    <div class="mt-2 font-bold text-on-background" th:text="${assignment.submissionCount + ' / ' + assignment.maxAttempts}"></div>
+                    <div class="text-sm text-on-surface-variant mt-1" th:text="${assignment.remainingAttempts + ' remaining'}"></div>
+                </div>
+                <div class="rounded-xl bg-white border border-slate-100 p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Current state</div>
+                    <div class="mt-2 font-bold text-on-background"
+                         th:text="${assignment.latestSubmission != null ? (assignment.latestSubmission.graded ? 'Graded submission' : 'Awaiting review') : (assignment.canSubmit ? 'Ready to submit' : 'Submission closed')}"></div>
+                    <div class="text-sm text-on-surface-variant mt-1"
+                         th:text="${assignment.allowLateSubmission ? 'Late confirmation available' : 'Strict deadline'}"></div>
+                </div>
             </div>
-            <div th:if="${assignment.pastDue}" class="rounded-lg px-4 py-3 text-sm border bg-amber-50 text-amber-900 border-amber-100">
-                <span th:if="${assignment.allowLateSubmission}">This assignment is past due, but you can still submit if you confirm a late submission.</span>
-                <span th:unless="${assignment.allowLateSubmission}">This assignment is past due and the system is no longer accepting submissions.</span>
+            <div th:if="${assignment.pastDue}" class="px-5 md:px-6 pb-5 md:pb-6 text-sm text-amber-900">
+                <div class="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+                    <span th:if="${assignment.allowLateSubmission}">The deadline has passed, but you can still submit if you confirm a late submission.</span>
+                    <span th:unless="${assignment.allowLateSubmission}">The deadline has passed and the system is no longer accepting new attempts.</span>
+                </div>
             </div>
-            <div th:if="${assignment.description != null}" class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap" th:text="${assignment.description}"></div>
         </section>
 
-        <section th:if="${progress != null}" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div class="bg-surface-container-low rounded-xl p-4">
-                <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Submitted</div>
-                <div class="mt-1 text-2xl font-black text-primary" th:text="${progress.submittedAssignments + '/' + progress.totalAssignments}">0/0</div>
-            </div>
-            <div class="bg-surface-container-low rounded-xl p-4">
-                <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Pending grading</div>
-                <div class="mt-1 text-2xl font-black text-on-surface" th:text="${progress.pendingGradeAssignments}">0</div>
-            </div>
-            <div class="bg-surface-container-low rounded-xl p-4">
-                <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Average score</div>
-                <div class="mt-1 text-2xl font-black text-primary" th:text="${progress.averageScore != null ? progress.averageScore : 'N/A'}">N/A</div>
-            </div>
-            <div class="bg-surface-container-low rounded-xl p-4">
-                <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Activity XP</div>
-                <div class="mt-1 text-2xl font-black text-tertiary" th:text="${progress.activityXp}">0</div>
-            </div>
-        </section>
-
-        <section th:if="${assignment.latestSubmission != null}" class="rounded-xl border border-emerald-200 bg-emerald-50/80 p-5 space-y-3">
+        <section th:if="${progress != null}" class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="font-bold text-emerald-800">Latest submission: #<span th:text="${assignment.latestSubmission.attemptNumber}"></span></div>
-                <span th:if="${assignment.latestSubmission.lateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Late</span>
+                <div>
+                    <h2 class="text-lg font-bold font-headline text-on-background">Course progress snapshot</h2>
+                    <p class="text-sm text-on-surface-variant mt-1" th:text="${progress.courseCode + ' | ' + progress.completionPercentage + '% complete'}"></p>
+                </div>
             </div>
-            <div class="grid sm:grid-cols-3 gap-3 text-sm">
-                <div class="rounded-lg bg-white/80 border border-emerald-100 px-4 py-3">
-                    <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Status</div>
-                    <div class="mt-1 font-bold text-on-surface" th:text="${assignment.latestSubmission.graded ? 'Graded' : 'Pending grading'}">Pending grading</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="bg-surface-container-low rounded-xl p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Submitted</div>
+                    <div class="mt-1 text-2xl font-black text-primary" th:text="${progress.submittedAssignments + '/' + progress.totalAssignments}">0/0</div>
                 </div>
-                <div class="rounded-lg bg-white/80 border border-emerald-100 px-4 py-3">
-                    <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Score</div>
-                    <div class="mt-1 font-bold text-on-surface" th:text="${assignment.latestSubmission.score != null ? assignment.latestSubmission.score + '/' + assignment.maxScore : 'No score yet'}">No score yet</div>
+                <div class="bg-surface-container-low rounded-xl p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Pending grading</div>
+                    <div class="mt-1 text-2xl font-black text-on-surface" th:text="${progress.pendingGradeAssignments}">0</div>
                 </div>
-                <div class="rounded-lg bg-white/80 border border-emerald-100 px-4 py-3">
+                <div class="bg-surface-container-low rounded-xl p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Average score</div>
+                    <div class="mt-1 text-2xl font-black text-primary" th:text="${progress.averageScore != null ? progress.averageScore : 'N/A'}">N/A</div>
+                </div>
+                <div class="bg-surface-container-low rounded-xl p-4">
+                    <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Activity XP</div>
+                    <div class="mt-1 text-2xl font-black text-tertiary" th:text="${progress.activityXp}">0</div>
+                </div>
+            </div>
+        </section>
+
+        <section th:if="${assignment.latestSubmission != null}" class="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 md:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <div class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Latest submission</div>
+                    <h2 class="mt-1 text-lg font-bold font-headline text-emerald-900">Attempt #<span th:text="${assignment.latestSubmission.attemptNumber}"></span></h2>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold"
+                          th:classappend="${assignment.latestSubmission.graded} ? ' bg-emerald-100 text-emerald-800' : ' bg-white text-on-surface'">
+                        <span th:text="${assignment.latestSubmission.graded ? 'Graded' : 'Pending grading'}"></span>
+                    </span>
+                    <span th:if="${assignment.latestSubmission.lateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Late</span>
+                    <span th:if="${assignment.latestSubmission.autoGraded}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800">Auto-graded</span>
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
+                <div class="rounded-xl bg-white/90 border border-emerald-100 px-4 py-3">
                     <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Submitted at</div>
                     <div class="mt-1 font-bold text-on-surface" th:text="${#temporals.format(assignment.latestSubmission.submittedAt, 'dd/MM/yyyy HH:mm')}">01/01/2026 08:00</div>
                 </div>
+                <div class="rounded-xl bg-white/90 border border-emerald-100 px-4 py-3">
+                    <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Score</div>
+                    <div class="mt-1 font-bold text-on-surface" th:text="${assignment.latestSubmission.score != null ? assignment.latestSubmission.score + '/' + assignment.maxScore : 'No score yet'}">No score yet</div>
+                </div>
+                <div class="rounded-xl bg-white/90 border border-emerald-100 px-4 py-3">
+                    <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Status</div>
+                    <div class="mt-1 font-bold text-on-surface" th:text="${assignment.latestSubmission.status != null ? assignment.latestSubmission.status : 'SUBMITTED'}">SUBMITTED</div>
+                </div>
+                <div class="rounded-xl bg-white/90 border border-emerald-100 px-4 py-3">
+                    <div class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold">Reviewed at</div>
+                    <div class="mt-1 font-bold text-on-surface" th:text="${assignment.latestSubmission.gradedAt != null ? #temporals.format(assignment.latestSubmission.gradedAt, 'dd/MM/yyyy HH:mm') : 'Awaiting review'}">Awaiting review</div>
+                </div>
             </div>
-            <div th:if="${assignment.latestSubmission.feedback != null}" class="rounded-lg bg-white border border-emerald-100 p-4 text-sm text-on-surface">
+            <div th:if="${assignment.latestSubmission.content != null and !assignment.latestSubmission.content.isEmpty()}" class="rounded-xl bg-white border border-emerald-100 p-4 text-sm text-on-surface">
+                <div class="font-semibold mb-1">Your response</div>
+                <div class="whitespace-pre-wrap" th:text="${assignment.latestSubmission.content}"></div>
+            </div>
+            <div th:if="${assignment.latestSubmission.feedback != null and !assignment.latestSubmission.feedback.isEmpty()}" class="rounded-xl bg-white border border-emerald-100 p-4 text-sm text-on-surface">
                 <div class="font-semibold mb-1">Feedback</div>
                 <div class="whitespace-pre-wrap" th:text="${assignment.latestSubmission.feedback}"></div>
             </div>
-            <div th:if="${assignment.latestSubmission.fileName != null}" class="text-sm">
-                <a th:href="@{/assignments/submissions/{id}/file(id=${assignment.latestSubmission.id})}" class="inline-flex items-center gap-1 text-primary font-semibold hover:underline no-underline">
+            <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
+                <a th:if="${assignment.latestSubmission.fileName != null}" th:href="@{/assignments/submissions/{id}/file(id=${assignment.latestSubmission.id})}" class="inline-flex items-center gap-1 text-primary font-semibold hover:underline no-underline">
                     <span class="material-symbols-outlined text-lg">download</span>
                     <span th:text="${assignment.latestSubmission.fileName}">file.pdf</span>
                 </a>
+                <span class="text-xs text-on-surface-variant" th:text="${assignment.remainingAttempts + ' attempts remaining'}"></span>
             </div>
-            <div class="text-xs text-on-surface-variant" th:text="'You have ' + ${assignment.remainingAttempts} + ' submissions.'"></div>
         </section>
 
-        <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.canSubmit and assignment.type == 'QUIZ' and !assignment.questions.isEmpty()}" class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold font-headline text-on-background">Take quiz</h2>
+        <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.canSubmit and assignment.type == 'QUIZ' and !assignment.questions.isEmpty()}" class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold font-headline text-on-background">Take quiz</h2>
+                    <p class="text-sm text-on-surface-variant mt-1">Answer every question before you submit this attempt.</p>
+                </div>
                 <span class="text-sm text-on-surface-variant" th:text="'Next attempt: #' + (${assignment.submissionCount} + 1)"></span>
             </div>
             <form th:action="@{/assignments/{id}/submit(id=${assignment.id})}" th:object="${submissionForm}" method="post" enctype="multipart/form-data" class="space-y-4">
@@ -102,10 +167,10 @@
                     <input type="checkbox" th:field="*{confirmLate}" class="rounded border-slate-300">
                     <span>I confirm this is a late submission.</span>
                 </label>
-                <div th:each="q, stat : ${assignment.questions}" class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5">
+                <div th:each="q, stat : ${assignment.questions}" class="bg-surface-container-low rounded-xl border border-slate-100 p-4 md:p-5">
                     <div class="font-semibold text-on-background text-sm mb-3" th:text="${(stat.index + 1) + '. ' + q.questionText}"></div>
                     <div class="flex flex-col gap-2">
-                        <label th:each="opt : ${ {'A','B','C','D'} }" class="flex items-start gap-2 cursor-pointer text-sm text-on-surface">
+                        <label th:each="opt : ${ {'A','B','C','D'} }" class="flex items-start gap-2 cursor-pointer text-sm text-on-surface rounded-lg px-3 py-2 hover:bg-white">
                             <input type="radio" th:name="'q_' + ${q.id}" th:value="${opt}" required class="text-primary mt-1">
                             <span th:switch="${opt}">
                                 <span th:case="'A'" th:text="'A. ' + ${q.optionA}"></span>
@@ -120,9 +185,12 @@
             </form>
         </section>
 
-        <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.canSubmit and assignment.type != 'QUIZ'}" class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold font-headline text-on-background">Submit work</h2>
+        <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.canSubmit and assignment.type != 'QUIZ'}" class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold font-headline text-on-background">Submit work</h2>
+                    <p class="text-sm text-on-surface-variant mt-1">Write your answer clearly and attach supporting files only when needed.</p>
+                </div>
                 <span class="text-sm text-on-surface-variant" th:text="'Next attempt: #' + (${assignment.submissionCount} + 1)"></span>
             </div>
             <form th:action="@{/assignments/{id}/submit(id=${assignment.id})}" th:object="${submissionForm}" method="post" enctype="multipart/form-data" class="space-y-4">
@@ -153,12 +221,15 @@
             This quiz does not have any questions yet. Please contact your instructor.
         </section>
 
-        <section class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold font-headline text-on-background">Submission history</h2>
+        <section class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="px-5 md:px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold font-headline text-on-background">Submission history</h2>
+                    <p class="text-sm text-on-surface-variant mt-1">Review timestamps, grading status, response content, and file attachments for each attempt.</p>
+                </div>
                 <span class="text-sm text-on-surface-variant" th:text="${submissionHistory.size()} + ' submissions'">0 submissions</span>
             </div>
-            <div th:if="${submissionHistory.isEmpty()}" class="rounded-xl border border-dashed border-slate-200 bg-surface-container-low/50 px-4 py-8 text-center text-sm text-on-surface-variant">
+            <div th:if="${submissionHistory.isEmpty()}" class="px-5 md:px-6 py-10 text-center text-sm text-on-surface-variant">
                 You do not have any submissions for this assignment yet.
             </div>
             <div th:unless="${submissionHistory.isEmpty()}" class="it-table-wrap">
@@ -166,26 +237,38 @@
                     <thead>
                     <tr>
                         <th>Attempt</th>
-                        <th>Time</th>
+                        <th>Submitted</th>
                         <th>Status</th>
                         <th>Score</th>
-                        <th>Feedback</th>
-                        <th>File</th>
+                        <th>Response and feedback</th>
+                        <th>Attachment</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="item : ${submissionHistory}">
-                        <td th:text="${'#' + item.attemptNumber}"></td>
-                        <td th:text="${#temporals.format(item.submittedAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <div class="font-semibold text-on-surface" th:text="${'#' + item.attemptNumber}"></div>
+                            <div th:if="${assignment.latestSubmission != null and item.id == assignment.latestSubmission.id}" class="text-[11px] text-primary font-semibold mt-1">Most recent</div>
+                        </td>
+                        <td>
+                            <div class="font-medium text-on-surface" th:text="${#temporals.format(item.submittedAt, 'dd/MM/yyyy HH:mm')}"></div>
+                            <div class="text-[11px] text-on-surface-variant mt-1"
+                                 th:text="${item.gradedAt != null ? 'Reviewed ' + #temporals.format(item.gradedAt, 'dd/MM/yyyy HH:mm') : 'Review pending'}"></div>
+                        </td>
                         <td>
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold"
                                   th:classappend="${item.graded} ? ' bg-emerald-100 text-emerald-800' : ' bg-slate-100 text-on-surface'">
                                 <span th:text="${item.graded ? 'Graded' : 'Pending grading'}"></span>
                             </span>
-                            <span th:if="${item.lateSubmission}" class="block mt-1 text-[11px] text-amber-800">Late</span>
+                            <span th:if="${item.lateSubmission}" class="block mt-1 text-[11px] text-amber-800">Late submission</span>
+                            <span th:if="${item.autoGraded}" class="block mt-1 text-[11px] text-sky-700">Auto-graded</span>
                         </td>
                         <td th:text="${item.score != null ? item.score : 'N/A'}"></td>
-                        <td class="max-w-[260px] whitespace-pre-wrap" th:text="${item.feedback != null ? item.feedback : 'No feedback yet'}"></td>
+                        <td class="max-w-[320px] align-top">
+                            <div th:if="${item.content != null and !item.content.isEmpty()}" class="text-sm text-on-surface whitespace-pre-wrap" th:text="${item.content}"></div>
+                            <div th:if="${item.feedback != null and !item.feedback.isEmpty()}" class="mt-2 text-[12px] text-on-surface-variant whitespace-pre-wrap" th:text="${'Feedback: ' + item.feedback}"></div>
+                            <div th:if="${(item.content == null or item.content.isEmpty()) and (item.feedback == null or item.feedback.isEmpty())}" class="text-sm text-on-surface-variant">No text response or feedback.</div>
+                        </td>
                         <td>
                             <a th:if="${item.fileName != null}" th:href="@{/assignments/submissions/{id}/file(id=${item.id})}" class="text-xs font-bold text-primary no-underline hover:underline" th:text="${item.fileName}">file</a>
                             <span th:if="${item.fileName == null}" class="text-xs text-on-surface-variant">None</span>
@@ -196,7 +279,8 @@
             </div>
         </section>
     </div>
-</main>
+    </main>
+</div>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>

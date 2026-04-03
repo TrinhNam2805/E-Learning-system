@@ -1,4 +1,4 @@
-package com.elearning.model.entity;
+/* Temporary copy retained for reference only. Active code lives in Lesson.java.
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,3 +64,4 @@ public class Lesson {
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Note> notes;
 }
+*/

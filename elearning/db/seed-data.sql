@@ -26,6 +26,7 @@ DELETE FROM `enrollments`;
 DELETE FROM `forum_posts`;
 DELETE FROM `assignments`;
 DELETE FROM `lessons`;
+DELETE FROM `course_sections`;
 DELETE FROM `course_prerequisites`;
 DELETE FROM `courses`;
 DELETE FROM `users`;
@@ -69,8 +70,13 @@ INSERT INTO `course_prerequisites` (`id`, `course_id`, `prerequisite_course_code
 (1, 2, 'CS201'),
 (2, 3, 'CS201');
 
-INSERT INTO `lessons` (`id`, `course_id`, `lesson_order`, `lesson_title`, `lesson_content`, `video_url`, `duration_minutes`, `published`) VALUES
-(1, 1, 1, 'Phân tích độ phức tạp và ký hiệu asymptotic',
+INSERT INTO `course_sections` (`id`, `course_id`, `section_order`, `title`) VALUES
+(1, 1, 1, 'Phần 1 — Cấu trúc dữ liệu và giải thuật'),
+(2, 2, 1, 'Phần 1 — HTML & CSS'),
+(3, 3, 1, 'Phần 1 — Lập trình Java');
+
+INSERT INTO `lessons` (`id`, `course_id`, `section_id`, `lesson_order`, `lesson_title`, `lesson_content`, `video_url`, `duration_minutes`, `published`) VALUES
+(1, 1, 1, 1, 'Phân tích độ phức tạp và ký hiệu asymptotic',
 CONCAT(
 '<h2>Mục tiêu học tập</h2><ul>',
 '<li>Phân biệt thời gian chạy thực nghiệm và phân tích tiệm cận.</li>',
@@ -83,7 +89,7 @@ CONCAT(
 ),
 NULL, 90, 1),
 
-(2, 1, 2, 'Danh sách liên kết, stack và queue',
+(2, 1, 1, 2, 'Danh sách liên kết, stack và queue',
 CONCAT(
 '<h2>Mục tiêu</h2><ul>',
 '<li>So sánh mảng với danh sách liên kết đơn/kép.</li>',
@@ -94,7 +100,7 @@ CONCAT(
 ),
 NULL, 90, 1),
 
-(3, 1, 3, 'Cây BST và duyệt cây',
+(3, 1, 1, 3, 'Cây BST và duyệt cây',
 CONCAT(
 '<h2>Định nghĩa BST</h2>',
 '<p>Cây nhị phân tìm kiếm: với mỗi nút v, mọi khóa cây con trái nhỏ hơn khóa(v), mọi khóa cây con phải lớn hơn (giả sử không trùng khóa).</p>',
@@ -104,7 +110,7 @@ CONCAT(
 ),
 NULL, 90, 1),
 
-(4, 2, 1, 'HTML5: cấu trúc và ngữ nghĩa',
+(4, 2, 2, 1, 'HTML5: cấu trúc và ngữ nghĩa',
 CONCAT(
 '<h2>Giới thiệu</h2>',
 '<p>HTML mô tả cấu trúc tài liệu web: tiêu đề, đoạn, danh sách, liên kết, biểu mẫu. HTML5 chuẩn hóa các thẻ ngữ nghĩa như <code>header</code>, <code>nav</code>, <code>main</code>, <code>article</code>, <code>section</code>, <code>footer</code>.</p>',
@@ -115,7 +121,7 @@ CONCAT(
 ),
 NULL, 60, 1),
 
-(5, 2, 2, 'CSS: box model, màu và typography',
+(5, 2, 2, 2, 'CSS: box model, màu và typography',
 CONCAT(
 '<h2>Box model</h2>',
 '<p>Mỗi phần tử có <strong>content</strong>, <strong>padding</strong>, <strong>border</strong>, <strong>margin</strong>. Thuộc tính <code>box-sizing: border-box</code> giúp tính kích thước trực quan hơn.</p>',
@@ -126,7 +132,7 @@ CONCAT(
 ),
 NULL, 60, 1),
 
-(6, 2, 3, 'Flexbox và responsive cơ bản',
+(6, 2, 2, 3, 'Flexbox và responsive cơ bản',
 CONCAT(
 '<h2>Flexbox</h2>',
 '<p>Đặt <code>display: flex</code> trên container; dùng <code>justify-content</code> (trục chính) và <code>align-items</code> (trục phụ) để căn chỉnh hàng/cột.</p>',
@@ -137,7 +143,7 @@ CONCAT(
 ),
 NULL, 60, 1),
 
-(7, 3, 1, 'Java: JVM, Hello World và kiểu dữ liệu',
+(7, 3, 3, 1, 'Java: JVM, Hello World và kiểu dữ liệu',
 CONCAT(
 '<h2>Nền tảng Java</h2>',
 '<p>Mã nguồn <code>.java</code> biên dịch thành bytecode chạy trên JVM — đa nền tảng. Mỗi ứng dụng có hàm <code>public static void main(String[] args)</code> làm điểm vào.</p>',
@@ -148,7 +154,7 @@ CONCAT(
 ),
 NULL, 75, 1),
 
-(8, 3, 2, 'Lớp, đối tượng và constructor',
+(8, 3, 3, 2, 'Lớp, đối tượng và constructor',
 CONCAT(
 '<h2>Lớp và đối tượng</h2>',
 '<p>Lớp là khuôn mẫu; đối tượng là thể hiện. Thuộc tính lưu trạng thái, phương thức định nghĩa hành vi. Từ khóa <code>this</code> tham chiếu thể hiện hiện tại.</p>',
@@ -159,7 +165,7 @@ CONCAT(
 ),
 NULL, 75, 1),
 
-(9, 3, 3, 'Kế thừa, interface và xử lý ngoại lệ',
+(9, 3, 3, 3, 'Kế thừa, interface và xử lý ngoại lệ',
 CONCAT(
 '<h2>Kế thừa</h2>',
 '<p>Dùng <code>extends</code> cho một lớp cha. Ghi đè phương thức với <code>@Override</code>; đa hình cho phép tham chiếu kiểu cha trỏ tới thể hiện lớp con.</p>',
@@ -337,6 +343,7 @@ ALTER TABLE `badge_definitions` AUTO_INCREMENT = 100;
 ALTER TABLE `user_badges` AUTO_INCREMENT = 100;
 ALTER TABLE `courses` AUTO_INCREMENT = 100;
 ALTER TABLE `course_prerequisites` AUTO_INCREMENT = 100;
+ALTER TABLE `course_sections` AUTO_INCREMENT = 100;
 ALTER TABLE `lessons` AUTO_INCREMENT = 100;
 ALTER TABLE `enrollments` AUTO_INCREMENT = 100;
 ALTER TABLE `assignments` AUTO_INCREMENT = 100;

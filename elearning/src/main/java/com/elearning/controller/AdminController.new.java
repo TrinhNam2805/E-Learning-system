@@ -1,4 +1,4 @@
-package com.elearning.controller;
+/* Temporary copy retained for reference only. Active code lives in AdminController.java.
 
 import com.elearning.model.entity.Course;
 import com.elearning.model.entity.Department;
@@ -197,3 +197,4 @@ public class AdminController {
         return "redirect:/admin/courses/" + courseId + "/lessons";
     }
 }
+*/

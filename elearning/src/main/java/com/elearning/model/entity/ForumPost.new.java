@@ -1,4 +1,4 @@
-package com.elearning.model.entity;
+/* Temporary copy retained for reference only. Active code lives in ForumPost.java.
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,10 +42,6 @@ public class ForumPost {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
@@ -80,3 +76,4 @@ public class ForumPost {
         QUESTION, DISCUSSION, ANNOUNCEMENT
     }
 }
+*/

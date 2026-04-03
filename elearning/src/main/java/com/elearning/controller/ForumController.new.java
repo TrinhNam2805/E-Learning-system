@@ -1,4 +1,4 @@
-package com.elearning.controller;
+/* Temporary copy retained for reference only. Active code lives in ForumController.java.
 
 import com.elearning.model.entity.Comment;
 import com.elearning.model.entity.Course;
@@ -72,10 +72,7 @@ public class ForumController {
             if (lessonId != null) {
                 lessonService.findById(lessonId)
                         .filter(l -> l.getCourse().getId().equals(courseId))
-                        .ifPresent(l -> {
-                            model.addAttribute("prefillLessonId", lessonId);
-                            model.addAttribute("prefillPostTitle", "Lesson: " + l.getLessonTitle());
-                        });
+                        .ifPresent(l -> model.addAttribute("prefillPostTitle", "Lesson: " + l.getLessonTitle()));
             }
         }
 
@@ -167,9 +164,8 @@ public class ForumController {
             return "redirect:/courses";
         }
 
-        Lesson lesson = null;
         if (lessonId != null) {
-            lesson = lessonService.findById(lessonId)
+            Lesson lesson = lessonService.findById(lessonId)
                     .filter(l -> l.getCourse().getId().equals(courseId))
                     .orElse(null);
             if (lesson == null) {
@@ -180,7 +176,6 @@ public class ForumController {
 
         forumService.createPost(ForumPost.builder()
                 .course(course)
-                .lesson(lesson)
                 .author(user)
                 .title(title.trim())
                 .content(content)
@@ -248,3 +243,4 @@ public class ForumController {
         return mayUseCourseForum(user, post.getCourse().getId());
     }
 }
+*/

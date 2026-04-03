@@ -1,4 +1,4 @@
-package com.elearning.service;
+/* Temporary copy retained for reference only. Active code lives in LessonService.java.
 
 import com.elearning.model.dto.CurriculumSectionDto;
 import com.elearning.model.entity.Lesson;
@@ -60,3 +60,4 @@ public class LessonService {
         return lessonRepository.countByCourseId(courseId);
     }
 }
+*/

@@ -100,8 +100,8 @@
             <a th:href="@{/courses}" class="text-slate-600 hover:text-primary transition-colors no-underline">Courses</a>
             <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary transition-colors no-underline">Announcements</a>
             <th:block th:if="${currentUser != null}">
-                <a th:href="@{/rankings}" class="text-slate-600 hover:text-primary transition-colors no-underline">Leaderboard</a>
-                <a th:href="@{/courses}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Open a course to use the forum">Forums</a>
+                <a th:href="@{/rankings}" class="text-slate-600 hover:text-primary transition-colors no-underline">Rankings</a>
+                <a th:href="@{/forum}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Global and course forums">Forums</a>
                 <a th:href="@{/assignments/results}" class="text-slate-600 hover:text-primary transition-colors no-underline">Assignments</a>
                 <a th:href="@{/notes}" class="text-slate-600 hover:text-primary transition-colors no-underline">Notes</a>
             </th:block>
@@ -157,8 +157,8 @@
         <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Courses</a>
         <a th:if="${currentUser == null}" th:href="@{/announcements}" class="py-2 text-slate-700 no-underline">Announcements</a>
         <th:block th:if="${currentUser != null}">
-            <a th:href="@{/rankings}" class="py-2 text-slate-700 no-underline">Leaderboard</a>
-            <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Forums</a>
+            <a th:href="@{/rankings}" class="py-2 text-slate-700 no-underline">Rankings</a>
+            <a th:href="@{/forum}" class="py-2 text-slate-700 no-underline">Forums</a>
             <a th:href="@{/assignments/results}" class="py-2 text-slate-700 no-underline">Assignments</a>
             <a th:href="@{/notes}" class="py-2 text-slate-700 no-underline">Notes</a>
         </th:block>
@@ -193,7 +193,7 @@
         <a th:href="@{/courses}"
            th:class="${active == 'courses'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
             <span class="material-symbols-outlined text-xl">menu_book</span>
-            <span>Courses</span>
+            <span>My Curriculum</span>
         </a>
         <a th:href="@{/notes}"
            th:class="${active == 'notes'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">

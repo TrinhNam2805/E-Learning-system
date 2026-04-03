@@ -158,7 +158,6 @@
                 <div th:each="p : ${recentPosts}" class="bg-surface-container-low rounded-xl border border-slate-100 p-4 mb-2">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary" th:text="${p.postType}"></span>
-                        <span th:if="${p.lesson != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800" th:text="${p.lesson.lessonTitle}"></span>
                         <span class="font-semibold text-on-surface text-sm" th:text="${p.title}"></span>
                     </div>
                     <div class="text-xs text-on-surface-variant">

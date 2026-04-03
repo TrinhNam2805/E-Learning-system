@@ -59,8 +59,6 @@
                             <a th:if="${prev != null}" th:href="@{/lessons/{id}(id=${prev.id}, courseId=${course.id})}"
                                class="px-3 py-2 text-xs font-bold border border-slate-200 rounded-lg text-on-surface hover:bg-white no-underline">&larr; Previous lesson</a>
                             <div class="flex-1 min-w-[1rem]"></div>
-                            <a th:href="@{/forum(courseId=${course.id}, lessonId=${lesson.id})}"
-                               class="px-4 py-2 rounded-lg text-sm font-bold border border-primary text-primary no-underline hover:bg-primary/5">Discuss this lesson</a>
                             <span th:if="${isCompleted}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">&#10003; Completed</span>
                             <form th:if="${!isCompleted and canMarkComplete}" th:action="@{/lessons/{id}/complete(id=${lesson.id})}" method="post" class="inline">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">

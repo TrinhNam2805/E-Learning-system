@@ -1,4 +1,4 @@
-package com.elearning.repository;
+/* Temporary copy retained for reference only. Active code lives in ForumPostRepository.java.
 
 import com.elearning.model.entity.ForumPost;
 import org.springframework.data.domain.Pageable;
@@ -8,20 +8,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ForumPostRepository extends JpaRepository<ForumPost, Long> {
-    @EntityGraph(attributePaths = {"course", "author", "lesson"})
+    @EntityGraph(attributePaths = {"course", "author"})
     List<ForumPost> findByCourseIdOrderByCreatedAtDesc(Long courseId);
 
-    @EntityGraph(attributePaths = {"author", "course", "lesson"})
+    @EntityGraph(attributePaths = {"author", "course"})
     List<ForumPost> findByCourseIsNullOrderByCreatedAtDesc();
 
     List<ForumPost> findByCourseIdAndPostTypeOrderByCreatedAtDesc(Long courseId, ForumPost.PostType postType);
 
     long countByCourseId(Long courseId);
 
-    @EntityGraph(attributePaths = {"course", "author", "lesson"})
+    @EntityGraph(attributePaths = {"course", "author"})
     List<ForumPost> findByPostTypeOrderByCreatedAtDesc(ForumPost.PostType postType, Pageable pageable);
-
-    @Override
-    @EntityGraph(attributePaths = {"course", "author", "lesson"})
-    java.util.Optional<ForumPost> findById(Long id);
 }
+*/

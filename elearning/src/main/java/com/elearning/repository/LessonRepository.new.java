@@ -1,4 +1,4 @@
-package com.elearning.repository;
+/* Temporary copy retained for reference only. Active code lives in LessonRepository.java.
 
 import com.elearning.model.entity.Lesson;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,3 +12,4 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     long countByCourseId(Long courseId);
 }
+*/

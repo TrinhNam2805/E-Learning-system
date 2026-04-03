@@ -1,4 +1,4 @@
-package com.elearning.controller;
+/* Temporary copy retained for reference only. Active code lives in TeacherController.java.
 
 import com.elearning.exception.AssessmentException;
 import com.elearning.model.dto.assessment.AssignmentCreateForm;
@@ -250,3 +250,4 @@ public class TeacherController {
         return "teacher/students";
     }
 }
+*/
