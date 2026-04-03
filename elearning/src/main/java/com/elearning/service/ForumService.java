@@ -20,6 +20,10 @@ public class ForumService {
         return postRepository.findByCourseIdOrderByCreatedAtDesc(courseId);
     }
 
+    public List<ForumPost> findGlobalPosts() {
+        return postRepository.findByCourseIsNullOrderByCreatedAtDesc();
+    }
+
     public List<ForumPost> findRecentAnnouncements(int limit) {
         return postRepository.findByPostTypeOrderByCreatedAtDesc(
                 ForumPost.PostType.ANNOUNCEMENT,

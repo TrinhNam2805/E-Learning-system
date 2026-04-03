@@ -11,6 +11,7 @@
 --   6) Chỉ mục trên FK và các cột lọc thường dùng (status, role, semester).
 --
 -- Cách dùng: tạo database rồi chạy file này, sau đó chạy seed-data.sql (ddl-auto=none).
+-- DB đã tạo từ bản cũ (thiếu course_sections / lessons.section_id): chạy thêm db/migration-course-sections.sql.
 --   mysql -u root -p --default-character-set=utf8mb4 -e "CREATE DATABASE IF NOT EXISTS \`e-learning\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 --   mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/schema-standard.sql
 -- =============================================================================
@@ -29,6 +30,7 @@ DROP TABLE IF EXISTS `notes`;
 DROP TABLE IF EXISTS `notifications`;
 DROP TABLE IF EXISTS `enrollments`;
 DROP TABLE IF EXISTS `lessons`;
+DROP TABLE IF EXISTS `course_sections`;
 DROP TABLE IF EXISTS `course_prerequisites`;
 DROP TABLE IF EXISTS `courses`;
 DROP TABLE IF EXISTS `users`;
@@ -127,9 +129,23 @@ CREATE TABLE `course_prerequisites` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Môn tiên quyết theo mã học phần';
 
+-- Phần/chương trong khóa (curriculum kiểu Udemy)
+CREATE TABLE `course_sections` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `course_id` BIGINT NOT NULL,
+  `section_order` INT NOT NULL,
+  `title` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_course_sections_course_id` (`course_id`),
+  CONSTRAINT `fk_course_sections_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Phần nội dung trong khóa học';
+
 CREATE TABLE `lessons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `course_id` BIGINT NOT NULL,
+  `section_id` BIGINT DEFAULT NULL,
   `lesson_order` INT NOT NULL,
   `lesson_title` VARCHAR(200) NOT NULL,
   `lesson_content` LONGTEXT,
@@ -138,8 +154,11 @@ CREATE TABLE `lessons` (
   `published` BIT(1) NOT NULL DEFAULT b'1',
   PRIMARY KEY (`id`),
   KEY `idx_lessons_course_id` (`course_id`),
+  KEY `idx_lessons_section_id` (`section_id`),
   CONSTRAINT `fk_lessons_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_lessons_section` FOREIGN KEY (`section_id`) REFERENCES `course_sections` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `enrollments` (
@@ -213,7 +232,8 @@ CREATE TABLE `submissions` (
 
 CREATE TABLE `forum_posts` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `course_id` BIGINT NOT NULL,
+  `course_id` BIGINT DEFAULT NULL COMMENT 'NULL = diễn đàn chung toàn kênh',
+  `lesson_id` BIGINT DEFAULT NULL COMMENT 'Tuỳ chọn: thảo luận gắn một bài học',
   `author_id` BIGINT NOT NULL,
   `title` VARCHAR(300) NOT NULL,
   `content` TEXT NOT NULL,
@@ -222,9 +242,12 @@ CREATE TABLE `forum_posts` (
   `created_at` DATETIME(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_forum_posts_course_id` (`course_id`),
+  KEY `idx_forum_posts_lesson_id` (`lesson_id`),
   KEY `idx_forum_posts_author_id` (`author_id`),
   CONSTRAINT `fk_forum_posts_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_forum_posts_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_forum_posts_author` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

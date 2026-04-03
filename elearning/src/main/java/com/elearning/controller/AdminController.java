@@ -1,9 +1,11 @@
 package com.elearning.controller;
 
 import com.elearning.model.entity.Course;
+import com.elearning.model.entity.CourseSection;
 import com.elearning.model.entity.Department;
 import com.elearning.model.entity.Lesson;
 import com.elearning.model.entity.User;
+import com.elearning.repository.CourseSectionRepository;
 import com.elearning.repository.DepartmentRepository;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
@@ -27,6 +29,7 @@ public class AdminController {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final LessonService lessonService;
+    private final CourseSectionRepository courseSectionRepository;
     private final DepartmentRepository departmentRepository;
 
     @GetMapping("/dashboard")
@@ -125,6 +128,7 @@ public class AdminController {
 
         model.addAttribute("course", course);
         model.addAttribute("lessons", lessonService.findByCourseId(id));
+        model.addAttribute("sections", courseSectionRepository.findByCourse_IdOrderBySectionOrderAsc(id));
         model.addAttribute("currentUser", user);
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
         return "admin/lessons";
@@ -135,18 +139,31 @@ public class AdminController {
                             @RequestParam String lessonTitle,
                             @RequestParam String lessonContent,
                             @RequestParam(required = false) String videoUrl,
+                            @RequestParam(required = false) Long sectionId,
                             @RequestParam int durationMinutes,
                             RedirectAttributes ra) {
         Course course = courseService.findById(courseId).orElse(null);
         if (course == null) return "redirect:/admin/dashboard";
 
+        CourseSection section = lessonService.resolveSectionForLesson(courseId, course, sectionId);
         long count = lessonService.countByCourseId(courseId);
         Lesson lesson = Lesson.builder()
-                .course(course).lessonTitle(lessonTitle).lessonContent(lessonContent)
+                .course(course).section(section).lessonTitle(lessonTitle).lessonContent(lessonContent)
                 .videoUrl(videoUrl).durationMinutes(durationMinutes)
                 .lessonOrder((int) count + 1).build();
         lessonService.save(lesson);
         ra.addFlashAttribute("success", "Lesson added successfully!");
+        return "redirect:/admin/courses/" + courseId + "/lessons";
+    }
+
+    @PostMapping("/courses/{courseId}/sections/add")
+    public String addSection(@PathVariable Long courseId,
+                             @RequestParam String sectionTitle,
+                             RedirectAttributes ra) {
+        Course course = courseService.findById(courseId).orElse(null);
+        if (course == null) return "redirect:/admin/dashboard";
+        lessonService.addSection(courseId, course, sectionTitle);
+        ra.addFlashAttribute("success", "Section added.");
         return "redirect:/admin/courses/" + courseId + "/lessons";
     }
 }

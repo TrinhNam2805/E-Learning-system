@@ -77,6 +77,10 @@ public class Course {
     @OrderBy("lessonOrder ASC")
     private List<Lesson> lessons;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("sectionOrder ASC")
+    private List<CourseSection> courseSections;
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Enrollment> enrollments;
 

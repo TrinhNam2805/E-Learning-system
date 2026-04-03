@@ -14,9 +14,15 @@ public class ForumPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Null = diễn đàn chung toàn hệ thống (kênh). */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_id")
     private Course course;
+
+    /** Tuỳ chọn: bài đăng gắn một bài học cụ thể (thường kèm course). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)

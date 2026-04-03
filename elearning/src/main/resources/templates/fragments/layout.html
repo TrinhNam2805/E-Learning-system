@@ -101,7 +101,7 @@
             <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary transition-colors no-underline">Announcements</a>
             <th:block th:if="${currentUser != null}">
                 <a th:href="@{/rankings}" class="text-slate-600 hover:text-primary transition-colors no-underline">Rankings</a>
-                <a th:href="@{/courses}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Open a course to use the forum">Forums</a>
+                <a th:href="@{/forum}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Diễn đàn chung và theo khóa học">Forums</a>
                 <a th:href="@{/student/dashboard}" class="text-slate-600 hover:text-primary transition-colors no-underline">Assignments</a>
                 <a th:href="@{/notes}" class="text-slate-600 hover:text-primary transition-colors no-underline">Notes</a>
             </th:block>
@@ -158,7 +158,7 @@
         <a th:if="${currentUser == null}" th:href="@{/announcements}" class="py-2 text-slate-700 no-underline">Announcements</a>
         <th:block th:if="${currentUser != null}">
             <a th:href="@{/rankings}" class="py-2 text-slate-700 no-underline">Rankings</a>
-            <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Forums</a>
+            <a th:href="@{/forum}" class="py-2 text-slate-700 no-underline">Forums</a>
             <a th:href="@{/student/dashboard}" class="py-2 text-slate-700 no-underline">Assignments</a>
             <a th:href="@{/notes}" class="py-2 text-slate-700 no-underline">Notes</a>
         </th:block>

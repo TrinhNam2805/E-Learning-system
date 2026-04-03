@@ -1,8 +1,10 @@
 package com.elearning.controller;
 
+import com.elearning.model.dto.CurriculumSectionDto;
 import com.elearning.model.entity.*;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
+import com.elearning.util.VideoEmbedUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,22 +46,29 @@ public class LessonController {
         }
 
         List<Lesson> allLessons = lessonService.findPublishedByCourseId(courseId);
+        List<CurriculumSectionDto> curriculumSections = lessonService.buildCurriculumSections(allLessons);
         int idx = allLessons.indexOf(lesson);
         Lesson prev = idx > 0 ? allLessons.get(idx - 1) : null;
         Lesson next = idx < allLessons.size() - 1 ? allLessons.get(idx + 1) : null;
+        int lessonIndexOneBased = idx >= 0 ? idx + 1 : 1;
+        String videoEmbed = VideoEmbedUtil.embedUrl(lesson.getVideoUrl());
 
         boolean isCompleted = enrollmentService.isLessonCompleted(user.getId(), lessonId);
         List<Note> lessonNotes = noteService.findByStudentAndLesson(user.getId(), lessonId);
-        List<Note> noteLinkCandidates = noteService.findByStudentId(user.getId());
 
         model.addAttribute("course", course);
         model.addAttribute("lesson", lesson);
         model.addAttribute("allLessons", allLessons);
+        model.addAttribute("curriculumSections", curriculumSections);
+        model.addAttribute("lessonIndexOneBased", lessonIndexOneBased);
+        model.addAttribute("totalLessonsCount", allLessons.size());
+        model.addAttribute("videoEmbedUrl", videoEmbed);
+        model.addAttribute("videoIsDirectFile", videoEmbed != null && VideoEmbedUtil.isDirectVideoFile(videoEmbed));
+        model.addAttribute("hideStudentSidebar", true);
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
         model.addAttribute("isCompleted", isCompleted);
         model.addAttribute("lessonNotes", lessonNotes);
-        model.addAttribute("noteLinkCandidates", noteLinkCandidates);
         model.addAttribute("currentUser", user);
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
 
@@ -70,10 +79,16 @@ public class LessonController {
                 .collect(java.util.stream.Collectors.toList());
         model.addAttribute("completedLessonIds", completedLessonIds);
         Long scrollNote = null;
+        String focusSourceExcerpt = null;
         if (noteId != null && noteService.isNoteOnLesson(user.getId(), lessonId, noteId)) {
             scrollNote = noteId;
+            focusSourceExcerpt = noteService.findByIdAndStudentId(noteId, user.getId())
+                    .map(Note::getSourceExcerpt)
+                    .filter(s -> s != null && !s.trim().isEmpty())
+                    .orElse(null);
         }
         model.addAttribute("scrollToNoteId", scrollNote);
+        model.addAttribute("focusSourceExcerpt", focusSourceExcerpt);
 
         return "lesson/view";
     }

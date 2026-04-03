@@ -17,6 +17,11 @@ public class Lesson {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    /** Phần/chương trong curriculum (Udemy-style); có thể null — hiển thị trong nhóm mặc định. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_id")
+    private CourseSection section;
+
     @Column(nullable = false)
     private int lessonOrder;
 
