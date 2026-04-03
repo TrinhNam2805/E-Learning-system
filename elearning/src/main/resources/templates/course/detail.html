@@ -41,11 +41,11 @@
                                 <span th:text="${course.teacher.fullName}"></span>
                             </span>
                             <span class="text-slate-300">|</span>
-                            <span th:text="${totalLectures} + ' bài giảng'"></span>
+                            <span th:text="${totalLectures} + ' lectures'"></span>
                             <span class="text-slate-300">|</span>
-                            <span th:text="'Tổng ' + ${courseDurationLabel}"></span>
+                            <span th:text="'Total ' + courseDurationLabel"></span>
                             <span class="text-slate-300">|</span>
-                            <span th:text="'Tối đa ' + ${course.maxStudents} + ' SV'"></span>
+                            <span th:text="'Up to ' + course.maxStudents + ' students'"></span>
                         </div>
                     </div>
                 </div>
@@ -73,10 +73,10 @@
             </div>
 
             <section class="udemy-curriculum-wrap">
-                <h2 class="text-xl font-bold font-headline text-on-background mb-1">Nội dung khóa học</h2>
+                <h2 class="text-xl font-bold font-headline text-on-background mb-1">Course content</h2>
                 <p class="text-sm text-on-surface-variant mb-4">
-                    <span th:text="${totalLectures}"></span> bài giảng
-                    <span th:if="${totalCourseMinutes > 0}" th:text="' · Tổng ' + ${courseDurationLabel}"></span>
+                    <span th:text="${totalLectures}"></span> lectures
+                    <span th:if="${totalCourseMinutes > 0}" th:text="' · Total ' + courseDurationLabel"></span>
                 </p>
                 <div class="border border-slate-200 rounded-lg overflow-hidden bg-white" th:if="${!lessons.isEmpty()}">
                     <th:block th:each="sec, secStat : ${curriculumSections}">
@@ -86,7 +86,7 @@
                                     <span class="material-symbols-outlined text-slate-500 shrink-0 udemy-acc-icon-expand text-lg">expand_more</span>
                                     <span class="truncate" th:text="${sec.title}">Section</span>
                                 </span>
-                                <span class="text-xs font-normal text-slate-500 shrink-0" th:text="${sec.lessons.size()} + ' bài · ' + ${sec.sectionMinutesTotal} + ' phút'"></span>
+                                <span class="text-xs font-normal text-slate-500 shrink-0" th:text="${sec.lessons.size()} + ' lessons · ' + ${sec.sectionMinutesTotal} + ' min'"></span>
                             </summary>
                             <div class="divide-y divide-slate-100">
                                 <a class="udemy-lecture-row flex items-start gap-3 px-4 py-2.5 pl-11 hover:bg-slate-50/80 transition-colors no-underline text-inherit"
@@ -100,8 +100,8 @@
                                         <div class="text-sm font-medium text-on-surface leading-snug" th:text="${l.lessonTitle}"></div>
                                     </div>
                                     <div class="flex items-center gap-2 shrink-0 text-xs text-slate-500">
-                                        <span th:if="${completedLessonIds != null and completedLessonIds.contains(l.id)}" class="text-emerald-600 font-semibold">Đã xem</span>
-                                        <span th:text="${l.durationMinutes} + ' phút'"></span>
+                                        <span th:if="${completedLessonIds != null and completedLessonIds.contains(l.id)}" class="text-emerald-600 font-semibold">Watched</span>
+                                        <span th:text="${l.durationMinutes} + ' min'"></span>
                                         <span th:if="${enrolled == true}" class="text-primary">▶</span>
                                         <span th:if="${enrolled != true}">&#128274;</span>
                                     </div>
@@ -110,7 +110,7 @@
                         </details>
                     </th:block>
                 </div>
-                <div th:if="${lessons.isEmpty()}" class="text-center py-12 text-on-surface-variant rounded-xl border border-dashed border-slate-200">Chưa có bài giảng.</div>
+                <div th:if="${lessons.isEmpty()}" class="text-center py-12 text-on-surface-variant rounded-xl border border-dashed border-slate-200">No lectures yet.</div>
             </section>
 
             <section th:if="${enrolled == true and !assignments.isEmpty()}">

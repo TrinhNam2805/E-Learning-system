@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head(${lesson.lessonTitle})}"></head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 <header th:replace="~{fragments/layout :: navbar}"></header>
@@ -16,7 +16,7 @@
                 <a th:if="${currentUser != null}"
                    th:href="@{/forum(courseId=${course.id}, lessonId=${lesson.id})}"
                    class="shrink-0 inline-flex items-center gap-1 text-xs font-bold text-[#5624d0] hover:underline no-underline">
-                    <span class="material-symbols-outlined text-base">forum</span> Thảo luận bài này
+                    <span class="material-symbols-outlined text-base">forum</span> Discuss this lesson
                 </a>
             </div>
 
@@ -33,16 +33,16 @@
                                class="absolute inset-0 w-full h-full"
                                controls playsinline preload="metadata" th:src="${videoEmbedUrl}"></video>
                         <div th:if="${videoEmbedUrl == null}" class="absolute inset-0 flex items-center justify-center p-6 text-center text-slate-400 text-sm">
-                            <span>Chưa có video cho bài này. Xem nội dung bên dưới.</span>
+                            <span>No video for this lesson yet. See the content below.</span>
                         </div>
                     </div>
                 </div>
 
                 <aside class="xl:sticky xl:top-16 xl:max-h-[calc(100vh-4rem)] xl:flex xl:flex-col bg-white border-l border-slate-200 min-h-[320px] max-h-[50vh] xl:max-h-[calc(100vh-4rem)]">
                     <div class="px-4 py-3 border-b border-slate-200 shrink-0">
-                        <h2 class="text-base font-bold text-[#1c1d1f]">Nội dung khóa học</h2>
+                        <h2 class="text-base font-bold text-[#1c1d1f]">Course content</h2>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Bài <span th:text="${lessonIndexOneBased}">1</span> / <span th:text="${totalLessonsCount}">1</span>
+                            Lesson <span th:text="${lessonIndexOneBased}">1</span> / <span th:text="${totalLessonsCount}">1</span>
                         </p>
                     </div>
                     <div class="overflow-y-auto flex-1 pb-4">
@@ -57,7 +57,7 @@
                                             <span class="material-symbols-outlined text-lg shrink-0 text-slate-500"
                                                   th:text="${l.videoUrl != null and !l.videoUrl.isEmpty()} ? 'play_circle' : 'article'">play_circle</span>
                                             <span class="flex-1 min-w-0 leading-snug" th:text="${l.lessonTitle}"></span>
-                                            <span class="text-[11px] text-slate-400 shrink-0" th:text="|${l.durationMinutes} phút|"></span>
+                                            <span class="text-[11px] text-slate-400 shrink-0" th:text="|${l.durationMinutes} min|"></span>
                                         </a>
                                     </li>
                                 </ul>
@@ -75,30 +75,30 @@
                     <h1 class="text-2xl font-bold text-[#1c1d1f] font-headline" th:text="${lesson.lessonTitle}"></h1>
                     <p class="text-sm text-slate-500 mt-2 flex items-center gap-1">
                         <span class="material-symbols-outlined text-base">schedule</span>
-                        <span th:text="${lesson.durationMinutes} + ' phút'"></span>
+                        <span th:text="${lesson.durationMinutes} + ' min'"></span>
                     </p>
                 </div>
 
                 <div class="udemy-lesson-tabs border-b border-slate-200 flex gap-6 text-sm font-semibold">
-                    <button type="button" class="lesson-tab pb-3 border-b-2 border-[#1c1d1f] text-[#1c1d1f]" data-panel="panel-overview">Tổng quan</button>
-                    <button type="button" class="lesson-tab pb-3 border-b-2 border-transparent text-slate-500 hover:text-[#1c1d1f]" data-panel="panel-notes">Ghi chú</button>
+                    <button type="button" class="lesson-tab pb-3 border-b-2 border-[#1c1d1f] text-[#1c1d1f]" data-panel="panel-overview">Overview</button>
+                    <button type="button" class="lesson-tab pb-3 border-b-2 border-transparent text-slate-500 hover:text-[#1c1d1f]" data-panel="panel-notes">Notes</button>
                 </div>
 
                 <div id="panel-overview" class="lesson-panel space-y-6">
-                    <p class="text-xs text-slate-500 -mt-2 mb-2">Bôi đen đoạn chữ trong bài bên dưới rồi chọn <strong>Ghi chú</strong> để lưu trích dẫn và nhảy lại đúng chỗ sau này.</p>
+                    <p class="text-xs text-slate-500 -mt-2 mb-2">Select text in the lesson below, then choose <strong>Note</strong> to save a quote and jump back to it later.</p>
                     <div id="lesson-content-root" class="lesson-content-box lesson-content-html prose-lesson max-w-none text-[#1c1d1f] select-text" th:utext="${lesson.lessonContent}"></div>
                     <div class="flex flex-wrap gap-3 items-center pt-4 border-t border-slate-100">
                         <a th:if="${prev != null}" th:href="@{/lessons/{id}(id=${prev.id}, courseId=${course.id})}"
-                           class="px-4 py-2 text-sm font-bold border border-slate-300 rounded text-on-surface hover:bg-slate-50 no-underline">← Bài trước</a>
+                           class="px-4 py-2 text-sm font-bold border border-slate-300 rounded text-on-surface hover:bg-slate-50 no-underline">← Previous</a>
                         <div class="flex-1 min-w-[1rem]"></div>
-                        <span th:if="${isCompleted}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">Đã hoàn thành</span>
+                        <span th:if="${isCompleted}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">Completed</span>
                         <form th:unless="${isCompleted}" th:action="@{/lessons/{id}/complete(id=${lesson.id})}" method="post" class="inline">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                             <input type="hidden" name="courseId" th:value="${course.id}">
-                            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 border-0 cursor-pointer">Đánh dấu hoàn thành</button>
+                            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 border-0 cursor-pointer">Mark complete</button>
                         </form>
                         <a th:if="${next != null}" th:href="@{/lessons/{id}(id=${next.id}, courseId=${course.id})}"
-                           class="px-4 py-2 rounded-lg text-sm font-bold bg-[#5624d0] text-white no-underline hover:opacity-90">Bài tiếp →</a>
+                           class="px-4 py-2 rounded-lg text-sm font-bold bg-[#5624d0] text-white no-underline hover:opacity-90">Next →</a>
                     </div>
                 </div>
 
@@ -106,10 +106,10 @@
                     <div class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm">
                         <div class="flex justify-between items-center gap-3 mb-4">
                             <h3 class="text-sm font-bold font-headline text-on-background flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary text-xl">sticky_note_2</span> Ghi chú bài học
+                                <span class="material-symbols-outlined text-primary text-xl">sticky_note_2</span> Lesson notes
                             </h3>
                             <button type="button" onclick="document.getElementById('note-form').classList.toggle('hidden')"
-                                    class="px-3 py-1.5 text-xs font-bold border border-primary text-primary rounded-lg hover:bg-primary/5">+ Thêm ghi chú</button>
+                                    class="px-3 py-1.5 text-xs font-bold border border-primary text-primary rounded-lg hover:bg-primary/5">+ Add note</button>
                         </div>
 
                         <div id="note-form" class="hidden mb-4 p-4 rounded-xl bg-surface-container-low border border-slate-100">
@@ -120,13 +120,13 @@
                                 <input type="hidden" name="noteType" value="LESSON">
                                 <input type="hidden" name="sourceExcerpt" id="note-source-excerpt" value="">
                                 <div>
-                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Ghi chú</label>
-                                    <textarea name="content" required rows="3" class="w-full rounded-lg border-slate-200 text-sm" placeholder="Ý chính của bạn…"></textarea>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Note</label>
+                                    <textarea name="content" required rows="3" class="w-full rounded-lg border-slate-200 text-sm" placeholder="Your main points…"></textarea>
                                 </div>
                                 <p id="note-excerpt-preview" class="hidden text-xs text-slate-600 bg-white/80 border border-slate-100 rounded-lg p-2 italic max-h-24 overflow-y-auto"></p>
                                 <div class="flex flex-wrap items-center justify-between gap-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-[11px] font-semibold text-on-surface-variant">Màu</span>
+                                        <span class="text-[11px] font-semibold text-on-surface-variant">Color</span>
                                         <div class="flex gap-1.5">
                                             <label th:each="color : ${ {'#FFFF00','#90EE90','#FFB6C1','#87CEEB','#FFA500'} }" class="cursor-pointer">
                                                 <input type="radio" name="highlightColor" th:value="${color}" th:checked="${color == '#FFFF00'}" class="hidden peer">
@@ -135,20 +135,24 @@
                                             </label>
                                         </div>
                                     </div>
-                                    <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Lưu</button>
+                                    <div class="flex gap-2">
+                                        <button type="button" id="lesson-note-cancel"
+                                                class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white text-on-surface hover:bg-slate-50 cursor-pointer">Cancel</button>
+                                        <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Save</button>
+                                    </div>
                                 </div>
-                                <p class="text-[11px] text-slate-400">Tiêu đề, thẻ và liên kết giữa các ghi chú có thể chỉnh ở trang chi tiết ghi chú sau khi lưu.</p>
+                                <p class="text-[11px] text-slate-400">Title, tags, and links between notes can be edited on the note detail page after saving.</p>
                             </form>
                         </div>
 
-                        <div th:if="${lessonNotes.isEmpty()}" class="text-center text-sm text-slate-400 py-6">Chưa có ghi chú cho bài này.</div>
+                        <div th:if="${lessonNotes.isEmpty()}" class="text-center text-sm text-slate-400 py-6">No notes for this lesson yet.</div>
                         <div th:each="n : ${lessonNotes}"
                              th:id="${'note-' + n.id}"
                              class="note-item lesson-note-card rounded-lg border border-slate-100 bg-white mb-3"
                              th:style="'border-left:3px solid ' + ${n.highlightColor}">
                             <div class="flex justify-between gap-3 p-3">
                                 <a th:href="@{/notes/{id}/open-lesson(id=${n.id})}" class="lesson-note-hit flex-1 min-w-0 no-underline text-inherit">
-                                    <span class="lesson-note-jump-hint">Mở trong bài →</span>
+                                    <span class="lesson-note-jump-hint">Open in lesson →</span>
                                     <div th:if="${n.title != null and !n.title.trim().isEmpty()}" class="font-semibold text-on-surface text-sm mt-1" th:text="${n.title}"></div>
                                     <div th:if="${n.sourceExcerpt != null and !n.sourceExcerpt.isEmpty()}" class="text-xs text-slate-600 italic mt-2 whitespace-pre-wrap" th:text="'“' + ${n.sourceExcerpt} + '”'"></div>
                                     <div th:if="${n.tags != null and !n.tags.isEmpty()}" class="text-[11px] text-slate-500 mt-2" th:text="${n.tags}"></div>
@@ -156,11 +160,11 @@
                                     <div class="text-[11px] text-slate-400 mt-2" th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
                                 </a>
                                 <div class="flex flex-col items-end gap-2 shrink-0">
-                                    <a th:href="@{/notes/{id}(id=${n.id})}" class="text-[11px] font-semibold text-primary no-underline">Chi tiết</a>
+                                    <a th:href="@{/notes/{id}(id=${n.id})}" class="text-[11px] font-semibold text-primary no-underline">Detail</a>
                                     <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post">
                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                         <button type="submit" class="text-xs px-2 py-1 rounded bg-red-50 text-red-700 border-0 cursor-pointer"
-                                                onclick="return confirm('Xoá ghi chú này?')">×</button>
+                                                onclick="return confirm('Delete this note?')">×</button>
                                     </form>
                                 </div>
                             </div>
@@ -173,7 +177,7 @@
 </div>
 <button type="button" id="selection-note-fab"
         class="hidden fixed z-[70] px-4 py-2 rounded-full bg-[#5624d0] text-white text-xs font-bold shadow-lg border-0 cursor-pointer hover:opacity-95">
-    Ghi chú từ đoạn chọn
+    Note from selection
 </button>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
@@ -254,7 +258,7 @@
             var preview = document.getElementById('note-excerpt-preview');
             if (excerptInput) excerptInput.value = pendingExcerpt;
             if (preview) {
-                preview.textContent = 'Trích: “' + pendingExcerpt.substring(0, 400) + (pendingExcerpt.length > 400 ? '…' : '') + '”';
+                preview.textContent = 'Quote: “' + pendingExcerpt.substring(0, 400) + (pendingExcerpt.length > 400 ? '…' : '') + '”';
                 preview.classList.remove('hidden');
             }
             window.__lessonActivateTab('panel-notes');
@@ -295,13 +299,32 @@
                             mark.classList.remove('ring-2', 'ring-amber-400');
                         }, 2800);
                         return true;
-                    } catch (e) { /* span nhiều node */ }
+                    } catch (e) { /* multi-node span */ }
                 }
             }
         }
         return false;
     }
     window.__lessonTryHighlight = tryHighlightInLessonContent;
+
+    var cancelBtn = document.getElementById('lesson-note-cancel');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            var form = document.getElementById('lesson-note-form');
+            var wrap = document.getElementById('note-form');
+            if (form) form.reset();
+            var excerptInput = document.getElementById('note-source-excerpt');
+            if (excerptInput) excerptInput.value = '';
+            var preview = document.getElementById('note-excerpt-preview');
+            if (preview) {
+                preview.textContent = '';
+                preview.classList.add('hidden');
+            }
+            var firstColor = document.querySelector('#lesson-note-form input[name="highlightColor"][value="#FFFF00"]');
+            if (firstColor) firstColor.checked = true;
+            if (wrap) wrap.classList.add('hidden');
+        });
+    }
 })();
 </script>
 <script th:if="${focusSourceExcerpt != null}" th:inline="javascript">

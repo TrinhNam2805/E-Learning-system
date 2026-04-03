@@ -101,7 +101,7 @@
             <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary transition-colors no-underline">Announcements</a>
             <th:block th:if="${currentUser != null}">
                 <a th:href="@{/rankings}" class="text-slate-600 hover:text-primary transition-colors no-underline">Rankings</a>
-                <a th:href="@{/forum}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Diễn đàn chung và theo khóa học">Forums</a>
+                <a th:href="@{/forum}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Global and course forums">Forums</a>
                 <a th:href="@{/student/dashboard}" class="text-slate-600 hover:text-primary transition-colors no-underline">Assignments</a>
                 <a th:href="@{/notes}" class="text-slate-600 hover:text-primary transition-colors no-underline">Notes</a>
             </th:block>
@@ -224,9 +224,9 @@
             &copy; 2026 IT Scholar
         </p>
         <nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 font-medium" aria-label="Footer">
-            <a th:href="@{/courses}" class="text-slate-600 hover:text-primary no-underline">Khóa học</a>
-            <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary no-underline">Thông báo</a>
-            <a th:if="${currentUser != null}" th:href="@{/rankings}" class="text-slate-600 hover:text-primary no-underline">Bảng xếp hạng</a>
+            <a th:href="@{/courses}" class="text-slate-600 hover:text-primary no-underline">Courses</a>
+            <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary no-underline">Announcements</a>
+            <a th:if="${currentUser != null}" th:href="@{/rankings}" class="text-slate-600 hover:text-primary no-underline">Rankings</a>
         </nav>
     </div>
 </footer>

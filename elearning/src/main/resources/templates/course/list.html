@@ -6,9 +6,9 @@
 <header th:replace="~{fragments/layout :: navbar}"></header>
 
 <!--
-  Một trang = một layout: không dùng th:fragment trong cùng file rồi th:insert,
-  vì node định nghĩa fragment vẫn có thể render thêm một lần (trùng nội dung / thanh cuộn).
-  Học sinh: sidebar + main; khác: chỉ main.
+  One page = one layout: avoid th:fragment in the same file as th:insert,
+  or the fragment node may render twice (duplicate content / scrollbars).
+  Students: sidebar + main; others: main only.
 -->
 <th:block th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}">
     <div class="flex flex-1 overflow-hidden pt-16 min-h-0 w-full">

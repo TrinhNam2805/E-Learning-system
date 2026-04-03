@@ -62,7 +62,7 @@ public class ForumController {
             if (lessonId != null) {
                 lessonService.findById(lessonId).filter(l -> l.getCourse().getId().equals(courseId)).ifPresent(l -> {
                     model.addAttribute("prefillLessonId", lessonId);
-                    model.addAttribute("prefillPostTitle", "Bài: " + l.getLessonTitle());
+                    model.addAttribute("prefillPostTitle", "Lesson: " + l.getLessonTitle());
                 });
             }
         }
@@ -116,13 +116,13 @@ public class ForumController {
         }
 
         if (type == ForumPost.PostType.ANNOUNCEMENT && user.getRole() == User.Role.STUDENT) {
-            ra.addFlashAttribute("error", "Chỉ giảng viên hoặc quản trị viên mới đăng được thông báo.");
+            ra.addFlashAttribute("error", "Only instructors or admins can post announcements.");
             return redirectToForumList(courseId);
         }
 
         if (courseId == null) {
             if (!mayCreateGlobalForumPost(user)) {
-                ra.addFlashAttribute("error", "Diễn đàn chung: chỉ giảng viên hoặc quản trị viên được tạo chủ đề mới. Sinh viên xem danh sách và bình luận trong từng bài.");
+                ra.addFlashAttribute("error", "Global forum: only instructors or admins can create topics. Students can read and comment on each post.");
                 return "redirect:/forum";
             }
             ForumPost post = ForumPost.builder()
@@ -130,15 +130,15 @@ public class ForumController {
                     .author(user).title(title.trim()).content(content)
                     .postType(type).build();
             forumService.createPost(post);
-            ra.addFlashAttribute("success", "Đã đăng bài.");
+            ra.addFlashAttribute("success", "Post published.");
             return "redirect:/forum";
         }
 
         if (!mayUseCourseForum(user, courseId)) {
             if (user.getRole() == User.Role.STUDENT) {
-                ra.addFlashAttribute("error", "Bạn cần đăng ký khóa học để tham gia diễn đàn môn này.");
+                ra.addFlashAttribute("error", "Enroll in the course to use this forum.");
             } else {
-                ra.addFlashAttribute("error", "Không có quyền đăng bài trong diễn đàn này.");
+                ra.addFlashAttribute("error", "You do not have permission to post in this forum.");
             }
             return "redirect:/forum?courseId=" + courseId;
         }
@@ -150,7 +150,7 @@ public class ForumController {
         if (lessonId != null) {
             lesson = lessonService.findById(lessonId).filter(l -> l.getCourse().getId().equals(courseId)).orElse(null);
             if (lesson == null) {
-                ra.addFlashAttribute("error", "Bài học không thuộc khóa học này.");
+                ra.addFlashAttribute("error", "That lesson does not belong to this course.");
                 return "redirect:/forum?courseId=" + courseId;
             }
         }
@@ -160,7 +160,7 @@ public class ForumController {
                 .author(user).title(title.trim()).content(content)
                 .postType(type).build();
         forumService.createPost(post);
-        ra.addFlashAttribute("success", "Đã đăng bài.");
+        ra.addFlashAttribute("success", "Post published.");
         return "redirect:/forum?courseId=" + courseId;
     }
 
@@ -176,13 +176,13 @@ public class ForumController {
         ForumPost post = forumService.findById(postId).orElse(null);
         if (post == null) return "redirect:/courses";
         if (!mayCommentOnPost(user, post)) {
-            ra.addFlashAttribute("error", "Bạn không có quyền bình luận bài này.");
+            ra.addFlashAttribute("error", "You do not have permission to comment on this post.");
             return "redirect:/forum/post/" + postId;
         }
 
         Comment comment = Comment.builder().post(post).author(user).content(content).build();
         forumService.addComment(comment);
-        ra.addFlashAttribute("success", "Đã thêm bình luận.");
+        ra.addFlashAttribute("success", "Comment added.");
         return "redirect:/forum/post/" + postId;
     }
 

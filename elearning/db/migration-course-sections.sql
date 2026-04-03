@@ -34,7 +34,7 @@ DEALLOCATE PREPARE _mcs;
 
 -- Một phần mặc định cho mỗi khóa học đang có bài học
 INSERT INTO `course_sections` (`course_id`, `section_order`, `title`)
-SELECT c.id, 1, 'Phần 1 — Nội dung khóa học'
+SELECT c.id, 1, 'Section 1 — Course content'
 FROM `courses` c
 WHERE EXISTS (SELECT 1 FROM `lessons` l WHERE l.course_id = c.id)
   AND NOT EXISTS (SELECT 1 FROM `course_sections` cs WHERE cs.course_id = c.id);

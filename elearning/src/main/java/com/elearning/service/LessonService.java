@@ -39,7 +39,7 @@ public class LessonService {
         CurriculumSectionDto current = null;
         for (Lesson l : orderedLessons) {
             Long sid = l.getSection() != null ? l.getSection().getId() : null;
-            String title = l.getSection() != null ? l.getSection().getTitle() : "Nội dung khóa học";
+            String title = l.getSection() != null ? l.getSection().getTitle() : "Course content";
             int order = l.getSection() != null ? l.getSection().getSectionOrder() : 0;
             if (current == null || !Objects.equals(current.getSectionId(), sid)) {
                 current = CurriculumSectionDto.builder()
@@ -73,7 +73,7 @@ public class LessonService {
         CourseSection created = CourseSection.builder()
                 .course(course)
                 .sectionOrder(1)
-                .title("Phần 1 — Nội dung khóa học")
+                .title("Section 1 — Course content")
                 .build();
         return courseSectionRepository.save(created);
     }
@@ -84,7 +84,7 @@ public class LessonService {
         CourseSection s = CourseSection.builder()
                 .course(course)
                 .sectionOrder(n + 1)
-                .title(title != null && !title.trim().isEmpty() ? title.trim() : "Phần " + (n + 1))
+                .title(title != null && !title.trim().isEmpty() ? title.trim() : "Section " + (n + 1))
                 .build();
         return courseSectionRepository.save(s);
     }
