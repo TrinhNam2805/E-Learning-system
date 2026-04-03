@@ -195,6 +195,26 @@ INSERT INTO `assignments` (`id`, `course_id`, `title`, `description`, `type`, `d
 'Trắc nghiệm về kiểu dữ liệu, lớp, kế thừa và xử lý ngoại lệ.',
 'QUIZ', '2025-12-22 23:59:00', 10.0);
 
+UPDATE `assignments`
+SET `lesson_id` = 1,
+    `minimum_passing_score` = 6.0
+WHERE `id` = 1;
+
+UPDATE `assignments`
+SET `lesson_id` = 2,
+    `minimum_passing_score` = 6.0
+WHERE `id` = 2;
+
+UPDATE `assignments`
+SET `lesson_id` = 4,
+    `minimum_passing_score` = 5.0
+WHERE `id` = 3;
+
+UPDATE `assignments`
+SET `lesson_id` = 7,
+    `minimum_passing_score` = 5.0
+WHERE `id` = 4;
+
 INSERT INTO `quiz_questions` (`id`, `assignment_id`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_answer`, `question_order`, `points`) VALUES
 (1, 1,
 'Cho đoạn mã duyệt một mảng một chiều n phần tử đúng một lần, mỗi phần tử thực hiện O(1) phép toán. Độ phức tạp thời gian tiệm cận (worst-case) là gì?',
@@ -300,9 +320,21 @@ INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `type`, `is_re
 (2, 4, 'Điểm bài kiểm tra đã có', 'Bài kiểm tra đã được chấm. Xem phản hồi trong mục nộp bài.', 'GRADE', 0, '2024-11-11 08:05:00'),
 (3, 3, 'Thông báo khóa học', 'Diễn đàn CS201 có thêm công bố tài liệu tham khảo.', 'ANNOUNCEMENT', 0, '2024-10-03 14:30:00');
 
+INSERT INTO `badge_definitions`
+(`id`, `code`, `name`, `description`, `icon`, `criterion_type`, `threshold_value`, `active`, `display_order`) VALUES
+(1, 'FIRST_STEP', 'Bước khởi đầu', 'Hoàn thành 1 bài học đầu tiên trong hệ thống.', 'rocket_launch', 'COMPLETED_LESSONS', 1, 1, 1),
+(2, 'LEARNING_STREAK', 'Tiến bộ bền bỉ', 'Hoàn thành ít nhất 5 bài học.', 'local_fire_department', 'COMPLETED_LESSONS', 5, 1, 2),
+(3, 'FIRST_GRADE', 'Có điểm đầu tiên', 'Có ít nhất 1 bài nộp đã được chấm điểm.', 'fact_check', 'GRADED_SUBMISSIONS', 1, 1, 3),
+(4, 'QUIZ_ACE', 'Chuyên gia quiz', 'Đạt điểm tuyệt đối ở ít nhất 1 bài quiz.', 'psychology', 'PERFECT_QUIZZES', 1, 1, 4),
+(5, 'XP_BRONZE', 'XP Đồng', 'Đạt ít nhất 100 XP tích lũy.', 'workspace_premium', 'TOTAL_XP', 100, 1, 5),
+(6, 'XP_SILVER', 'XP Bạc', 'Đạt ít nhất 300 XP tích lũy.', 'workspace_premium', 'TOTAL_XP', 300, 1, 6),
+(7, 'COURSE_FINISHER', 'Hoàn tất học phần', 'Hoàn thành ít nhất 1 khóa học với tiến độ 100%.', 'school', 'COMPLETED_COURSES', 1, 1, 7);
+
 -- Reset AUTO_INCREMENT để id không chồng lấn khi thêm bản ghi mới sau này
 ALTER TABLE `departments` AUTO_INCREMENT = 100;
 ALTER TABLE `users` AUTO_INCREMENT = 100;
+ALTER TABLE `badge_definitions` AUTO_INCREMENT = 100;
+ALTER TABLE `user_badges` AUTO_INCREMENT = 100;
 ALTER TABLE `courses` AUTO_INCREMENT = 100;
 ALTER TABLE `course_prerequisites` AUTO_INCREMENT = 100;
 ALTER TABLE `lessons` AUTO_INCREMENT = 100;

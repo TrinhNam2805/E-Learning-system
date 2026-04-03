@@ -1,0 +1,65 @@
+package com.elearning.model.dto.assessment;
+
+import com.elearning.model.entity.Submission;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Builder
+public class AssessmentSubmissionDto {
+
+    private final Long id;
+    private final Long assignmentId;
+    private final String assignmentTitle;
+    private final Long courseId;
+    private final String courseCode;
+    private final Long studentId;
+    private final String studentName;
+    private final String studentEmail;
+    private final Integer attemptNumber;
+    private final String content;
+    private final String fileName;
+    private final Long fileSize;
+    private final Double score;
+    private final String feedback;
+    private final String status;
+    private final boolean lateSubmission;
+    private final boolean autoGraded;
+    private final boolean graded;
+    private final LocalDateTime submittedAt;
+    private final LocalDateTime gradedAt;
+
+    public static AssessmentSubmissionDto fromEntity(Submission submission) {
+        Submission.SubmissionStatus status = submission.getStatus();
+        boolean graded = submission.getScore() != null
+                || status == Submission.SubmissionStatus.GRADED
+                || submission.isAutoGraded();
+
+        return AssessmentSubmissionDto.builder()
+                .id(submission.getId())
+                .assignmentId(submission.getAssignment() != null ? submission.getAssignment().getId() : null)
+                .assignmentTitle(submission.getAssignment() != null ? submission.getAssignment().getTitle() : null)
+                .courseId(submission.getAssignment() != null && submission.getAssignment().getCourse() != null
+                        ? submission.getAssignment().getCourse().getId() : null)
+                .courseCode(submission.getAssignment() != null && submission.getAssignment().getCourse() != null
+                        ? submission.getAssignment().getCourse().getCourseCode() : null)
+                .studentId(submission.getStudent() != null ? submission.getStudent().getId() : null)
+                .studentName(submission.getStudent() != null ? submission.getStudent().getFullName() : null)
+                .studentEmail(submission.getStudent() != null ? submission.getStudent().getEmail() : null)
+                .attemptNumber(submission.getAttemptNumber())
+                .content(submission.getContent())
+                .fileName(submission.getOriginalFileName())
+                .fileSize(submission.getFileSize())
+                .score(submission.getScore())
+                .feedback(submission.getFeedback())
+                .status(status != null ? status.name() : null)
+                .lateSubmission(submission.isLateSubmission() || status == Submission.SubmissionStatus.LATE)
+                .autoGraded(submission.isAutoGraded())
+                .graded(graded)
+                .submittedAt(submission.getSubmittedAt())
+                .gradedAt(submission.getGradedAt())
+                .build();
+    }
+}

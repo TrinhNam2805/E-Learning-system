@@ -23,8 +23,10 @@ public class LessonProgress {
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
 
+    @Column(nullable = false)
     @Builder.Default
     private boolean completed = false;
 
+    @Column(name = "completed_at")
     private LocalDate completedAt;
 }

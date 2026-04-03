@@ -1,5 +1,7 @@
 package com.elearning.controller;
 
+import com.elearning.exception.AssessmentException;
+import com.elearning.model.dto.assessment.AssignmentCreateForm;
 import com.elearning.model.entity.*;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
@@ -8,9 +10,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.time.LocalDateTime;
+
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -95,18 +99,17 @@ public class TeacherController {
 
         model.addAttribute("course", course);
         model.addAttribute("assignments", assignmentService.findByCourseId(courseId));
+        model.addAttribute("lessons", lessonService.findByCourseId(courseId));
+        model.addAttribute("assignmentForm", new AssignmentCreateForm());
         model.addAttribute("currentUser", user);
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
-        return "teacher/assignments";
+        return "teacher/assessment-assignments";
     }
 
     @PostMapping("/courses/{courseId}/assignments/add")
     public String addAssignment(@PathVariable Long courseId,
-                                @RequestParam String title,
-                                @RequestParam(required = false) String description,
-                                @RequestParam String type,
-                                @RequestParam String dueDate,
-                                @RequestParam double maxScore,
+                                @Valid @ModelAttribute("assignmentForm") AssignmentCreateForm form,
+                                BindingResult bindingResult,
                                 @AuthenticationPrincipal UserDetails userDetails,
                                 RedirectAttributes ra) {
         User user = getTeacher(userDetails);
@@ -115,22 +118,59 @@ public class TeacherController {
         Course course = courseService.findById(courseId).orElse(null);
         if (course == null) return "redirect:/teacher/dashboard";
 
+        if (bindingResult.hasErrors()) {
+            ra.addFlashAttribute("error", bindingResult.getFieldError().getDefaultMessage());
+            return "redirect:/teacher/courses/" + courseId + "/assignments";
+        }
+
+        Lesson linkedLesson = null;
+        if (form.getLessonId() != null) {
+            linkedLesson = lessonService.findById(form.getLessonId()).orElse(null);
+            if (linkedLesson == null || linkedLesson.getCourse() == null || !courseId.equals(linkedLesson.getCourse().getId())) {
+                ra.addFlashAttribute("error", "The selected lesson is invalid.");
+                return "redirect:/teacher/courses/" + courseId + "/assignments";
+            }
+            if (form.getMinimumPassingScore() == null) {
+                ra.addFlashAttribute("error", "Please enter the minimum passing score required to unlock the next lesson.");
+                return "redirect:/teacher/courses/" + courseId + "/assignments";
+            }
+            if (form.getMinimumPassingScore() > form.getMaxScore()) {
+                ra.addFlashAttribute("error", "The minimum passing score cannot be greater than the maximum score.");
+                return "redirect:/teacher/courses/" + courseId + "/assignments";
+            }
+        } else if (form.getMinimumPassingScore() != null) {
+            ra.addFlashAttribute("error", "Only configure a minimum passing score when a linked lesson is selected.");
+            return "redirect:/teacher/courses/" + courseId + "/assignments";
+        }
+
         Assignment assignment = Assignment.builder()
-                .course(course).title(title).description(description)
-                .type(Assignment.AssignmentType.valueOf(type))
-                .dueDate(LocalDateTime.parse(dueDate + "T23:59:00"))
-                .maxScore(maxScore).build();
-        assignmentService.save(assignment);
+                .course(course)
+                .lesson(linkedLesson)
+                .title(form.getTitle())
+                .description(form.getDescription())
+                .type(form.getType())
+                .dueDate(form.getDueDate())
+                .maxScore(form.getMaxScore())
+                .minimumPassingScore(form.getMinimumPassingScore())
+                .allowLateSubmission(form.isAllowLateSubmission())
+                .maxAttempts(form.getMaxAttempts())
+                .build();
+        try {
+            assignmentService.save(assignment);
+        } catch (AssessmentException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/teacher/courses/" + courseId + "/assignments";
+        }
 
         // Notify enrolled students
         List<Enrollment> enrollments = enrollmentService.findByCourseId(courseId);
         for (Enrollment e : enrollments) {
-            notificationService.send(e.getStudent(), "New Assignment: " + title,
-                    "Course " + course.getCourseCode() + " has a new assignment. Due: " + dueDate,
+            notificationService.send(e.getStudent(), "New assignment: " + form.getTitle(),
+                    "Course " + course.getCourseCode() + " has a new assignment. Due date: " + form.getDueDate() + ".",
                     Notification.NotifType.ASSIGNMENT);
         }
 
-        ra.addFlashAttribute("success", "Assignment added successfully!");
+        ra.addFlashAttribute("success", "Assignment created successfully.");
         return "redirect:/teacher/courses/" + courseId + "/assignments";
     }
 

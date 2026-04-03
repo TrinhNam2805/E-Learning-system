@@ -1,30 +1,65 @@
 package com.elearning.service;
 
-import com.elearning.model.entity.*;
-import com.elearning.repository.*;
+import com.elearning.exception.AssessmentDeadlineException;
+import com.elearning.exception.AssessmentNotFoundException;
+import com.elearning.exception.AssessmentValidationException;
+import com.elearning.model.dto.assessment.AssignmentSubmissionForm;
+import com.elearning.model.dto.assessment.SubmissionGradeForm;
+import com.elearning.model.entity.Assignment;
+import com.elearning.model.entity.Notification;
+import com.elearning.model.entity.QuizQuestion;
+import com.elearning.model.entity.Submission;
+import com.elearning.model.entity.User;
+import com.elearning.repository.AssignmentRepository;
+import com.elearning.repository.QuizQuestionRepository;
+import com.elearning.repository.SubmissionRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AssignmentService {
+
+    private static final Set<String> QUIZ_OPTIONS =
+            new HashSet<String>(Arrays.asList("A", "B", "C", "D"));
 
     private final AssignmentRepository assignmentRepository;
     private final SubmissionRepository submissionRepository;
     private final QuizQuestionRepository quizQuestionRepository;
     private final GamificationService gamificationService;
     private final EnrollmentService enrollmentService;
+    private final NotificationService notificationService;
+    private final AssessmentFileStorageService assessmentFileStorageService;
 
     public List<Assignment> findByCourseId(Long courseId) {
         return assignmentRepository.findByCourseIdOrderByDueDateAsc(courseId);
     }
 
     public Optional<Assignment> findById(Long id) {
-        return assignmentRepository.findById(id);
+        return assignmentRepository.findDetailedById(id);
+    }
+
+    public Assignment getDetailedAssignmentOrThrow(Long id) {
+        return findById(id).orElseThrow(() -> new AssessmentNotFoundException("Assignment not found."));
+    }
+
+    public Submission getDetailedSubmissionOrThrow(Long submissionId) {
+        return submissionRepository.findDetailedById(submissionId)
+                .orElseThrow(() -> new AssessmentNotFoundException("Submission not found."));
     }
 
     public List<Assignment> findUpcomingForStudent(Long studentId) {
@@ -33,6 +68,22 @@ public class AssignmentService {
 
     @Transactional
     public Assignment save(Assignment assignment) {
+        if (assignment.getMaxAttempts() <= 0) {
+            assignment.setMaxAttempts(1);
+        }
+        if (assignment.getMaxScore() <= 0) {
+            assignment.setMaxScore(10.0);
+        }
+        if (assignment.getLesson() == null) {
+            assignment.setMinimumPassingScore(null);
+        } else if (assignment.getMinimumPassingScore() != null) {
+            if (assignment.getMinimumPassingScore() < 0) {
+                throw new AssessmentValidationException("The minimum passing score cannot be less than 0.");
+            }
+            if (assignment.getMinimumPassingScore() > assignment.getMaxScore()) {
+                throw new AssessmentValidationException("The minimum passing score cannot be greater than the maximum score.");
+            }
+        }
         return assignmentRepository.save(assignment);
     }
 
@@ -41,45 +92,115 @@ public class AssignmentService {
         assignmentRepository.deleteById(id);
     }
 
-    // Submissions
-    public Optional<Submission> findSubmission(Long assignmentId, Long studentId) {
-        return submissionRepository.findByAssignmentIdAndStudentId(assignmentId, studentId);
+    public Optional<Submission> findLatestSubmission(Long assignmentId, Long studentId) {
+        return submissionRepository.findTopByAssignmentIdAndStudentIdOrderByAttemptNumberDescSubmittedAtDesc(
+                assignmentId, studentId);
+    }
+
+    public List<Submission> findSubmissionHistory(Long assignmentId, Long studentId) {
+        return submissionRepository.findHistoryByAssignmentIdAndStudentId(assignmentId, studentId);
     }
 
     public List<Submission> findSubmissionsByAssignment(Long assignmentId) {
-        return submissionRepository.findByAssignmentId(assignmentId);
+        return submissionRepository.findDetailedByAssignmentId(assignmentId);
+    }
+
+    public List<Submission> findSubmissionsByStudent(Long studentId) {
+        return submissionRepository.findDetailedByStudentId(studentId);
     }
 
     @Transactional
-    public Submission submit(Submission submission) {
-        return submissionRepository.save(submission);
-    }
+    public SubmissionResult submit(Long assignmentId,
+                                   User student,
+                                   AssignmentSubmissionForm form,
+                                   Map<String, String> allParams) {
+        Assignment assignment = getDetailedAssignmentOrThrow(assignmentId);
+        validateStudentMaySubmit(assignment, student);
 
-    @Transactional
-    public Submission grade(Long submissionId, double score, String feedback) {
-        Submission sub = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new IllegalArgumentException("Submission not found."));
-        boolean firstGrade = sub.getScore() == null;
-        Assignment a = sub.getAssignment();
-        sub.setScore(score);
-        sub.setFeedback(feedback);
-        sub.setStatus(Submission.SubmissionStatus.GRADED);
-        Submission saved = submissionRepository.save(sub);
-
-        if (firstGrade
-                && enrollmentService.isEnrolled(sub.getStudent().getId(), a.getCourse().getId())
-                && a.getType() != Assignment.AssignmentType.QUIZ) {
-            gamificationService.awardGradedAssignmentXp(
-                    sub.getStudent().getId(),
-                    a.getCourse().getId(),
-                    score,
-                    a.getMaxScore(),
-                    a.getType());
+        long existingAttempts = submissionRepository.countByAssignmentIdAndStudentId(assignmentId, student.getId());
+        if (existingAttempts >= Math.max(assignment.getMaxAttempts(), 1)) {
+            throw new AssessmentValidationException("You have used all available submissions for this assignment.");
         }
-        return saved;
+
+        boolean pastDue = isPastDue(assignment);
+        validateDeadline(assignment, pastDue, form.isConfirmLate());
+
+        Submission submission = Submission.builder()
+                .assignment(assignment)
+                .student(student)
+                .attemptNumber((int) existingAttempts + 1)
+                .lateSubmission(pastDue)
+                .status(Submission.SubmissionStatus.SUBMITTED)
+                .content(normalize(form.getContent()))
+                .build();
+
+        if (assignment.getType() == Assignment.AssignmentType.QUIZ) {
+            return submitQuiz(assignment, student, submission, form.getAttachment(), allParams);
+        }
+
+        attachFile(submission, form.getAttachment(), assignmentId, student.getId());
+        validateOpenSubmission(submission);
+
+        Submission saved = submissionRepository.save(submission);
+        return new SubmissionResult(saved, 0);
     }
 
-    // Quiz questions
+    @Transactional
+    public GradeResult grade(Long submissionId, SubmissionGradeForm form) {
+        Submission submission = getDetailedSubmissionOrThrow(submissionId);
+        Assignment assignment = submission.getAssignment();
+
+        if (assignment.getType() == Assignment.AssignmentType.QUIZ && submission.isAutoGraded()) {
+            throw new AssessmentValidationException("This quiz has already been auto-graded.");
+        }
+
+        double validatedScore = validateScore(form.getScore(), assignment.getMaxScore());
+        boolean alreadyHadGradeForAssignment = submissionRepository
+                .existsByAssignmentIdAndStudentIdAndScoreIsNotNull(assignment.getId(), submission.getStudent().getId());
+
+        submission.setScore(validatedScore);
+        submission.setFeedback(normalize(form.getFeedback()));
+        submission.setStatus(Submission.SubmissionStatus.GRADED);
+        submission.setGradedAt(LocalDateTime.now());
+        submission.setAutoGraded(false);
+        Submission saved = submissionRepository.save(submission);
+
+        int awardedXp = 0;
+        boolean firstGradeForAssignment = !alreadyHadGradeForAssignment;
+        if (!alreadyHadGradeForAssignment
+                && enrollmentService.isEnrolled(submission.getStudent().getId(), assignment.getCourse().getId())
+                && assignment.getType() != Assignment.AssignmentType.QUIZ) {
+            awardedXp = gamificationService.awardGradedAssignmentXp(
+                    submission.getStudent().getId(),
+                    assignment.getCourse().getId(),
+                    validatedScore,
+                    assignment.getMaxScore(),
+                    assignment.getType());
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append("Submission \"").append(assignment.getTitle()).append("\" was graded: ")
+                .append(String.format(Locale.US, "%.1f", validatedScore))
+                .append("/").append(String.format(Locale.US, "%.1f", assignment.getMaxScore())).append(".");
+        if (StringUtils.hasText(saved.getFeedback())) {
+            message.append(" Feedback: ").append(saved.getFeedback());
+        }
+        if (awardedXp > 0) {
+            message.append(" +").append(awardedXp).append(" XP.");
+        }
+        notificationService.send(submission.getStudent(),
+                "Assignment result available",
+                message.toString(),
+                Notification.NotifType.GRADE);
+
+        return new GradeResult(saved, awardedXp, firstGradeForAssignment);
+    }
+
+    public boolean isPastDue(Assignment assignment) {
+        LocalDateTime dueDate = assignment.getDueDate();
+        return dueDate != null && LocalDateTime.now().isAfter(dueDate);
+    }
+
     public List<QuizQuestion> findQuestions(Long assignmentId) {
         return quizQuestionRepository.findByAssignmentIdOrderByQuestionOrderAsc(assignmentId);
     }
@@ -92,5 +213,149 @@ public class AssignmentService {
     @Transactional
     public void deleteQuestion(Long id) {
         quizQuestionRepository.deleteById(id);
+    }
+
+    private SubmissionResult submitQuiz(Assignment assignment,
+                                        User student,
+                                        Submission submission,
+                                        MultipartFile attachment,
+                                        Map<String, String> allParams) {
+        if (attachment != null && !attachment.isEmpty()) {
+            throw new AssessmentValidationException("Quiz submissions do not support file attachments.");
+        }
+
+        List<QuizQuestion> questions = findQuestions(assignment.getId());
+        if (questions.isEmpty()) {
+            throw new AssessmentValidationException("This quiz does not have any questions yet.");
+        }
+
+        StringBuilder answerBuilder = new StringBuilder();
+        int correctAnswers = 0;
+        for (QuizQuestion question : questions) {
+            String answer = normalizeQuizAnswer(allParams.get("q_" + question.getId()));
+            if (!QUIZ_OPTIONS.contains(answer)) {
+                throw new AssessmentValidationException("Please answer every question before submitting.");
+            }
+            answerBuilder.append("Q").append(question.getId()).append(":").append(answer).append(";");
+            if (answer.equalsIgnoreCase(question.getCorrectAnswer())) {
+                correctAnswers++;
+            }
+        }
+
+        double score = (correctAnswers * assignment.getMaxScore()) / questions.size();
+
+        submission.setContent(answerBuilder.toString());
+        submission.setScore(score);
+        submission.setAutoGraded(true);
+        submission.setStatus(Submission.SubmissionStatus.GRADED);
+        submission.setFeedback("Auto-graded by the system: " + correctAnswers + "/" + questions.size() + " correct answers.");
+        submission.setGradedAt(LocalDateTime.now());
+
+        Submission saved = submissionRepository.save(submission);
+        int awardedXp = 0;
+        if (submission.getAttemptNumber() == 1
+                && enrollmentService.isEnrolled(student.getId(), assignment.getCourse().getId())) {
+            awardedXp = gamificationService.awardQuizXp(
+                    student.getId(), assignment.getCourse().getId(), score, assignment.getMaxScore());
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append("Quiz \"").append(assignment.getTitle()).append("\" was auto-graded: ")
+                .append(String.format(Locale.US, "%.1f", score))
+                .append("/").append(String.format(Locale.US, "%.1f", assignment.getMaxScore())).append(".");
+        if (submission.isLateSubmission()) {
+            message.append(" The submission was recorded as late.");
+        }
+        if (awardedXp > 0) {
+            message.append(" +").append(awardedXp).append(" XP.");
+        }
+        notificationService.send(student,
+                "Quiz result",
+                message.toString(),
+                Notification.NotifType.GRADE);
+
+        return new SubmissionResult(saved, awardedXp);
+    }
+
+    private void validateStudentMaySubmit(Assignment assignment, User student) {
+        if (student == null || student.getRole() != User.Role.STUDENT) {
+            throw new AssessmentValidationException("Only students can submit assignments.");
+        }
+        if (!enrollmentService.isEnrolled(student.getId(), assignment.getCourse().getId())) {
+            throw new AssessmentValidationException("You are not enrolled in this course.");
+        }
+    }
+
+    private void validateDeadline(Assignment assignment, boolean pastDue, boolean confirmedLate) {
+        if (!pastDue) {
+            return;
+        }
+        if (!assignment.isAllowLateSubmission()) {
+            throw new AssessmentDeadlineException("This assignment is past due and late submission is not allowed.");
+        }
+        if (!confirmedLate) {
+            throw new AssessmentDeadlineException("This assignment is past due. Please confirm late submission to continue.");
+        }
+    }
+
+    private void attachFile(Submission submission, MultipartFile attachment, Long assignmentId, Long studentId) {
+        AssessmentFileStorageService.StoredFile storedFile = assessmentFileStorageService
+                .storeSubmissionFile(assignmentId, studentId, attachment);
+        if (storedFile == null) {
+            return;
+        }
+        submission.setFileUrl(storedFile.getStoredFileName());
+        submission.setOriginalFileName(storedFile.getOriginalFileName());
+        submission.setFileSize(storedFile.getSize());
+    }
+
+    private void validateOpenSubmission(Submission submission) {
+        boolean hasContent = StringUtils.hasText(submission.getContent());
+        boolean hasFile = StringUtils.hasText(submission.getFileUrl());
+        if (!hasContent && !hasFile) {
+            throw new AssessmentValidationException("Please enter submission content or upload a valid file.");
+        }
+    }
+
+    private double validateScore(Double score, double maxScore) {
+        if (score == null) {
+            throw new AssessmentValidationException("Score is required.");
+        }
+        if (score < 0 || score > maxScore) {
+            throw new AssessmentValidationException("Score must be between 0 and " + maxScore + ".");
+        }
+        return score;
+    }
+
+    private String normalize(String value) {
+        return StringUtils.hasText(value) ? value.trim() : null;
+    }
+
+    private String normalizeQuizAnswer(String answer) {
+        return answer == null ? null : answer.trim().toUpperCase(Locale.ROOT);
+    }
+
+    @Getter
+    public static class SubmissionResult {
+        private final Submission submission;
+        private final int awardedXp;
+
+        public SubmissionResult(Submission submission, int awardedXp) {
+            this.submission = submission;
+            this.awardedXp = awardedXp;
+        }
+    }
+
+    @Getter
+    public static class GradeResult {
+        private final Submission submission;
+        private final int awardedXp;
+        private final boolean firstGradeForAssignment;
+
+        public GradeResult(Submission submission, int awardedXp, boolean firstGradeForAssignment) {
+            this.submission = submission;
+            this.awardedXp = awardedXp;
+            this.firstGradeForAssignment = firstGradeForAssignment;
+        }
     }
 }

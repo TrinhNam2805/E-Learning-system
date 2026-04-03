@@ -7,11 +7,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
+    @EntityGraph(attributePaths = {"course", "lesson"})
     List<Assignment> findByCourseIdOrderByDueDateAsc(Long courseId);
 
-    @EntityGraph(attributePaths = {"course"})
+    @EntityGraph(attributePaths = {"course", "lesson"})
+    List<Assignment> findByCourseIdAndLessonIdOrderByDueDateAsc(Long courseId, Long lessonId);
+
+    @EntityGraph(attributePaths = {"course", "course.teacher", "lesson"})
+    @Query("SELECT a FROM Assignment a WHERE a.id = :id")
+    Optional<Assignment> findDetailedById(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = {"course", "lesson"})
     @Query("SELECT a FROM Assignment a WHERE a.course.id IN " +
            "(SELECT e.course.id FROM Enrollment e WHERE e.student.id = :studentId) " +
            "AND a.dueDate >= :now ORDER BY a.dueDate ASC")

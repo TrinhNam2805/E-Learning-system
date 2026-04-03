@@ -21,8 +21,10 @@
 --
 -- A1) Bảng dữ liệu liên quan
 --   • assignments      : bài giao (HOMEWORK | QUIZ | EXAM), due_date, max_score
+--                        + allow_late_submission, max_attempts
+--                        + lesson_id, minimum_passing_score để khóa/mở lesson theo thứ tự
 --   • quiz_questions   : câu hỏi trắc nghiệm gắn assignment type QUIZ
---   • submissions      : lần nộp của sinh viên (mỗi SV 1 bản ghi / assignment — app kiểm tra)
+--   • submissions      : nhiều lần nộp của sinh viên theo rule max_attempts
 --   • enrollments      : activity_xp (XP từ quiz + bài được chấm), total_xp (tổng trong khóa)
 --
 -- A2) Nộp bài tự luận (HOMEWORK / EXAM)
@@ -73,15 +75,22 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `assignments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `course_id` BIGINT NOT NULL,
+  `lesson_id` BIGINT DEFAULT NULL COMMENT 'Bài học mà assignment này thuộc về (nếu dùng rule tuần tự)',
   `title` VARCHAR(200) NOT NULL,
   `description` TEXT,
   `type` VARCHAR(20) DEFAULT 'HOMEWORK' COMMENT 'HOMEWORK | QUIZ | EXAM',
   `due_date` DATETIME(6) DEFAULT NULL,
   `max_score` DOUBLE NOT NULL DEFAULT 10,
+  `minimum_passing_score` DOUBLE DEFAULT NULL COMMENT 'Điểm tối thiểu cần đạt để mở bài học tiếp theo',
+  `allow_late_submission` BIT(1) NOT NULL DEFAULT b'0' COMMENT '0 = không cho nộp trễ, 1 = cho nộp trễ có xác nhận',
+  `max_attempts` INT NOT NULL DEFAULT 1 COMMENT 'Số lần nộp tối đa cho mỗi sinh viên',
   PRIMARY KEY (`id`),
   KEY `idx_assignments_course_id` (`course_id`),
+  KEY `idx_assignments_lesson_id` (`lesson_id`),
   CONSTRAINT `fk_assignments_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_assignments_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Bài tập / Quiz / Kiểm tra theo khóa học';
 
@@ -108,11 +117,17 @@ CREATE TABLE `submissions` (
   `assignment_id` BIGINT NOT NULL,
   `student_id` BIGINT NOT NULL,
   `content` TEXT COMMENT 'Tự luận: nội dung nộp; Quiz: chuỗi đáp án Qid:value;',
-  `file_url` VARCHAR(500) DEFAULT NULL COMMENT 'App chưa dùng trong luồng nộp hiện tại',
+  `file_url` VARCHAR(500) DEFAULT NULL COMMENT 'Tên tệp đã lưu trong kho lưu trữ nội bộ',
+  `original_file_name` VARCHAR(255) DEFAULT NULL COMMENT 'Tên gốc sinh viên tải lên',
+  `file_size` BIGINT DEFAULT NULL COMMENT 'Dung lượng tệp (byte)',
   `score` DOUBLE DEFAULT NULL,
   `feedback` TEXT,
   `status` VARCHAR(20) DEFAULT 'SUBMITTED' COMMENT 'SUBMITTED | GRADED | LATE',
+  `attempt_number` INT NOT NULL DEFAULT 1 COMMENT 'Thứ tự lần nộp',
+  `late_submission` BIT(1) NOT NULL DEFAULT b'0' COMMENT '1 = lần nộp này bị đánh dấu trễ hạn',
+  `auto_graded` BIT(1) NOT NULL DEFAULT b'0' COMMENT '1 = hệ thống chấm tự động',
   `submitted_at` DATETIME(6) DEFAULT NULL,
+  `graded_at` DATETIME(6) DEFAULT NULL COMMENT 'Thời điểm có điểm/feedback cuối cùng',
   PRIMARY KEY (`id`),
   KEY `idx_submissions_assignment_id` (`assignment_id`),
   KEY `idx_submissions_student_id` (`student_id`),
@@ -121,7 +136,7 @@ CREATE TABLE `submissions` (
   CONSTRAINT `fk_submissions_student` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Nộp bài; 1 SV / assignment (ràng buộc ở tầng ứng dụng)';
+COMMENT='Nộp bài; nhiều attempt theo rule của assignment';
 
 -- =============================================================================
 -- PHẦN C — enrollments: cột phục vụ XP & ranking (thường đã có trong schema-standard)

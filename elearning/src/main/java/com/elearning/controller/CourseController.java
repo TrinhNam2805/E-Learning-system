@@ -1,6 +1,7 @@
 package com.elearning.controller;
 
 import com.elearning.model.entity.*;
+import com.elearning.model.dto.lesson.LessonAccessDto;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.*;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class CourseController {
     private final EnrollmentService enrollmentService;
     private final ForumService forumService;
     private final AssignmentService assignmentService;
+    private final LessonUnlockService lessonUnlockService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
@@ -60,10 +62,12 @@ public class CourseController {
             boolean enrolled = enrollmentService.isEnrolled(user.getId(), id);
             model.addAttribute("enrolled", enrolled);
             if (enrolled) {
-                List<Long> completedLessonIds = lessons.stream()
-                        .filter(l -> enrollmentService.isLessonCompleted(user.getId(), l.getId()))
-                        .map(Lesson::getId)
+                java.util.Map<Long, LessonAccessDto> lessonAccessMap = lessonUnlockService.buildCourseLessonAccess(id, user.getId());
+                List<Long> completedLessonIds = lessonAccessMap.values().stream()
+                        .filter(LessonAccessDto::isCompleted)
+                        .map(LessonAccessDto::getLessonId)
                         .collect(Collectors.toList());
+                model.addAttribute("lessonAccessMap", lessonAccessMap);
                 model.addAttribute("completedLessonIds", completedLessonIds);
             }
         }

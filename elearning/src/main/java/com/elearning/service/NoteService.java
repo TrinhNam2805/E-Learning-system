@@ -48,6 +48,21 @@ public class NoteService {
         return noteRepository.findById(id);
     }
 
+    /** Ghi chú của đúng sinh viên (kèm lesson/course để redirect). */
+    public Optional<Note> findByIdAndStudentId(Long noteId, Long studentId) {
+        return noteRepository.findByIdAndStudent_Id(noteId, studentId);
+    }
+
+    /** Tổng số ghi chú của một sinh viên (giới hạn lưu trữ). */
+    public long countByStudentId(Long studentId) {
+        return noteRepository.countByStudentId(studentId);
+    }
+
+    /** Ghi chú thuộc đúng bài học và đúng sinh viên (dùng cho ?noteId= trên trang lesson). */
+    public boolean isNoteOnLesson(Long studentId, Long lessonId, Long noteId) {
+        return noteRepository.existsByIdAndStudent_IdAndLesson_Id(noteId, studentId, lessonId);
+    }
+
     public List<NoteLink> findOutgoingLinks(Long noteId) {
         return noteLinkRepository.findByFromNoteId(noteId);
     }

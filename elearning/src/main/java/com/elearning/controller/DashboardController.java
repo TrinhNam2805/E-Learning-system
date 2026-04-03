@@ -1,5 +1,7 @@
 package com.elearning.controller;
 
+import com.elearning.model.dto.ranking.BadgeCollectionDto;
+import com.elearning.model.dto.ranking.LeaderboardEntryDto;
 import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.Course;
 import com.elearning.model.entity.Enrollment;
@@ -26,6 +28,7 @@ public class DashboardController {
     private final NotificationService notificationService;
     private final AssignmentService assignmentService;
     private final RankingService rankingService;
+    private final BadgeService badgeService;
     private final CourseService courseService;
 
     @GetMapping("/dashboard")
@@ -60,7 +63,8 @@ public class DashboardController {
         int totalXp = enrollments.stream().mapToInt(Enrollment::getTotalXp).sum();
         List<Notification> notifications = notificationService.findByUserId(user.getId());
         List<Assignment> upcoming = assignmentService.findUpcomingForStudent(user.getId());
-        RankingService.RankEntry myRank = rankingService.getMyRank(user.getId());
+        LeaderboardEntryDto myRank = rankingService.getMyRank(user.getId());
+        BadgeCollectionDto earnedBadges = badgeService.getEarnedBadges(user.getId());
 
         model.addAttribute("currentUser", user);
         model.addAttribute("enrollments", enrollments);
@@ -70,6 +74,8 @@ public class DashboardController {
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
         model.addAttribute("upcomingAssignments", upcoming.stream().limit(5).collect(Collectors.toList()));
         model.addAttribute("myRank", myRank);
+        model.addAttribute("earnedBadges", earnedBadges.getBadges().stream().limit(4).collect(Collectors.toList()));
+        model.addAttribute("earnedBadgeCount", earnedBadges.getEarnedBadgeCount());
         return "dashboard/student";
     }
 

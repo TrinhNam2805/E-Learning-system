@@ -3,47 +3,21 @@
 function toggleNotif() {
     const d = document.getElementById('notif-dropdown');
     const a = document.getElementById('account-dropdown');
-    if (a) a.hidden = true;
-    if (d) d.hidden = !d.hidden;
+    if (a) a.classList.add('hidden');
+    if (d) d.classList.toggle('hidden');
 }
 
 function toggleAccount() {
     const d = document.getElementById('account-dropdown');
     const n = document.getElementById('notif-dropdown');
-    if (n) n.hidden = true;
-    if (d) d.hidden = !d.hidden;
-}
-
-function toggleNavMenu(button) {
-    const nav = button.closest('nav');
-    if (!nav) return;
-    const open = nav.classList.toggle('open');
-    button.setAttribute('aria-expanded', open ? 'true' : 'false');
-}
-
-function initActiveNavigation() {
-    const path = window.location.pathname || '/';
-    document.querySelectorAll('[data-nav-match]').forEach(function(link) {
-        const raw = link.getAttribute('data-nav-match');
-        const mode = link.getAttribute('data-nav-mode');
-        if (!raw) return;
-        const matches = raw.split('|').map(function(item) { return item.trim(); }).filter(Boolean);
-        const isHome = mode === 'home' && (path === '/' || path === '/home');
-        const isMatch = isHome || matches.some(function(match) {
-            if (match === '/') return path === '/';
-            return path === match || path.indexOf(match + '/') === 0;
-        });
-        if (isMatch) {
-            link.classList.add('is-active');
-            link.setAttribute('aria-current', 'page');
-        }
-    });
+    if (n) n.classList.add('hidden');
+    if (d) d.classList.toggle('hidden');
 }
 
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.account-menu')) {
-        document.querySelectorAll('.dropdown-menu').forEach(function(m) {
-            m.hidden = true;
+        document.querySelectorAll('#notif-dropdown, #account-dropdown').forEach(function(m) {
+            if (m) m.classList.add('hidden');
         });
     }
 

@@ -1,0 +1,45 @@
+<div xmlns:th="http://www.thymeleaf.org"
+     th:fragment="inner"
+     class="max-w-7xl mx-auto w-full space-y-6">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="min-w-0">
+            <h1 class="text-2xl md:text-3xl font-extrabold font-headline text-on-background">All Courses</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Browse and enroll in courses.</p>
+        </div>
+        <form class="flex w-full flex-row flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap shrink-0" th:action="@{/courses}" method="get">
+            <input type="search" name="q" th:value="${q}" placeholder="Search by name, code..."
+                   class="min-w-0 flex-1 rounded-lg border border-slate-200 text-sm px-3 py-2.5 bg-white shadow-sm sm:min-w-[220px] sm:flex-none sm:w-56 md:w-64">
+            <button type="submit" class="shrink-0 px-4 py-2.5 bg-primary text-on-primary text-sm font-bold rounded-lg hover:opacity-90 border-0 cursor-pointer">Search</button>
+        </form>
+    </div>
+
+    <div th:if="${q != null and !q.trim().isEmpty()}" class="text-sm text-on-surface-variant">
+        Results for "<strong th:text="${q}"></strong>":
+        <span th:text="${courses.size()}"></span> course(s).
+        <a th:href="@{/courses}" class="text-primary font-semibold">Clear filter</a>
+    </div>
+
+    <div th:if="${courses.isEmpty()}" class="text-center py-16 text-on-surface-variant rounded-xl border border-dashed border-slate-200 bg-surface-container-low/40">
+        No courses found.
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" th:unless="${courses.isEmpty()}">
+        <a class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md hover:border-primary-container/40 transition-all no-underline text-inherit flex flex-col"
+           th:each="c : ${courses}" th:href="@{/courses/{id}(id=${c.id})}">
+            <div class="aspect-video overflow-hidden bg-surface-container shrink-0">
+                <img th:src="${c.thumbnail}" th:alt="${c.courseName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/images/e-learning.jpg'">
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+                <div class="flex flex-wrap gap-1 mb-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/25 text-primary" th:text="${c.courseCode}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white" th:text="${c.semester}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:if="${c.enrollPassword != null and !c.enrollPassword.trim().isEmpty()}">&#128274; Password</span>
+                </div>
+                <h4 class="font-bold text-on-surface" th:text="${c.courseName}"></h4>
+                <p class="text-xs text-on-surface-variant mt-2 line-clamp-3 flex-1" th:text="${#strings.abbreviate(c.description, 120)}"></p>
+                <p class="text-[11px] text-slate-500 mt-2" th:text="${(c.teacher != null ? c.teacher.fullName : '') + ' · Max ' + c.maxStudents + ' students'}"></p>
+                <span class="text-primary text-xs font-bold mt-3">View details →</span>
+            </div>
+        </a>
+    </div>
+</div>

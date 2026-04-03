@@ -1,143 +1,233 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title} + ' | E-Learning IT'">E-Learning IT</title>
+    <title th:text="${title} + ' | IT Scholar'">IT Scholar</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#505c6d",
+              "surface-container-highest": "#d3dcff",
+              "error": "#b31b25",
+              "surface-variant": "#d3dcff",
+              "secondary-fixed": "#d7e3f8",
+              "on-secondary-fixed": "#344050",
+              "surface-container-low": "#eef0ff",
+              "outline": "#69769e",
+              "tertiary": "#69508a",
+              "on-tertiary-fixed": "#361d55",
+              "primary-fixed": "#62a1fd",
+              "on-secondary-container": "#475363",
+              "outline-variant": "#9facd7",
+              "on-error-container": "#570008",
+              "secondary-dim": "#455061",
+              "secondary-container": "#d7e3f8",
+              "on-background": "#202d51",
+              "inverse-surface": "#000b2d",
+              "on-secondary": "#edf3ff",
+              "on-primary-container": "#002249",
+              "surface-tint": "#005baf",
+              "on-tertiary-fixed-variant": "#543b74",
+              "surface": "#f6f5ff",
+              "primary-dim": "#004f9a",
+              "surface-container-high": "#dbe1ff",
+              "on-primary-fixed": "#000000",
+              "primary-container": "#62a1fd",
+              "on-surface": "#202d51",
+              "tertiary-fixed": "#d5b7fa",
+              "primary": "#005baf",
+              "on-primary-fixed-variant": "#002c5a",
+              "secondary": "#505c6d",
+              "secondary-fixed-dim": "#c9d5e9",
+              "primary-fixed-dim": "#5494ef",
+              "on-surface-variant": "#4e5a81",
+              "background": "#f6f5ff",
+              "tertiary-container": "#d5b7fa",
+              "on-error": "#ffefee",
+              "on-tertiary-container": "#4b326b",
+              "error-dim": "#9f0519",
+              "surface-bright": "#f6f5ff",
+              "surface-container": "#e3e7ff",
+              "tertiary-fixed-dim": "#c7a9eb",
+              "on-tertiary": "#faefff",
+              "tertiary-dim": "#5d447d",
+              "error-container": "#fb5151",
+              "on-primary": "#eff2ff",
+              "surface-container-lowest": "#ffffff",
+              "surface-dim": "#c7d3ff",
+              "inverse-primary": "#609ffb",
+              "inverse-on-surface": "#8f9cc6"
+            },
+            fontFamily: {
+              headline: ["Manrope", "system-ui", "sans-serif"],
+              body: ["Manrope", "system-ui", "sans-serif"],
+              label: ["Inter", "system-ui", "sans-serif"],
+              manrope: ["Manrope", "system-ui", "sans-serif"]
+            },
+            borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }
+          }
+        }
+      };
+    </script>
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+    <style>
+      body { font-family: Manrope, system-ui, sans-serif !important; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
 </head>
 <body>
-<nav th:fragment="navbar" id="top-nav">
-    <div class="nav-shell">
-        <div class="nav-main">
-            <div class="logo">
-                <a th:href="@{/}" data-nav-match="/" data-nav-mode="home">
-                    <span class="logo-mark">E</span>
-                    <span class="logo-copy">
-                        <span>E-Learning IT</span>
-                        <small>Education Platform</small>
-                    </span>
-                </a>
-            </div>
-            <div class="nav-main-actions">
-                <a th:href="@{/courses}" class="nav-search-link" data-nav-match="/courses">
-                    <span class="nav-search-icon">&#128269;</span>
-                    <span>Search courses</span>
-                </a>
-                <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" onclick="toggleNavMenu(this)">&#9776;</button>
-            </div>
+<!-- Top navigation -->
+<header th:fragment="navbar" id="top-nav" class="bg-white/80 backdrop-blur-lg shadow-sm fixed top-0 w-full flex justify-between items-center px-4 sm:px-8 h-16 z-50 border-b border-slate-100/80">
+    <div class="flex items-center gap-4 md:gap-8 min-w-0">
+        <div class="flex items-center gap-2 shrink-0">
+            <a th:href="@{/}" class="flex items-center gap-2 no-underline hover:opacity-90">
+                <span class="text-xl font-extrabold tracking-tighter text-primary font-headline">IT Scholar</span>
+            </a>
         </div>
-
-        <div class="nav-panel">
-            <div class="nav-primary">
-                <a th:href="@{/}" class="nav-link" data-nav-match="/" data-nav-mode="home">Home</a>
-                <a th:href="@{/courses}" class="nav-link" data-nav-match="/courses">Courses</a>
-                <a th:if="${currentUser == null}" th:href="@{/announcements}" class="nav-link" data-nav-match="/announcements">Announcements</a>
-                <a th:if="${currentUser != null}" th:href="@{/rankings}" class="nav-link" data-nav-match="/rankings">Rankings</a>
-                <a th:if="${currentUser != null}" th:href="@{/notes}" class="nav-link" data-nav-match="/notes">Notes</a>
-            </div>
-
-            <div class="nav-utility">
-                <th:block th:if="${currentUser != null}">
-                    <a th:href="@{/dashboard}" class="nav-cta nav-dashboard-link" data-nav-match="/dashboard|/student/dashboard|/teacher/dashboard|/admin/dashboard">Dashboard</a>
-                    <div class="account-menu">
-                        <button class="icon-btn notification-btn nav-icon-btn" onclick="toggleNotif()" title="Notifications" type="button">
-                            <span aria-hidden="true">&#128276;</span>
-                            <span class="nav-icon-label">Alerts</span>
-                            <span class="notif-badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
-                        </button>
-                        <div id="notif-dropdown" class="dropdown-menu" hidden>
-                            <div class="dropdown-header">Notifications</div>
-                            <div class="dropdown-footer">
-                                <a th:href="@{/notifications}" data-nav-match="/notifications">View all &rarr;</a>
-                            </div>
-                        </div>
+        <nav class="hidden md:flex items-center gap-6 font-manrope text-sm font-semibold tracking-tight">
+            <a th:href="@{/courses}" class="text-slate-600 hover:text-primary transition-colors no-underline">Courses</a>
+            <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary transition-colors no-underline">Announcements</a>
+            <th:block th:if="${currentUser != null}">
+                <a th:href="@{/rankings}" class="text-slate-600 hover:text-primary transition-colors no-underline">Leaderboard</a>
+                <a th:href="@{/courses}" class="text-slate-600 hover:text-primary transition-colors no-underline" title="Open a course to use the forum">Forums</a>
+                <a th:href="@{/assignments/results}" class="text-slate-600 hover:text-primary transition-colors no-underline">Assignments</a>
+                <a th:href="@{/notes}" class="text-slate-600 hover:text-primary transition-colors no-underline">Notes</a>
+            </th:block>
+        </nav>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+        <button type="button" class="md:hidden p-2 text-slate-500 hover:bg-surface-container-low rounded-lg" onclick="document.getElementById('mobile-nav-panel').classList.toggle('hidden')" aria-label="Open menu">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <th:block th:if="${currentUser != null}">
+            <div class="account-menu relative">
+                <button type="button" class="relative p-2 text-slate-500 hover:bg-blue-50/50 rounded-lg transition-all active:scale-95" onclick="toggleNotif()" title="Notifications">
+                    <span class="material-symbols-outlined text-[22px]">notifications</span>
+                    <span class="notif-badge absolute top-1 right-1 min-w-[18px] h-[18px] text-[10px] font-bold bg-error text-white rounded-full flex items-center justify-center px-0.5"
+                          th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
+                </button>
+                <div id="notif-dropdown" class="dropdown-menu hidden absolute right-0 mt-2 w-[min(100vw-2rem,320px)] bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-[60]">
+                    <div class="px-4 py-2 font-semibold text-on-surface text-sm border-b border-slate-100">Notifications</div>
+                    <div class="px-4 py-2 text-sm text-on-surface-variant">
+                        <a th:href="@{/notifications}" class="text-primary font-medium no-underline hover:underline">View all</a>
                     </div>
-                    <div class="account-menu">
-                        <button class="icon-btn account-btn nav-account-btn" onclick="toggleAccount()" title="Account" type="button">
-                            <span class="nav-avatar-mini" th:text="${#strings.toUpperCase(#strings.substring(currentUser.fullName, 0, 1))}">A</span>
-                            <span class="nav-account-copy">
-                                <strong th:text="${currentUser.fullName}"></strong>
-                                <small th:text="${currentUser.role}"></small>
-                            </span>
-                        </button>
-                        <div id="account-dropdown" class="dropdown-menu" hidden>
-                            <div class="dropdown-header">
-                                <div class="dropdown-profile">
-                                    <strong th:text="${currentUser.fullName}"></strong>
-                                    <span th:text="${currentUser.role}"></span>
-                                </div>
-                            </div>
-                            <div class="dropdown-list">
-                                <a th:href="@{/profile}" class="dropdown-item" data-nav-match="/profile">&#128100; My Profile</a>
-                                <a th:href="@{/dashboard}" class="dropdown-item" data-nav-match="/dashboard|/student/dashboard|/teacher/dashboard|/admin/dashboard">&#128202; Dashboard</a>
-                                <a th:href="@{/notes}" class="dropdown-item" data-nav-match="/notes">&#128211; My Notes</a>
-                                <a th:href="@{/change-password}" class="dropdown-item" data-nav-match="/change-password">&#128274; Change Password</a>
-                                <a th:href="@{/logout}" class="dropdown-item logout-item">&#128682; Logout</a>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="account-menu relative">
+                <button type="button" class="hidden sm:flex items-center gap-2 max-w-[200px] px-2 py-1.5 rounded-lg hover:bg-surface-container-low text-sm font-semibold text-on-surface" onclick="toggleAccount()" title="Account">
+                    <span class="h-8 w-8 rounded-full bg-primary-container/30 flex items-center justify-center text-xs font-bold text-primary shrink-0" th:text="${#strings.substring(currentUser.fullName,0,1)}">U</span>
+                    <span class="truncate" th:text="${currentUser.fullName}"></span>
+                </button>
+                <button type="button" class="sm:hidden h-9 w-9 rounded-full overflow-hidden border border-primary-container shrink-0" onclick="toggleAccount()" title="Account">
+                    <span class="h-full w-full flex items-center justify-center bg-primary-container/20 text-xs font-bold text-primary" th:text="${#strings.substring(currentUser.fullName,0,1)}">U</span>
+                </button>
+                <div id="account-dropdown" class="dropdown-menu hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-[60]">
+                    <div class="px-4 py-2 border-b border-slate-100">
+                        <div class="font-semibold text-on-surface text-sm" th:text="${currentUser.fullName}"></div>
+                        <div class="text-xs text-on-surface-variant" th:text="${currentUser.role}"></div>
                     </div>
-                </th:block>
-
-                <th:block th:if="${currentUser == null}">
-                    <a th:href="@{/login}" class="nav-link" data-nav-match="/login">Login</a>
-                    <a th:href="@{/register}" class="nav-cta" data-nav-match="/register">Create account</a>
-                </th:block>
+                    <a th:href="@{/profile}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low no-underline">My Profile</a>
+                    <a th:href="@{/dashboard}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low no-underline">Dashboard</a>
+                    <a th:href="@{/notes}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low no-underline">My Notes</a>
+                    <a th:href="@{/change-password}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low no-underline">Change Password</a>
+                    <hr class="my-1 border-slate-100">
+                    <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-error font-medium hover:bg-red-50 no-underline">Logout</a>
+                </div>
             </div>
-        </div>
+        </th:block>
+        <th:block th:if="${currentUser == null}">
+            <a th:href="@{/login}" class="text-sm font-semibold text-primary no-underline hover:underline px-2">Login</a>
+        </th:block>
+    </div>
+</header>
+<div id="mobile-nav-panel" class="hidden md:hidden fixed inset-0 top-16 z-40 bg-black/40" onclick="this.classList.add('hidden')">
+    <nav class="bg-white border-b border-slate-100 p-4 flex flex-col gap-2 font-manrope text-sm font-semibold shadow-lg" onclick="event.stopPropagation()">
+        <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Courses</a>
+        <a th:if="${currentUser == null}" th:href="@{/announcements}" class="py-2 text-slate-700 no-underline">Announcements</a>
+        <th:block th:if="${currentUser != null}">
+            <a th:href="@{/rankings}" class="py-2 text-slate-700 no-underline">Leaderboard</a>
+            <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Forums</a>
+            <a th:href="@{/assignments/results}" class="py-2 text-slate-700 no-underline">Assignments</a>
+            <a th:href="@{/notes}" class="py-2 text-slate-700 no-underline">Notes</a>
+        </th:block>
+    </nav>
+</div>
 
-        <div class="nav-rolebar" th:if="${currentUser != null}">
-            <div class="nav-role-summary">
-                <span class="nav-role-badge" th:text="${currentUser.role.name() == 'STUDENT'} ? 'Student Workspace' : (${currentUser.role.name() == 'TEACHER'} ? 'Lecturer Workspace' : 'Administrator Workspace')">Workspace</span>
-                <span class="nav-role-text">Quick access for your current role</span>
-            </div>
-
-            <div class="nav-role-links" th:if="${currentUser.role.name() == 'STUDENT'}">
-                <a th:href="@{/student/dashboard}" class="nav-role-link" data-nav-match="/dashboard|/student/dashboard">Learning Hub</a>
-                <a th:href="@{/courses}" class="nav-role-link" data-nav-match="/courses">Courses</a>
-                <a th:href="@{/notes}" class="nav-role-link" data-nav-match="/notes">Notes</a>
-                <a th:href="@{/rankings}" class="nav-role-link" data-nav-match="/rankings">Rankings</a>
-                <a th:href="@{/notifications}" class="nav-role-link" data-nav-match="/notifications">Notifications</a>
-            </div>
-
-            <div class="nav-role-links" th:if="${currentUser.role.name() == 'TEACHER'}">
-                <a th:href="@{/teacher/dashboard}" class="nav-role-link" data-nav-match="/dashboard|/teacher/dashboard">Teaching Hub</a>
-                <a th:href="@{/courses}" class="nav-role-link" data-nav-match="/courses">Courses</a>
-                <a th:href="@{/notes}" class="nav-role-link" data-nav-match="/notes">Notes</a>
-                <a th:href="@{/forum}" class="nav-role-link" data-nav-match="/forum">Forum</a>
-                <a th:href="@{/rankings}" class="nav-role-link" data-nav-match="/rankings">Rankings</a>
-            </div>
-
-            <div class="nav-role-links" th:if="${currentUser.role.name() == 'ADMIN'}">
-                <a th:href="@{/admin/dashboard}" class="nav-role-link" data-nav-match="/dashboard|/admin/dashboard">Admin Home</a>
-                <a th:href="@{/courses}" class="nav-role-link" data-nav-match="/courses">Courses</a>
-                <a th:href="@{/admin/courses/create}" class="nav-role-link" data-nav-match="/admin/courses/create">Create Course</a>
-                <a th:href="@{/notes}" class="nav-role-link" data-nav-match="/notes">Notes</a>
-                <a th:href="@{/rankings}" class="nav-role-link" data-nav-match="/rankings">Rankings</a>
+<!-- Student sidebar: pass active = home | dashboard | courses | notes | rankings | other -->
+<aside th:fragment="studentSidebar(active)"
+       class="hidden md:flex flex-col w-64 max-h-[calc(100vh-4rem)] overflow-y-auto border-r border-slate-100 p-4 bg-slate-50 sticky top-16 self-start shrink-0">
+    <div class="mb-6 px-2">
+        <div class="flex items-center gap-3 mb-1">
+            <div class="h-10 w-10 rounded-lg bg-primary-container/20 flex items-center justify-center text-sm font-bold text-primary"
+                 th:text="${currentUser != null ? #strings.substring(currentUser.fullName,0,1) : '?'}">A</div>
+            <div class="min-w-0">
+                <h3 class="font-manrope font-bold text-slate-900 text-sm truncate" th:text="${currentUser != null ? currentUser.fullName : ''}">Student</h3>
+                <p class="text-[10px] text-slate-500 font-label uppercase tracking-tight"
+                   th:text="${myRank != null ? 'Level ' + myRank.level + ' Specialist' : 'Student'}">Level 1</p>
             </div>
         </div>
     </div>
-</nav>
-<footer th:fragment="footer">
-    <div class="footer-shell">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <strong>E-Learning IT</strong>
-                <span>Online learning platform for a focused, modern education experience.</span>
-            </div>
-            <div class="footer-links">
-                <a th:href="@{/courses}">Courses</a>
-                <a th:if="${currentUser == null}" th:href="@{/announcements}">Announcements</a>
-                <a th:if="${currentUser != null}" th:href="@{/rankings}">Rankings</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2026 E-Learning IT. All rights reserved.
-        </div>
+    <nav class="flex flex-col space-y-1 flex-1 min-h-0 font-manrope text-sm font-medium">
+        <a th:href="@{/}"
+           th:class="${active == 'home'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
+            <span class="material-symbols-outlined text-xl">dashboard</span>
+            <span>Home</span>
+        </a>
+        <a th:href="@{/student/dashboard}"
+           th:class="${active == 'dashboard'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
+            <span class="material-symbols-outlined text-xl">analytics</span>
+            <span>Dashboard</span>
+        </a>
+        <a th:href="@{/courses}"
+           th:class="${active == 'courses'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
+            <span class="material-symbols-outlined text-xl">menu_book</span>
+            <span>Courses</span>
+        </a>
+        <a th:href="@{/notes}"
+           th:class="${active == 'notes'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
+            <span class="material-symbols-outlined text-xl">description</span>
+            <span>Notes</span>
+        </a>
+        <a th:href="@{/rankings}"
+           th:class="${active == 'rankings'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
+            <span class="material-symbols-outlined text-xl">leaderboard</span>
+            <span>Leaderboard</span>
+        </a>
+        <a th:href="@{/assignments/results}"
+           th:class="${active == 'assignments'} ? 'flex items-center gap-3 px-4 py-3 bg-white text-primary rounded-xl shadow-sm' : 'flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-all hover:translate-x-1'">
+            <span class="material-symbols-outlined text-xl">assignment</span>
+            <span>Assignments</span>
+        </a>
+    </nav>
+    <div class="pt-4 mt-4 border-t border-slate-100">
+        <a th:href="@{/student/dashboard}" class="block w-full py-2.5 px-4 bg-primary text-on-primary font-manrope font-bold text-xs rounded-lg shadow-md hover:opacity-90 transition-opacity active:scale-[0.98] text-center no-underline">
+            Resume Learning
+        </a>
+    </div>
+</aside>
+
+<footer th:fragment="footer" class="mt-auto shrink-0 border-t border-slate-200/90 bg-white/95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-xs text-slate-500">
+        <p class="m-0 text-slate-400 leading-snug">
+            &copy; 2026 IT Scholar
+        </p>
+        <nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 font-medium" aria-label="Footer">
+            <a th:href="@{/courses}" class="text-slate-600 hover:text-primary no-underline">Courses</a>
+            <a th:if="${currentUser == null}" th:href="@{/announcements}" class="text-slate-600 hover:text-primary no-underline">Announcements</a>
+            <a th:if="${currentUser != null}" th:href="@{/rankings}" class="text-slate-600 hover:text-primary no-underline">Leaderboard</a>
+        </nav>
     </div>
 </footer>
 <th:block th:fragment="scripts">
@@ -145,3 +235,4 @@
 </th:block>
 </body>
 </html>
+

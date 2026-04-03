@@ -6,6 +6,17 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notes")
+@NamedEntityGraph(
+        name = "Note.withLessonAndCourse",
+        attributeNodes = {
+                @NamedAttributeNode("course"),
+                @NamedAttributeNode(value = "lesson", subgraph = "lesson-with-course")
+        },
+        subgraphs = @NamedSubgraph(
+                name = "lesson-with-course",
+                attributeNodes = @NamedAttributeNode("course")
+        )
+)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Note {
 

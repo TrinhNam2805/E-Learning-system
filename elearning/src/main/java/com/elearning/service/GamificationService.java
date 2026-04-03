@@ -25,13 +25,14 @@ public class GamificationService {
         return xp;
     }
 
-    public void awardGradedAssignmentXp(Long studentId, Long courseId, double score, double maxScore,
-                                        Assignment.AssignmentType type) {
+    public int awardGradedAssignmentXp(Long studentId, Long courseId, double score, double maxScore,
+                                       Assignment.AssignmentType type) {
         if (type == Assignment.AssignmentType.QUIZ) {
-            return;
+            return 0;
         }
         int xp = scaleXp(score, maxScore, MAX_XP_ASSIGNMENT);
         enrollmentService.addActivityXp(studentId, courseId, xp);
+        return xp;
     }
 
     private static int scaleXp(double score, double maxScore, int cap) {

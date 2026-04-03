@@ -20,6 +20,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `comments`;
 DROP TABLE IF EXISTS `forum_posts`;
+DROP TABLE IF EXISTS `user_badges`;
+DROP TABLE IF EXISTS `badge_definitions`;
 DROP TABLE IF EXISTS `quiz_questions`;
 DROP TABLE IF EXISTS `submissions`;
 DROP TABLE IF EXISTS `assignments`;
@@ -78,6 +80,36 @@ CREATE TABLE `users` (
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Tài khoản hệ thống';
+
+CREATE TABLE `badge_definitions` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `code` VARCHAR(50) NOT NULL,
+  `name` VARCHAR(120) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `icon` VARCHAR(80) NOT NULL,
+  `criterion_type` VARCHAR(40) NOT NULL COMMENT 'TOTAL_XP | COMPLETED_LESSONS | GRADED_SUBMISSIONS | PERFECT_QUIZZES | COMPLETED_COURSES',
+  `threshold_value` INT NOT NULL,
+  `active` BIT(1) NOT NULL DEFAULT b'1',
+  `display_order` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_badge_definitions_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Danh mục badge và rule trao badge';
+
+CREATE TABLE `user_badges` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `badge_definition_id` BIGINT NOT NULL,
+  `earned_at` DATETIME(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_badges_user_badge` (`user_id`, `badge_definition_id`),
+  KEY `idx_user_badges_badge_definition_id` (`badge_definition_id`),
+  CONSTRAINT `fk_user_badges_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_badges_badge_definition` FOREIGN KEY (`badge_definition_id`) REFERENCES `badge_definitions` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Badge mà người dùng đã đạt được';
 
 -- -----------------------------------------------------------------------------
 -- Học phần theo kỳ (lớp học phần): một hàng = một lần mở lớp (HK + năm học)
@@ -164,15 +196,22 @@ COMMENT='Đăng ký lớp học phần';
 CREATE TABLE `assignments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `course_id` BIGINT NOT NULL,
+  `lesson_id` BIGINT DEFAULT NULL,
   `title` VARCHAR(200) NOT NULL,
   `description` TEXT,
   `type` VARCHAR(20) DEFAULT 'HOMEWORK' COMMENT 'HOMEWORK | QUIZ | EXAM',
   `due_date` DATETIME(6) DEFAULT NULL,
   `max_score` DOUBLE NOT NULL DEFAULT 10,
+  `minimum_passing_score` DOUBLE DEFAULT NULL,
+  `allow_late_submission` BIT(1) NOT NULL DEFAULT b'0',
+  `max_attempts` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `idx_assignments_course_id` (`course_id`),
+  KEY `idx_assignments_lesson_id` (`lesson_id`),
   CONSTRAINT `fk_assignments_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_assignments_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `quiz_questions` (
@@ -198,10 +237,16 @@ CREATE TABLE `submissions` (
   `student_id` BIGINT NOT NULL,
   `content` TEXT,
   `file_url` VARCHAR(500) DEFAULT NULL,
+  `original_file_name` VARCHAR(255) DEFAULT NULL,
+  `file_size` BIGINT DEFAULT NULL,
   `score` DOUBLE DEFAULT NULL,
   `feedback` TEXT,
   `status` VARCHAR(20) DEFAULT 'SUBMITTED' COMMENT 'SUBMITTED | GRADED | LATE',
+  `attempt_number` INT NOT NULL DEFAULT 1,
+  `late_submission` BIT(1) NOT NULL DEFAULT b'0',
+  `auto_graded` BIT(1) NOT NULL DEFAULT b'0',
   `submitted_at` DATETIME(6) DEFAULT NULL,
+  `graded_at` DATETIME(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_submissions_assignment_id` (`assignment_id`),
   KEY `idx_submissions_student_id` (`student_id`),
