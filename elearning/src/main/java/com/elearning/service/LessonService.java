@@ -7,9 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.elearning.util.LessonContentOutlineExtractor;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -40,6 +44,20 @@ public class LessonService {
                 .sectionMinutesTotal(lessons.stream().mapToInt(Lesson::getDurationMinutes).sum())
                 .build();
         return Collections.singletonList(section);
+    }
+
+    /**
+     * Short preview lines per lesson (from HTML headings, bullets, or first paragraph).
+     */
+    public Map<Long, List<String>> buildLessonOutlinePreviews(List<Lesson> lessons) {
+        Map<Long, List<String>> map = new LinkedHashMap<>();
+        if (lessons == null) {
+            return map;
+        }
+        for (Lesson lesson : lessons) {
+            map.put(lesson.getId(), LessonContentOutlineExtractor.extractLines(lesson.getLessonContent()));
+        }
+        return map;
     }
 
     public Optional<Lesson> findById(Long id) {

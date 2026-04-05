@@ -26,10 +26,13 @@ Required:
 - MySQL running locally
 - Database named `e-learning`
 
-If your local credentials are different, update:
-- `spring.datasource.username`
-- `spring.datasource.password`
+Credentials:
+- Set environment variable `DB_PASSWORD` to your MySQL user password, **or**
+- Copy `elearning/src/main/resources/application-local.properties.example` to `application-local.properties` in the same folder and set `spring.datasource.password` (that file is gitignored).
+- If `root` has no password locally, the default empty password works as-is.
+
+Optional overrides: `DB_URL`, `DB_USERNAME`, `DB_DRIVER`.
 
 ## Notes
 
-- This project uses your real SQL data source configuration.
+- Do not commit real database passwords; use `application-local.properties` or env vars.

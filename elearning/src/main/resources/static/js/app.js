@@ -1,13 +1,21 @@
 // ===== E-Learning CNTT – Client-side helpers =====
 
-function toggleNotif() {
+function toggleNotif(ev) {
+    if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
     const d = document.getElementById('notif-dropdown');
     const a = document.getElementById('account-dropdown');
     if (a) a.classList.add('hidden');
     if (d) d.classList.toggle('hidden');
 }
 
-function toggleAccount() {
+function toggleAccount(ev) {
+    if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
     const d = document.getElementById('account-dropdown');
     const n = document.getElementById('notif-dropdown');
     if (n) n.classList.add('hidden');

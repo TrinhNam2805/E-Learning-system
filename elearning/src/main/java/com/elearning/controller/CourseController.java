@@ -65,6 +65,7 @@ public class CourseController {
         model.addAttribute("course", course);
         model.addAttribute("lessons", lessons);
         model.addAttribute("curriculumSections", curriculumSections);
+        model.addAttribute("lessonOutlineMap", lessonService.buildLessonOutlinePreviews(lessons));
         model.addAttribute("totalCourseMinutes", totalMinutes);
         model.addAttribute("totalLectures", lessons.size());
         model.addAttribute("previewVideoEmbedUrl", previewEmbed);

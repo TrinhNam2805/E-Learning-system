@@ -1,0 +1,8 @@
+# Copy this file to application-local.properties (same folder).
+# application-local.properties is gitignored — use it for your real DB password.
+
+spring.datasource.password=YOUR_MYSQL_PASSWORD_HERE
+
+# Optional: full override if URL/user differ
+# spring.datasource.url=jdbc:mysql://localhost:3306/e-learning?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8
+# spring.datasource.username=root

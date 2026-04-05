@@ -88,32 +88,50 @@
                                 <h3 class="text-sm font-bold text-on-background" th:text="${sec.title}">Course content</h3>
                             </div>
                             <div class="divide-y divide-slate-100">
-                                <th:block th:each="l : ${sec.lessons}" th:with="access=${lessonAccessMap != null ? lessonAccessMap.get(l.id) : null}">
+                                <div th:each="l : ${sec.lessons}"
+                                     th:with="access=${lessonAccessMap != null ? lessonAccessMap.get(l.id) : null},
+                                              outline=${lessonOutlineMap != null ? lessonOutlineMap.get(l.id) : null}">
                                     <a th:if="${enrolled == true and (access == null or access.accessible)}"
-                                       class="lesson-item flex items-center gap-3 p-4 hover:border-primary-container/40 transition-colors no-underline text-inherit"
+                                       class="lesson-item flex items-start gap-3 p-4 hover:border-primary-container/40 transition-colors no-underline text-inherit"
                                        th:href="@{/lessons/{id}(id=${l.id}, courseId=${course.id})}">
-                                        <div class="lesson-num w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+                                        <div class="lesson-num w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
                                              th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e;color:#fff;' : 'background:#e3e7ff;color:#005baf;'"
                                              th:text="${completedLessonIds != null and completedLessonIds.contains(l.id) ? 'Done' : l.lessonOrder}">1</div>
                                         <div class="lesson-info flex-1 min-w-0">
                                             <div class="lesson-title font-semibold text-on-surface text-sm" th:text="${l.lessonTitle}"></div>
-                                            <div class="lesson-meta text-[11px] text-slate-500" th:text="${l.durationMinutes} + ' min'"></div>
+                                            <div class="lesson-meta text-[11px] text-slate-500 mt-1.5" th:text="${l.durationMinutes} + ' min'"></div>
                                         </div>
-                                        <span class="text-slate-400 text-sm">Open</span>
+                                        <span class="text-slate-400 text-sm shrink-0 self-center">Open</span>
                                     </a>
+                                    <ul th:if="${enrolled == true and (access == null or access.accessible) and outline != null and !outline.isEmpty()}"
+                                        class="px-4 pb-3 pt-0 list-none m-0 space-y-0.5 ml-[3.25rem]">
+                                        <li th:each="line : ${outline}"
+                                            class="text-[11px] text-slate-500 leading-snug flex gap-1.5">
+                                            <span class="text-slate-300 shrink-0 select-none" aria-hidden="true">·</span>
+                                            <span class="min-w-0" th:text="${line}"></span>
+                                        </li>
+                                    </ul>
                                     <div th:unless="${enrolled == true and (access == null or access.accessible)}"
-                                         class="lesson-item flex items-center gap-3 p-4 opacity-70">
-                                        <div class="lesson-num w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+                                         class="lesson-item flex items-start gap-3 p-4 opacity-70">
+                                        <div class="lesson-num w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
                                              th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e;color:#fff;' : 'background:#e3e7ff;color:#005baf;'"
                                              th:text="${completedLessonIds != null and completedLessonIds.contains(l.id) ? 'Done' : l.lessonOrder}">1</div>
                                         <div class="lesson-info flex-1 min-w-0">
                                             <div class="lesson-title font-semibold text-on-surface text-sm" th:text="${l.lessonTitle}"></div>
-                                            <div class="lesson-meta text-[11px] text-slate-500" th:text="${l.durationMinutes} + ' min'"></div>
+                                            <ul th:if="${outline != null and !outline.isEmpty()}"
+                                                class="mt-1.5 space-y-0.5 list-none p-0 m-0">
+                                                <li th:each="line : ${outline}"
+                                                    class="text-[11px] text-slate-500 leading-snug flex gap-1.5">
+                                                    <span class="text-slate-300 shrink-0 select-none" aria-hidden="true">·</span>
+                                                    <span class="min-w-0" th:text="${line}"></span>
+                                                </li>
+                                            </ul>
+                                            <div class="lesson-meta text-[11px] text-slate-500 mt-1.5" th:text="${l.durationMinutes} + ' min'"></div>
                                             <div th:if="${access != null and !access.accessible}" class="text-[11px] text-amber-700 mt-1" th:text="${access.lockedReason}"></div>
                                         </div>
-                                        <span class="text-slate-400 text-sm" th:text="${enrolled == true ? 'Locked' : 'Enroll first'}"></span>
+                                        <span class="text-slate-400 text-sm shrink-0 self-center" th:text="${enrolled == true ? 'Locked' : 'Enroll first'}"></span>
                                     </div>
-                                </th:block>
+                                </div>
                             </div>
                         </section>
                     </th:block>

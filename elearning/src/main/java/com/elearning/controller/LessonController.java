@@ -108,6 +108,7 @@ public class LessonController {
         model.addAttribute("lesson", lesson);
         model.addAttribute("allLessons", allLessons);
         model.addAttribute("curriculumSections", curriculumSections);
+        model.addAttribute("lessonOutlineMap", lessonService.buildLessonOutlinePreviews(allLessons));
         model.addAttribute("lessonIndexOneBased", lessonIndexOneBased);
         model.addAttribute("totalLessonsCount", allLessons.size());
         model.addAttribute("videoEmbedUrl", videoEmbed);
