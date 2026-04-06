@@ -16,24 +16,25 @@ public class QuizQuestion {
     @JoinColumn(name = "assignment_id", nullable = false)
     private Assignment assignment;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "question_text", nullable = false, columnDefinition = "TEXT")
     private String questionText;
 
-    @Column(length = 500)
+    @Column(name = "option_a", length = 500)
     private String optionA;
 
-    @Column(length = 500)
+    @Column(name = "option_b", length = 500)
     private String optionB;
 
-    @Column(length = 500)
+    @Column(name = "option_c", length = 500)
     private String optionC;
 
-    @Column(length = 500)
+    @Column(name = "option_d", length = 500)
     private String optionD;
 
-    @Column(nullable = false, length = 1)
+    @Column(name = "correct_answer", nullable = false, length = 1)
     private String correctAnswer; // A, B, C, D
 
+    @Column(name = "question_order")
     @Builder.Default
     private int questionOrder = 1;
 

@@ -1,67 +1,126 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Rankings')}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <div class="page-header">
-            <h2>&#127942; XP Leaderboard</h2>
-        </div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Leaderboard')}"></head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
+    <aside th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}"
+           th:replace="~{fragments/layout :: studentSidebar('rankings')}"></aside>
+    <main class="flex-1 min-w-0 bg-background p-6 md:p-8">
+        <div class="max-w-6xl mx-auto space-y-8">
+            <section class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold font-headline text-on-background">Learning leaderboard</h1>
+                    <p class="text-sm text-on-surface-variant mt-1">
+                        Ranking is based on total XP across the platform. Ties are broken by completed lessons, then graded submissions.
+                    </p>
+                </div>
+                <div class="rounded-xl bg-surface-container-low px-4 py-3 text-sm text-on-surface">
+                    <div class="font-semibold">Current rule</div>
+                    <div class="text-on-surface-variant mt-1">Ranking score = total XP earned from learning progress and assignment or quiz results.</div>
+                </div>
+            </section>
 
-        <!-- My rank card -->
-        <div th:if="${myRank != null}" style="background:linear-gradient(135deg,#0a66c2,#004fa3); color:#fff; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-            <div style="font-size:2.5rem;">
-                <span th:if="${myRank.rank == 1}">&#129351;</span>
-                <span th:if="${myRank.rank == 2}">&#129352;</span>
-                <span th:if="${myRank.rank == 3}">&#129353;</span>
-                <span th:if="${myRank.rank > 3}" th:text="'#' + ${myRank.rank}"></span>
-            </div>
-            <div style="flex:1;">
-                <div style="font-size:1.1rem; font-weight:700;" th:text="${myRank.fullName} + ' (you)'"></div>
-                <div style="font-size:.9rem; opacity:.85;" th:text="${'Level ' + myRank.level + ' · ' + myRank.totalXp + ' XP'}"></div>
-                <div style="margin-top:.5rem;">
-                    <div style="font-size:.78rem; opacity:.7; margin-bottom:.25rem;"
-                         th:text="${myRank.xpInLevel} + '/100 XP to Level ' + (${myRank.level} + 1)"></div>
-                    <div style="background:rgba(255,255,255,.3); border-radius:999px; height:6px;">
-                        <div th:style="'width:' + ${myRank.xpInLevel} + '%; background:#f59e0b; height:6px; border-radius:999px;'"></div>
+            <section th:if="${myRank != null}" class="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
+                <div class="rounded-2xl p-6 bg-gradient-to-br from-primary to-primary-dim text-on-primary shadow-lg">
+                    <div class="flex flex-wrap items-start gap-4">
+                        <div class="h-16 w-16 rounded-2xl bg-white/15 flex items-center justify-center text-3xl font-black">
+                            <span th:if="${myRank.rank == 1}">&#129351;</span>
+                            <span th:if="${myRank.rank == 2}">&#129352;</span>
+                            <span th:if="${myRank.rank == 3}">&#129353;</span>
+                            <span th:if="${myRank.rank > 3}" th:text="' #' + ${myRank.rank}">#7</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs uppercase tracking-widest opacity-80 font-semibold">Your current rank</div>
+                            <div class="mt-1 text-2xl font-black" th:text="${myRank.fullName}">Student Name</div>
+                            <div class="mt-2 flex flex-wrap gap-4 text-sm opacity-95">
+                                <span th:text="${'Rank #' + myRank.rank}">Rank #1</span>
+                                <span th:text="${'Level ' + myRank.level}">Level 3</span>
+                                <span th:text="${myRank.totalXp + ' XP'}">320 XP</span>
+                            </div>
+                            <div class="mt-4">
+                                <div class="text-[11px] opacity-80 mb-1"
+                                     th:text="|${myRank.xpInLevel}/100 XP to Level ${myRank.level + 1}|"></div>
+                                <div class="h-2 rounded-full bg-white/25 overflow-hidden">
+                                    <div class="h-full rounded-full bg-amber-400 transition-all" th:style="|width:${myRank.xpInLevel}%|"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Leaderboard -->
-        <div style="background:#fff; border:1px solid #e0e7ef; border-radius:12px; overflow:hidden;">
-            <div style="padding:1rem 1.25rem; border-bottom:1px solid #e8eef6; font-weight:700; color:#0a3d7a;">
-                Top Students
-            </div>
-            <div th:each="r, stat : ${rankings}"
-                 th:style="'display:flex; align-items:center; gap:1rem; padding:.85rem 1.25rem; border-bottom:1px solid #f0f4fa;' + (${currentUser != null and r.userId == currentUser.id} ? 'background:#e8f0fe;' : '')">
-                <div style="width:2.5rem; text-align:center; flex-shrink:0;">
-                    <span th:if="${stat.index == 0}" style="font-size:1.5rem;">&#129351;</span>
-                    <span th:if="${stat.index == 1}" style="font-size:1.5rem;">&#129352;</span>
-                    <span th:if="${stat.index == 2}" style="font-size:1.5rem;">&#129353;</span>
-                    <span th:if="${stat.index >= 3}" style="font-size:1rem; font-weight:700; color:#888;"
-                          th:text="${r.rank}"></span>
-                </div>
-                <div class="avatar" style="width:40px; height:40px; font-size:.9rem; flex-shrink:0;"
-                     th:text="${#strings.toUpperCase(#strings.substring(r.fullName, 0, 1))}">A</div>
-                <div style="flex:1; min-width:0;">
-                    <div style="font-weight:600; color:#0a3d7a;"
-                         th:text="${r.fullName} + (${currentUser != null and r.userId == currentUser.id} ? ' (you)' : '')"></div>
-                    <div style="font-size:.82rem; color:#888;" th:text="'Level ' + ${r.level}"></div>
-                </div>
-                <div style="width:120px; flex-shrink:0;">
-                    <div style="font-size:.82rem; color:#666; text-align:right; margin-bottom:.2rem;"
-                         th:text="${r.totalXp} + ' XP'"></div>
-                    <div class="progress-bar-wrap" style="height:6px;">
-                        <div class="progress-bar" th:style="'width:' + ${r.xpInLevel} + '%; background:#f59e0b;'"></div>
+                <div class="rounded-2xl border border-slate-100 bg-surface-container-lowest p-6 shadow-sm">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Badges earned</div>
+                            <div class="mt-1 text-2xl font-black text-primary" th:text="${earnedBadgeCount != null ? earnedBadgeCount : 0}">0</div>
+                        </div>
+                        <span class="material-symbols-outlined text-4xl text-amber-500">military_tech</span>
+                    </div>
+                    <div th:if="${earnedBadges == null or earnedBadges.isEmpty()}" class="mt-4 rounded-xl bg-surface-container-low px-4 py-5 text-sm text-on-surface-variant">
+                        You have not earned any badges yet. Complete lessons and earn XP to unlock your first milestones.
+                    </div>
+                    <div th:unless="${earnedBadges == null or earnedBadges.isEmpty()}" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div th:each="badge : ${earnedBadges}" class="rounded-xl border border-slate-100 bg-surface-container-low p-4">
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-3xl text-amber-500" th:text="${badge.icon}">military_tech</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-bold text-sm text-on-surface" th:text="${badge.name}">Beginner</div>
+                                    <div class="text-xs text-on-surface-variant mt-1" th:text="${badge.description}">Reach your first milestone.</div>
+                                    <div class="text-[11px] text-primary mt-2" th:text="${'Earned: ' + #temporals.format(badge.earnedAt, 'dd/MM/yyyy HH:mm')}">Earned: 01/01/2026 08:00</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <section class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="font-bold text-on-background text-base font-headline">Leaderboard</h2>
+                        <p class="text-xs text-on-surface-variant mt-1">The leaderboard is updated directly from current progress and assessment data.</p>
+                    </div>
+                    <span class="rounded-full bg-primary-container/20 text-primary px-3 py-1 text-xs font-bold" th:text="${#lists.size(rankings)} + ' students'">0 students</span>
+                </div>
+
+                <div th:if="${leaderboardEmpty}" class="px-6 py-12 text-center text-sm text-on-surface-variant">
+                    No leaderboard data yet. Start learning and submitting work to earn XP.
+                </div>
+
+                <div th:unless="${leaderboardEmpty}" class="divide-y divide-slate-50">
+                    <div th:each="r, stat : ${rankings}"
+                         class="flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-4 transition-colors"
+                         th:classappend="${currentUser != null and r.userId == currentUser.id} ? ' bg-primary/5' : ' hover:bg-surface-container-low/60'">
+                        <div class="flex items-center gap-4 min-w-0 flex-1">
+                            <div class="w-10 text-center shrink-0 text-xl">
+                                <span th:if="${stat.index == 0}">&#129351;</span>
+                                <span th:if="${stat.index == 1}">&#129352;</span>
+                                <span th:if="${stat.index == 2}">&#129353;</span>
+                                <span th:if="${stat.index >= 3}" class="text-sm font-black text-on-surface-variant" th:text="${r.rank}"></span>
+                            </div>
+                            <div class="h-11 w-11 rounded-full bg-primary-container/25 flex items-center justify-center text-sm font-bold text-primary shrink-0 border border-slate-100"
+                                 th:text="${#strings.toUpperCase(#strings.substring(r.fullName, 0, 1))}">A</div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-semibold text-on-surface text-sm"
+                                     th:text="${r.fullName + (currentUser != null and r.userId == currentUser.id ? ' (you)' : '')}">Student Name</div>
+                                <div class="text-xs text-on-surface-variant mt-1"
+                                     th:text="${'Level ' + r.level + ' | ' + r.completedLessons + ' completed lessons | ' + r.gradedSubmissions + ' graded submissions'}">Level 3 | 5 completed lessons | 3 graded submissions</div>
+                            </div>
+                        </div>
+                        <div class="sm:w-44 shrink-0">
+                            <div class="text-sm font-black text-on-surface text-right sm:text-left" th:text="${r.totalPoints + ' points'}">320 points</div>
+                            <div class="text-xs text-on-surface-variant text-right sm:text-left" th:text="${r.totalXp + ' XP'}">320 XP</div>
+                            <div class="w-full h-2 bg-surface-container rounded-full mt-2 overflow-hidden">
+                                <div class="h-full rounded-full bg-amber-400" th:style="|width:${r.xpInLevel}%|"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-    </div>
-</main>
+    </main>
+</div>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>

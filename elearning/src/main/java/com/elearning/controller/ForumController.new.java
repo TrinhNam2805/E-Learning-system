@@ -1,0 +1,246 @@
+/* Temporary copy retained for reference only. Active code lives in ForumController.java.
+
+import com.elearning.model.entity.Comment;
+import com.elearning.model.entity.Course;
+import com.elearning.model.entity.ForumPost;
+import com.elearning.model.entity.Lesson;
+import com.elearning.model.entity.User;
+import com.elearning.repository.UserRepository;
+import com.elearning.service.CourseService;
+import com.elearning.service.EnrollmentService;
+import com.elearning.service.ForumService;
+import com.elearning.service.LessonService;
+import com.elearning.service.NotificationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Collections;
+import java.util.List;
+
+@Controller
+@RequestMapping("/forum")
+@RequiredArgsConstructor
+public class ForumController {
+
+    private final ForumService forumService;
+    private final CourseService courseService;
+    private final LessonService lessonService;
+    private final EnrollmentService enrollmentService;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
+
+    @GetMapping
+    public String list(@RequestParam(required = false) Long courseId,
+                       @RequestParam(required = false) Long lessonId,
+                       @AuthenticationPrincipal UserDetails userDetails,
+                       Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        if (courseId == null) {
+            model.addAttribute("globalForum", true);
+            model.addAttribute("course", null);
+            model.addAttribute("posts", forumService.findGlobalPosts());
+            model.addAttribute("canCreatePost", mayCreateGlobalForumPost(user));
+            model.addAttribute("courseLessons", Collections.<Lesson>emptyList());
+        } else {
+            Course course = courseService.findById(courseId).orElse(null);
+            if (course == null) {
+                return "redirect:/forum";
+            }
+
+            model.addAttribute("globalForum", false);
+            model.addAttribute("course", course);
+            model.addAttribute("posts", forumService.findByCourseId(courseId));
+            model.addAttribute("canCreatePost", mayUseCourseForum(user, courseId));
+            model.addAttribute("courseLessons", lessonService.findPublishedByCourseId(courseId));
+
+            if (lessonId != null) {
+                lessonService.findById(lessonId)
+                        .filter(l -> l.getCourse().getId().equals(courseId))
+                        .ifPresent(l -> model.addAttribute("prefillPostTitle", "Lesson: " + l.getLessonTitle()));
+            }
+        }
+
+        model.addAttribute("currentUser", user);
+        model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
+        return "forum/list";
+    }
+
+    @GetMapping("/post/{postId}")
+    public String viewPost(@PathVariable Long postId,
+                           @AuthenticationPrincipal UserDetails userDetails,
+                           Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        ForumPost post = forumService.findById(postId).orElse(null);
+        if (post == null) {
+            return "redirect:/courses";
+        }
+
+        forumService.incrementView(postId);
+        model.addAttribute("post", post);
+        model.addAttribute("comments", forumService.findCommentsByPostId(postId));
+        model.addAttribute("canComment", mayCommentOnPost(user, post));
+        model.addAttribute("currentUser", user);
+        model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
+        return "forum/post";
+    }
+
+    @PostMapping("/create")
+    public String createPost(@RequestParam(required = false) Long courseId,
+                             @RequestParam(required = false) Long lessonId,
+                             @RequestParam String title,
+                             @RequestParam String postType,
+                             @RequestParam String content,
+                             @AuthenticationPrincipal UserDetails userDetails,
+                             RedirectAttributes ra) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        ForumPost.PostType type;
+        try {
+            type = ForumPost.PostType.valueOf(postType);
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Invalid post type.");
+            return redirectToForumList(courseId);
+        }
+
+        if (type == ForumPost.PostType.ANNOUNCEMENT && user.getRole() == User.Role.STUDENT) {
+            ra.addFlashAttribute("error", "Only instructors or admins can post announcements.");
+            return redirectToForumList(courseId);
+        }
+
+        if (courseId == null) {
+            if (!mayCreateGlobalForumPost(user)) {
+                ra.addFlashAttribute("error", "Global forum topics can only be created by instructors or admins.");
+                return "redirect:/forum";
+            }
+            forumService.createPost(ForumPost.builder()
+                    .course(null)
+                    .author(user)
+                    .title(title.trim())
+                    .content(content)
+                    .postType(type)
+                    .build());
+            ra.addFlashAttribute("success", "Post published.");
+            return "redirect:/forum";
+        }
+
+        if (!mayUseCourseForum(user, courseId)) {
+            ra.addFlashAttribute("error", user.getRole() == User.Role.STUDENT
+                    ? "Enroll in the course to use this forum."
+                    : "You do not have permission to post in this forum.");
+            return "redirect:/forum?courseId=" + courseId;
+        }
+
+        Course course = courseService.findById(courseId).orElse(null);
+        if (course == null) {
+            return "redirect:/courses";
+        }
+
+        if (lessonId != null) {
+            Lesson lesson = lessonService.findById(lessonId)
+                    .filter(l -> l.getCourse().getId().equals(courseId))
+                    .orElse(null);
+            if (lesson == null) {
+                ra.addFlashAttribute("error", "That lesson does not belong to this course.");
+                return "redirect:/forum?courseId=" + courseId;
+            }
+        }
+
+        forumService.createPost(ForumPost.builder()
+                .course(course)
+                .author(user)
+                .title(title.trim())
+                .content(content)
+                .postType(type)
+                .build());
+        ra.addFlashAttribute("success", "Post published.");
+        return "redirect:/forum?courseId=" + courseId;
+    }
+
+    @PostMapping("/comment")
+    public String addComment(@RequestParam Long postId,
+                             @RequestParam String content,
+                             @AuthenticationPrincipal UserDetails userDetails,
+                             RedirectAttributes ra) {
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        ForumPost post = forumService.findById(postId).orElse(null);
+        if (post == null) {
+            return "redirect:/courses";
+        }
+        if (!mayCommentOnPost(user, post)) {
+            ra.addFlashAttribute("error", "You do not have permission to comment on this post.");
+            return "redirect:/forum/post/" + postId;
+        }
+
+        forumService.addComment(Comment.builder().post(post).author(user).content(content).build());
+        ra.addFlashAttribute("success", "Comment added.");
+        return "redirect:/forum/post/" + postId;
+    }
+
+    private static String redirectToForumList(Long courseId) {
+        return courseId == null ? "redirect:/forum" : "redirect:/forum?courseId=" + courseId;
+    }
+
+    private static boolean mayCreateGlobalForumPost(User user) {
+        return user.getRole() == User.Role.TEACHER || user.getRole() == User.Role.ADMIN;
+    }
+
+    private static boolean mayCommentOnGlobalForum(User user) {
+        return user.getRole() == User.Role.STUDENT
+                || user.getRole() == User.Role.TEACHER
+                || user.getRole() == User.Role.ADMIN;
+    }
+
+    private boolean mayUseCourseForum(User user, Long courseId) {
+        if (user.getRole() == User.Role.ADMIN || user.getRole() == User.Role.TEACHER) {
+            return true;
+        }
+        if (user.getRole() == User.Role.STUDENT) {
+            return enrollmentService.isEnrolled(user.getId(), courseId);
+        }
+        return false;
+    }
+
+    private boolean mayCommentOnPost(User user, ForumPost post) {
+        if (post.getCourse() == null) {
+            return mayCommentOnGlobalForum(user);
+        }
+        return mayUseCourseForum(user, post.getCourse().getId());
+    }
+}
+*/

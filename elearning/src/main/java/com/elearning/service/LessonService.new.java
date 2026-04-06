@@ -1,0 +1,63 @@
+/* Temporary copy retained for reference only. Active code lives in LessonService.java.
+
+import com.elearning.model.dto.CurriculumSectionDto;
+import com.elearning.model.entity.Lesson;
+import com.elearning.repository.LessonRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class LessonService {
+
+    private final LessonRepository lessonRepository;
+
+    public List<Lesson> findByCourseId(Long courseId) {
+        return lessonRepository.findByCourseIdOrderByLessonOrderAsc(courseId);
+    }
+
+    public List<Lesson> findPublishedByCourseId(Long courseId) {
+        return lessonRepository.findByCourseIdAndPublishedTrueOrderByLessonOrderAsc(courseId);
+    }
+
+    public List<CurriculumSectionDto> buildCurriculumSections(List<Lesson> orderedLessons) {
+        if (orderedLessons == null || orderedLessons.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Lesson> lessons = new ArrayList<>(orderedLessons);
+        CurriculumSectionDto section = CurriculumSectionDto.builder()
+                .sectionId(null)
+                .title("Course content")
+                .sectionOrder(1)
+                .lessons(lessons)
+                .sectionMinutesTotal(lessons.stream().mapToInt(Lesson::getDurationMinutes).sum())
+                .build();
+        return Collections.singletonList(section);
+    }
+
+    public Optional<Lesson> findById(Long id) {
+        return lessonRepository.findById(id);
+    }
+
+    @Transactional
+    public Lesson save(Lesson lesson) {
+        return lessonRepository.save(lesson);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        lessonRepository.deleteById(id);
+    }
+
+    public long countByCourseId(Long courseId) {
+        return lessonRepository.countByCourseId(courseId);
+    }
+}
+*/

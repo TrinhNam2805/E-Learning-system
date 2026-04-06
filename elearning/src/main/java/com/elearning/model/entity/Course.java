@@ -5,15 +5,26 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "courses")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Table(
+        name = "courses",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_courses_offering",
+                    columnNames = {"course_code", "semester", "academic_year"})
+        })
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    /** Mã học phần theo CTĐT; duy nhất trong cặp (học kỳ, năm học) */
+    @Column(name = "course_code", nullable = false, length = 20)
     private String courseCode;
 
     @Column(nullable = false, length = 200)
@@ -29,10 +40,10 @@ public class Course {
     @Column(length = 100)
     private String enrollPassword;
 
-    @Column(length = 20)
+    @Column(name = "semester", length = 20)
     private String semester;
 
-    @Column(length = 10)
+    @Column(name = "academic_year", length = 10)
     private String academicYear;
 
     @Enumerated(EnumType.STRING)
@@ -46,9 +57,29 @@ public class Course {
     @Column(length = 255)
     private String thumbnail;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private int credits = 3;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private int theoryHours = 30;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private int practiceHours = 15;
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("lessonOrder ASC")
     private List<Lesson> lessons;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("sectionOrder ASC")
+    private List<CourseSection> courseSections;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Enrollment> enrollments;

@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Notifications')}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <div class="page-header">
-            <h2>&#128276; Notifications</h2>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<main class="flex-1 overflow-y-auto pt-16 p-4 md:p-8 bg-background">
+    <div class="max-w-3xl mx-auto space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-extrabold font-headline text-on-background flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">notifications</span> Notifications
+                </h1>
+            </div>
             <form th:action="@{/notifications/mark-all-read}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button type="submit" class="btn btn-outline btn-sm">&#10003; Mark all as read</button>
+                <button type="submit" class="px-4 py-2 text-xs font-bold border border-primary text-primary rounded-lg hover:bg-primary/5 cursor-pointer bg-transparent">Mark all as read</button>
             </form>
         </div>
 
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
 
-        <div th:if="${notifications.isEmpty()}" class="empty-state">
-            <p>No notifications.</p>
-        </div>
+        <div th:if="${notifications.isEmpty()}" class="text-center py-16 text-on-surface-variant rounded-xl border border-dashed border-slate-200">No notifications.</div>
 
-        <div th:each="n : ${notifications}" class="post-item"
-             style="margin-bottom:.5rem; display:flex; gap:.75rem; align-items:flex-start;">
-            <div style="font-size:1.5rem; flex-shrink:0;">
+        <div th:each="n : ${notifications}" class="flex gap-4 bg-surface-container-lowest rounded-xl border border-slate-100 p-4 hover:border-primary-container/30 transition-colors">
+            <div class="text-2xl shrink-0">
                 <span th:if="${n.type.name() == 'GRADE'}">&#128202;</span>
                 <span th:if="${n.type.name() == 'ASSIGNMENT'}">&#128221;</span>
                 <span th:if="${n.type.name() == 'BADGE'}">&#127885;</span>
@@ -29,13 +30,12 @@
                 <span th:if="${n.type.name() == 'ANNOUNCEMENT'}">&#128226;</span>
                 <span th:if="${n.type.name() == 'SYSTEM'}">&#9881;</span>
             </div>
-            <div style="flex:1;">
-                <div style="font-weight:600; color:#0a3d7a;" th:text="${n.title}"></div>
-                <div style="font-size:.9rem; color:#555; margin-top:.25rem;" th:text="${n.message}"></div>
-                <div style="font-size:.8rem; color:#aaa; margin-top:.3rem;"
-                     th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
+            <div class="flex-1 min-w-0">
+                <div class="font-semibold text-on-background text-sm" th:text="${n.title}"></div>
+                <div class="text-sm text-on-surface-variant mt-1" th:text="${n.message}"></div>
+                <div class="text-[11px] text-slate-400 mt-2" th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
             </div>
-            <span th:unless="${n.isRead}" class="badge badge-dark" style="flex-shrink:0; align-self:center;">New</span>
+            <span th:unless="${n.isRead}" class="shrink-0 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white self-start">New</span>
         </div>
     </div>
 </main>

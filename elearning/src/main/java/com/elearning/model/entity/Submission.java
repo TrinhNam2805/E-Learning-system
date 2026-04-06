@@ -24,8 +24,14 @@ public class Submission {
     @Column(columnDefinition = "TEXT")
     private String content; // text answer or quiz answers JSON
 
-    @Column(length = 500)
+    @Column(name = "file_url", length = 500)
     private String fileUrl;
+
+    @Column(name = "original_file_name", length = 255)
+    private String originalFileName;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 
     private Double score;
 
@@ -37,11 +43,32 @@ public class Submission {
     @Builder.Default
     private SubmissionStatus status = SubmissionStatus.SUBMITTED;
 
+    @Column(name = "attempt_number", nullable = false)
+    @Builder.Default
+    private int attemptNumber = 1;
+
+    @Column(name = "late_submission", nullable = false)
+    @Builder.Default
+    private boolean lateSubmission = false;
+
+    @Column(name = "auto_graded", nullable = false)
+    @Builder.Default
+    private boolean autoGraded = false;
+
+    @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
+
+    @Column(name = "graded_at")
+    private LocalDateTime gradedAt;
 
     @PrePersist
     protected void onCreate() {
-        if (submittedAt == null) submittedAt = LocalDateTime.now();
+        if (submittedAt == null) {
+            submittedAt = LocalDateTime.now();
+        }
+        if (attemptNumber <= 0) {
+            attemptNumber = 1;
+        }
     }
 
     public enum SubmissionStatus {

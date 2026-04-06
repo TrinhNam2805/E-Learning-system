@@ -6,6 +6,17 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notes")
+@NamedEntityGraph(
+        name = "Note.withLessonAndCourse",
+        attributeNodes = {
+                @NamedAttributeNode("course"),
+                @NamedAttributeNode(value = "lesson", subgraph = "lesson-with-course")
+        },
+        subgraphs = @NamedSubgraph(
+                name = "lesson-with-course",
+                attributeNodes = @NamedAttributeNode("course")
+        )
+)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Note {
 
@@ -43,6 +54,14 @@ public class Note {
     @Column(length = 20)
     @Builder.Default
     private NoteType noteType = NoteType.LESSON;
+
+    /** Đoạn trích từ bài giảng (truy vết nguồn học thuật). */
+    @Column(columnDefinition = "TEXT")
+    private String sourceExcerpt;
+
+    /** Nhãn phân loại, phân tách bằng dấu phẩy — ví dụ: chuẩn-hóa, ôn-tập, lab */
+    @Column(length = 500)
+    private String tags;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

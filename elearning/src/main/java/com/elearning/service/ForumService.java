@@ -3,6 +3,7 @@ package com.elearning.service;
 import com.elearning.model.entity.*;
 import com.elearning.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -17,6 +18,16 @@ public class ForumService {
 
     public List<ForumPost> findByCourseId(Long courseId) {
         return postRepository.findByCourseIdOrderByCreatedAtDesc(courseId);
+    }
+
+    public List<ForumPost> findGlobalPosts() {
+        return postRepository.findByCourseIsNullOrderByCreatedAtDesc();
+    }
+
+    public List<ForumPost> findRecentAnnouncements(int limit) {
+        return postRepository.findByPostTypeOrderByCreatedAtDesc(
+                ForumPost.PostType.ANNOUNCEMENT,
+                PageRequest.of(0, Math.max(1, limit)));
     }
 
     public Optional<ForumPost> findById(Long id) {

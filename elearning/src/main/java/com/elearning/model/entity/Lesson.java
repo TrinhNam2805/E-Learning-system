@@ -1,12 +1,31 @@
 package com.elearning.model.entity;
 
-import javax.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 @Entity
 @Table(name = "lessons")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Lesson {
 
     @Id
@@ -17,18 +36,19 @@ public class Lesson {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Column(nullable = false)
+    @Column(name = "lesson_order", nullable = false)
     private int lessonOrder;
 
-    @Column(nullable = false, length = 200)
+    @Column(name = "lesson_title", nullable = false, length = 200)
     private String lessonTitle;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(name = "lesson_content", columnDefinition = "LONGTEXT")
     private String lessonContent;
 
-    @Column(length = 500)
+    @Column(name = "video_url", length = 500)
     private String videoUrl;
 
+    @Column(name = "duration_minutes")
     @Builder.Default
     private int durationMinutes = 45;
 
@@ -37,6 +57,9 @@ public class Lesson {
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LessonProgress> progressList;
+
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY)
+    private List<Assignment> assignments;
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Note> notes;

@@ -1,54 +1,92 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Forum')}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <a class="back-link" th:href="@{/courses/{id}(id=${course.id})}">&larr; Back to Course</a>
-
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-
-        <div class="page-header">
-            <h2 th:text="'Forum - ' + ${course.courseName}">Forum</h2>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Forums')}"></head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<main class="flex-1 min-h-0 pt-16 p-4 md:p-8 bg-background">
+    <div class="max-w-3xl mx-auto space-y-6">
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+            <a th:if="${globalForum}" th:href="@{/courses}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline no-underline">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Courses
+            </a>
+            <a th:unless="${globalForum}" th:href="@{/courses/{id}(id=${course.id})}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline no-underline">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Back to course
+            </a>
+            <span class="text-slate-300">|</span>
+            <a th:unless="${globalForum}" th:href="@{/forum}" class="font-semibold text-slate-600 hover:text-primary no-underline">Global forum</a>
+            <a th:if="${globalForum}" th:href="@{/courses}" class="font-semibold text-slate-600 hover:text-primary no-underline">Course forums</a>
         </div>
 
-        <!-- Create post form -->
-        <div th:if="${canPost}" style="background:#fff; border:1px solid #e0e7ef; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
-            <h3 style="font-size:1rem; color:#0a3d7a; margin-bottom:.75rem;">Create New Post</h3>
-            <form th:action="@{/forum/create}" method="post">
+        <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
+        <div th:if="${error}" class="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100" th:text="${error}"></div>
+
+        <div>
+            <h1 class="text-2xl font-extrabold font-headline text-on-background"
+                th:text="${globalForum} ? 'Global forum' : ('Forum | ' + course.courseName)">Forum</h1>
+            <p class="text-sm text-on-surface-variant mt-1"
+               th:text="${globalForum} ? 'Browse topics below. Instructors and admins can create new global topics.' : 'Enrolled students can start discussions for this course.'"></p>
+        </div>
+
+        <div th:if="${globalForum and !canCreatePost and currentUser.role.name() == 'STUDENT'}"
+             class="rounded-lg px-4 py-3 text-sm bg-slate-50 text-slate-800 border border-slate-200">
+            <span class="font-semibold">Students:</span> open a topic below to read and comment. You cannot create new topics in the global forum.
+        </div>
+
+        <div th:if="${canCreatePost}" class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm">
+            <h3 class="text-sm font-bold font-headline text-on-background mb-4"
+                th:text="${globalForum} ? 'New topic' : 'New discussion post'">New post</h3>
+            <form th:action="@{/forum/create}" method="post" class="space-y-3">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <input type="hidden" name="courseId" th:value="${course.id}">
-                <label style="margin-top:0;">Title</label>
-                <input type="text" name="title" placeholder="Post title..." required>
-                <label>Post Type</label>
-                <select name="postType">
-                    <option value="QUESTION">Question</option>
-                    <option value="DISCUSSION">Discussion</option>
-                    <option value="ANNOUNCEMENT" th:if="${currentUser.role.name() != 'STUDENT'}">Announcement</option>
-                </select>
-                <label>Content</label>
-                <textarea name="content" placeholder="Post content..." required></textarea>
-                <button type="submit" class="btn" style="width:auto; margin-top:.75rem; padding:.65rem 1.5rem;">Post</button>
+                <input type="hidden" name="courseId" th:if="${!globalForum}" th:value="${course.id}">
+                <div th:unless="${globalForum}">
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Related lesson (optional)</label>
+                    <select name="lessonId" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                        <option value="">No lesson link</option>
+                        <option th:each="les : ${courseLessons}"
+                                th:value="${les.id}"
+                                th:text="${'Lesson ' + les.lessonOrder + ' | ' + les.lessonTitle}"
+                                th:selected="${prefillLessonId != null and prefillLessonId == les.id}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Title</label>
+                    <input type="text" name="title" required class="w-full rounded-lg border-slate-200 text-sm"
+                           th:value="${prefillPostTitle != null ? prefillPostTitle : ''}" placeholder="Post title...">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Type</label>
+                    <select name="postType" class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                        <option value="QUESTION">Question</option>
+                        <option value="DISCUSSION">Discussion</option>
+                        <option value="ANNOUNCEMENT" th:if="${currentUser.role.name() != 'STUDENT'}">Announcement</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Content</label>
+                    <textarea name="content" required rows="5" class="w-full rounded-lg border-slate-200 text-sm" placeholder="Write your post..."></textarea>
+                </div>
+                <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Post</button>
             </form>
         </div>
-        <div th:unless="${canPost}" class="alert alert-info" style="margin-bottom:1rem;">
-            Enroll in this course to participate in the forum.
+
+        <div th:if="${!globalForum and !canCreatePost}" class="rounded-lg px-4 py-3 text-sm bg-blue-50 text-blue-900 border border-blue-100">
+            Enroll in the course to post and discuss with the class.
         </div>
 
-        <!-- Posts list -->
-        <div th:if="${posts.isEmpty()}" class="empty-state">
-            <p>No posts yet. Be the first to post!</p>
-        </div>
-        <div th:each="p : ${posts}" class="post-item"
-             th:onclick="'window.location.href=\'' + @{/forum/post/{id}(id=${p.id})} + '\''">
-            <div style="display:flex; align-items:flex-start; gap:.6rem; flex-wrap:wrap;">
-                <span class="badge" th:text="${p.postType}"></span>
-                <span style="font-weight:600; flex:1;" th:text="${p.title}"></span>
-            </div>
-            <div style="font-size:.82rem; color:#888; margin-top:.4rem;"
-                 th:text="${(p.author != null ? p.author.fullName : '') + ' · ' + #temporals.format(p.createdAt, 'MM/dd/yyyy') + ' · ' + p.viewCount + ' views'}"></div>
+        <h2 class="text-lg font-bold font-headline text-on-background pt-2">Topics</h2>
+        <div th:if="${posts.isEmpty()}" class="text-center py-12 text-on-surface-variant rounded-xl border border-dashed border-slate-200">No posts yet.</div>
+        <div th:unless="${posts.isEmpty()}" class="space-y-3">
+            <a th:each="p : ${posts}" th:href="@{/forum/post/{id}(id=${p.id})}"
+               class="block bg-surface-container-low rounded-xl border border-slate-100 p-4 hover:border-primary-container/40 transition-colors no-underline text-inherit">
+                <div class="flex flex-wrap items-start gap-2 mb-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary" th:text="${p.postType}"></span>
+                    <span th:if="${p.course != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white" th:text="${p.course.courseCode}"></span>
+                    <span th:if="${p.lesson != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800 truncate max-w-[220px]" th:text="${p.lesson.lessonTitle}"></span>
+                    <span class="font-semibold text-on-surface text-sm flex-1 min-w-0" th:text="${p.title}"></span>
+                </div>
+                <div class="text-xs text-on-surface-variant"
+                     th:text="${(p.author != null ? p.author.fullName : '') + ' | ' + #temporals.format(p.createdAt, 'dd/MM/yyyy') + ' | ' + p.viewCount + ' views'}"></div>
+            </a>
         </div>
     </div>
 </main>

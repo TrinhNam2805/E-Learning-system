@@ -1,129 +1,411 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head(${lesson.lessonTitle})}"></head>
-<body>
-<header><nav th:replace="~{fragments/layout :: navbar}"></nav></header>
-<main>
-    <div class="page">
-        <a class="back-link" th:href="@{/courses/{id}(id=${course.id})}">&larr; Back to Course</a>
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
+    <aside th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}"
+           th:replace="~{fragments/layout :: studentSidebar('other')}"></aside>
+    <main class="flex-1 min-w-0 min-h-0 bg-background p-4 md:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <a th:href="@{/courses/{id}(id=${course.id})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
+                <span class="material-symbols-outlined text-lg">arrow_back</span> Back to course
+            </a>
 
-        <div style="display:grid; grid-template-columns:1fr 280px; gap:1.5rem; align-items:start;">
-            <!-- Main lesson content -->
-            <div>
-                <div class="lesson-view">
-                    <div class="lesson-view-header">
-                        <div class="badge-row">
-                            <span class="badge" th:text="${course.courseCode}"></span>
-                            <span class="badge badge-dark" th:text="${course.courseName}"></span>
-                            <span class="badge" th:text="${'Lesson ' + lesson.lessonOrder + '/' + allLessons.size()}"></span>
+            <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
+            <div th:if="${error}" class="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100" th:text="${error}"></div>
+
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] items-start">
+                <section class="min-w-0 space-y-6">
+                    <article class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="p-5 md:p-6 border-b border-slate-100">
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/25 text-primary" th:text="${course.courseCode}"></span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white" th:text="${course.courseName}"></span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface"
+                                      th:text="${'Lesson ' + lessonIndexOneBased + ' / ' + totalLessonsCount}"></span>
+                            </div>
+                            <h1 class="text-2xl md:text-3xl font-bold font-headline text-on-background" th:text="${lesson.lessonTitle}"></h1>
+                            <p class="text-sm text-on-surface-variant mt-2 flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">schedule</span>
+                                    <span th:text="${lesson.durationMinutes} + ' min'"></span>
+                                </span>
+                                <span class="text-slate-300">|</span>
+                                <span th:text="${course.courseName}"></span>
+                            </p>
                         </div>
-                        <h2 th:text="${lesson.lessonTitle}"></h2>
-                        <div style="font-size:.85rem; color:#888; margin-top:.35rem;"
-                             th:text="${lesson.durationMinutes} + ' min'"></div>
-                    </div>
 
-                    <div class="lesson-view-body">
-                        <div class="lesson-content-box" th:text="${lesson.lessonContent}"></div>
-                    </div>
+                        <div th:if="${videoEmbedUrl != null}" class="p-5 md:p-6 border-b border-slate-100">
+                            <div class="rounded-2xl overflow-hidden bg-slate-950">
+                                <video th:if="${videoIsDirectFile}" controls class="w-full h-auto max-h-[70vh] bg-black">
+                                    <source th:src="${videoEmbedUrl}">
+                                </video>
+                                <div th:unless="${videoIsDirectFile}" class="aspect-video">
+                                    <iframe class="w-full h-full border-0"
+                                            th:src="${videoEmbedUrl}"
+                                            title="Lesson video"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="lesson-view-footer">
-                        <div style="display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; width:100%;">
+                        <div class="p-5 md:p-6">
+                            <div id="lesson-content-root" class="lesson-content-box lesson-content-html prose-lesson max-w-none" th:utext="${lesson.lessonContent}"></div>
+                        </div>
+
+                        <div class="p-4 md:p-6 border-t border-slate-100 bg-surface-container-low/30 flex flex-wrap gap-3 items-center">
                             <a th:if="${prev != null}" th:href="@{/lessons/{id}(id=${prev.id}, courseId=${course.id})}"
-                               class="btn btn-outline btn-sm">&larr; Previous</a>
-                            <div style="flex:1;"></div>
-                            <span th:if="${isCompleted}" class="badge badge-green" style="font-size:.93rem; padding:.4rem .9rem;">&#10003; Completed</span>
-                            <form th:unless="${isCompleted}" th:action="@{/lessons/{id}/complete(id=${lesson.id})}" method="post" style="display:inline;">
+                               class="px-3 py-2 text-xs font-bold border border-slate-200 rounded-lg text-on-surface hover:bg-white no-underline">&larr; Previous lesson</a>
+                            <div class="flex-1 min-w-[1rem]"></div>
+                            <a th:href="@{/forum(courseId=${course.id}, lessonId=${lesson.id})}"
+                               class="px-4 py-2 rounded-lg text-sm font-bold border border-primary text-primary no-underline hover:bg-primary/5">Discuss this lesson</a>
+                            <span th:if="${isCompleted}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">&#10003; Completed</span>
+                            <form th:if="${!isCompleted and canMarkComplete}" th:action="@{/lessons/{id}/complete(id=${lesson.id})}" method="post" class="inline">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                 <input type="hidden" name="courseId" th:value="${course.id}">
-                                <button type="submit" class="btn btn-success" style="padding:.7rem 1.75rem;">&#10003; Mark Complete</button>
+                                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 border-0 cursor-pointer">&#10003; Mark as complete</button>
                             </form>
-                            <a th:if="${next != null}" th:href="@{/lessons/{id}(id=${next.id}, courseId=${course.id})}"
-                               class="btn btn-sm">Next &rarr;</a>
+                            <a th:if="${next != null and (nextLessonAccess == null or nextLessonAccess.accessible)}"
+                               th:href="@{/lessons/{id}(id=${next.id}, courseId=${course.id})}"
+                               class="px-4 py-2 rounded-lg text-sm font-bold bg-primary text-on-primary no-underline hover:opacity-90">Next lesson &rarr;</a>
+                            <div th:if="${next != null and nextLessonAccess != null and !nextLessonAccess.accessible}" class="text-right max-w-[320px]">
+                                <div class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-500">Next lesson is locked</div>
+                                <div class="text-[11px] text-amber-700 mt-2" th:text="${nextLessonAccess.lockedReason}"></div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </article>
 
-                <!-- Notes section -->
-                <div style="margin-top:1.5rem; background:#fff; border:1px solid #e0e7ef; border-radius:12px; padding:1.25rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                        <h3 style="font-size:1rem; color:#0a3d7a;">&#128211; Lesson Notes</h3>
-                        <button onclick="document.getElementById('note-form').style.display = document.getElementById('note-form').style.display === 'none' ? 'block' : 'none'"
-                                class="btn btn-outline btn-sm">+ Add Note</button>
-                    </div>
+                    <section th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}"
+                             class="relative z-[80] bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-lg font-bold font-headline text-on-background">Lesson notes</h2>
+                                <p class="text-sm text-on-surface-variant">Select text in the lesson, then <strong>right‑click</strong> to add a note with that excerpt (or use the floating button). Hold <kbd class="px-1 rounded bg-slate-100 text-[11px]">Shift</kbd> while right‑clicking if you need the browser menu (Copy, etc.).</p>
+                            </div>
+                            <button type="button" id="toggle-lesson-note-panel"
+                                    class="px-3 py-1.5 text-xs font-bold border border-primary text-primary rounded-lg hover:bg-primary/5">
+                                Add note
+                            </button>
+                        </div>
 
-                    <div id="note-form" style="display:none; margin-bottom:1rem; padding:1rem; background:#f8faff; border-radius:8px; border:1px solid #dce8fb;">
-                        <form th:action="@{/notes/save}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                            <input type="hidden" name="lessonId" th:value="${lesson.id}">
-                            <input type="hidden" name="courseId" th:value="${course.id}">
-                            <input type="hidden" name="noteType" value="LESSON">
-                            <label style="margin-top:0;">Note Content</label>
-                            <textarea name="content" placeholder="Write your note here..." required style="min-height:80px;"></textarea>
-                            <div style="display:flex; gap:1rem; align-items:center; margin-top:.75rem; flex-wrap:wrap;">
+                        <div id="note-form" class="hidden relative z-[81] rounded-xl bg-surface-container-low border border-slate-100 p-4">
+                            <form id="lesson-note-form" th:action="@{/notes/save}" method="post" class="space-y-3">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                <input type="hidden" name="lessonId" th:value="${lesson.id}">
+                                <input type="hidden" name="courseId" th:value="${course.id}">
+                                <input type="hidden" name="noteType" value="LESSON">
+                                <input type="hidden" name="sourceExcerpt" id="note-source-excerpt" value="">
                                 <div>
-                                    <label style="margin-top:0; font-size:.85rem;">Highlight Color</label>
-                                    <div style="display:flex; gap:.5rem; margin-top:.35rem;">
-                                        <label th:each="color : ${ {'#FFFF00','#90EE90','#FFB6C1','#87CEEB','#FFA500'} }"
-                                               style="cursor:pointer;">
-                                            <input type="radio" name="highlightColor" th:value="${color}"
-                                                   th:checked="${color == '#FFFF00'}" style="display:none;">
-                                            <span th:style="'display:inline-block; width:24px; height:24px; border-radius:50%; background:' + ${color} + '; border:2px solid #ccc;'"></span>
-                                        </label>
+                                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Note</label>
+                                    <textarea name="content" required rows="4" class="w-full rounded-lg border-slate-200 text-sm" placeholder="Your main points..."></textarea>
+                                </div>
+                                <p id="note-excerpt-preview" class="hidden text-xs text-slate-600 bg-white/80 border border-slate-100 rounded-lg p-2 italic max-h-24 overflow-y-auto"></p>
+                                <div class="flex flex-wrap items-center justify-between gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] font-semibold text-on-surface-variant">Color</span>
+                                        <div class="flex gap-1.5">
+                                            <label th:each="color : ${ {'#FFFF00','#90EE90','#FFB6C1','#87CEEB','#FFA500'} }" class="cursor-pointer">
+                                                <input type="radio" name="highlightColor" th:value="${color}" th:checked="${color == '#FFFF00'}" class="hidden peer">
+                                                <span class="block w-6 h-6 rounded-full border-2 border-transparent peer-checked:border-slate-600 ring-offset-1"
+                                                      th:style="'background:' + ${color}"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" id="lesson-note-cancel"
+                                                class="px-4 py-2 text-sm font-bold rounded-lg border border-slate-300 bg-white text-on-surface hover:bg-slate-50 cursor-pointer">Cancel</button>
+                                        <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Save</button>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-sm" style="margin-top:auto;">Save Note</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div th:if="${lessonNotes.isEmpty()}" style="font-size:.88rem; color:#aaa; text-align:center; padding:.5rem 0;">
-                        No notes for this lesson yet.
-                    </div>
-                    <div th:each="n : ${lessonNotes}" class="note-item"
-                         th:style="'border-left:3px solid ' + ${n.highlightColor} + '; margin-bottom:.5rem;'">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem;">
-                            <div style="font-size:.9rem; color:#333; line-height:1.6; flex:1;" th:text="${n.content}"></div>
-                            <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post" style="flex-shrink:0;">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Delete this note?')" style="padding:.25rem .5rem;">&#10005;</button>
                             </form>
                         </div>
-                        <div style="font-size:.75rem; color:#aaa; margin-top:.25rem;"
-                             th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Sidebar: lesson list -->
-            <aside style="position:sticky; top:calc(56px + 12px);">
-                <div style="background:#fff; border:1px solid #e0e7ef; border-radius:12px; padding:1rem;">
-                    <div style="font-size:.9rem; font-weight:700; color:#0a3d7a; margin-bottom:.75rem;">
-                        Course Lessons
-                    </div>
-                    <div class="lesson-list" style="margin-top:0;">
-                        <a class="lesson-item" th:each="l : ${allLessons}"
-                           th:href="@{/lessons/{id}(id=${l.id}, courseId=${course.id})}"
-                           th:style="${l.id == lesson.id} ? 'background:#e8f0fe; border-color:#0a66c2;' : ''">
-                            <div class="lesson-num"
-                                 th:style="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'background:#22c55e; color:#fff;' : ''"
-                                 th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? '✓' : ${l.lessonOrder}">1</div>
-                            <div class="lesson-info">
-                                <div class="lesson-title"
-                                     th:style="${l.id == lesson.id} ? 'color:#0a66c2;' : ''"
-                                     th:text="${l.lessonTitle}"></div>
-                                <div class="lesson-meta" th:text="${l.durationMinutes} + ' min'"></div>
+                        <div th:if="${lessonNotes.isEmpty()}" class="text-center text-sm text-slate-400 py-6">No notes for this lesson yet.</div>
+
+                        <div th:each="n : ${lessonNotes}"
+                             th:id="${'note-' + n.id}"
+                             class="note-item lesson-note-card rounded-xl border border-slate-100 bg-white"
+                             th:style="'border-left:3px solid ' + ${n.highlightColor}">
+                            <div class="flex justify-between gap-3 p-4">
+                                <div class="flex-1 min-w-0">
+                                    <div th:if="${n.title != null and !n.title.trim().isEmpty()}" class="font-semibold text-on-surface text-sm" th:text="${n.title}"></div>
+                                    <div th:if="${n.sourceExcerpt != null and !n.sourceExcerpt.isEmpty()}" class="text-xs text-slate-600 italic mt-2 whitespace-pre-wrap">
+                                        <span class="select-none" aria-hidden="true">"</span><span th:text="${n.sourceExcerpt}"></span><span class="select-none" aria-hidden="true">"</span>
+                                    </div>
+                                    <div th:if="${n.tags != null and !n.tags.isEmpty()}" class="text-[11px] text-slate-500 mt-2" th:text="${n.tags}"></div>
+                                    <div class="text-sm text-on-surface mt-2 whitespace-pre-wrap" th:text="${n.content}"></div>
+                                    <div class="text-[11px] text-slate-400 mt-2" th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>
+                                </div>
+                                <div class="flex flex-col items-end gap-2 shrink-0">
+                                    <a th:href="@{/notes/{id}(id=${n.id})}" class="text-[11px] font-semibold text-primary no-underline">Detail</a>
+                                    <form th:action="@{/notes/{id}/delete(id=${n.id})}" method="post">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <button type="submit" class="text-xs px-2 py-1 rounded bg-red-50 text-red-700 border-0 cursor-pointer"
+                                                onclick="return confirm('Delete this note?')">x</button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="lesson-arrow" th:text="${l.id == lesson.id} ? '&#9654;' : '&rarr;'"></div>
-                        </a>
+                        </div>
+                    </section>
+                </section>
+
+                <aside class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm overflow-hidden xl:sticky xl:top-20">
+                    <div class="px-4 py-3 border-b border-slate-100">
+                        <h2 class="text-base font-bold text-on-background">Course content</h2>
+                        <p class="text-xs text-on-surface-variant mt-1">
+                            Lesson <span th:text="${lessonIndexOneBased}">1</span> / <span th:text="${totalLessonsCount}">1</span>
+                        </p>
                     </div>
-                </div>
-            </aside>
+                    <div class="max-h-[70vh] overflow-y-auto">
+                        <th:block th:each="sec : ${curriculumSections}">
+                            <div class="border-b border-slate-100 last:border-b-0">
+                                <div class="px-4 py-2 bg-slate-50 text-xs font-bold text-slate-600 uppercase tracking-wide" th:text="${sec.title}">Course content</div>
+                                <div class="divide-y divide-slate-100">
+                                    <div th:each="l : ${sec.lessons}"
+                                         th:with="access=${lessonAccessMap != null ? lessonAccessMap.get(l.id) : null},
+                                                  outline=${lessonOutlineMap != null ? lessonOutlineMap.get(l.id) : null}">
+                                        <a th:if="${access == null or access.accessible}"
+                                           th:href="@{/lessons/{id}(id=${l.id}, courseId=${course.id})}"
+                                           class="flex items-start gap-2 px-4 py-3 text-sm no-underline transition-colors"
+                                           th:classappend="${l.id == lesson.id} ? ' bg-surface-container-low text-on-background font-semibold' : ' text-slate-700 hover:bg-slate-50'">
+                                            <span class="material-symbols-outlined text-lg shrink-0 text-slate-500"
+                                                  th:text="${completedLessonIds != null and completedLessonIds.contains(l.id)} ? 'check_circle' : 'play_circle'">play_circle</span>
+                                            <div class="flex-1 min-w-0">
+                                                <span class="block leading-snug" th:text="${l.lessonTitle}"></span>
+                                            </div>
+                                            <span class="text-[11px] text-slate-400 shrink-0 self-start pt-0.5" th:text="${l.durationMinutes} + ' min'"></span>
+                                        </a>
+                                        <ul th:if="${(access == null or access.accessible) and outline != null and !outline.isEmpty()}"
+                                            class="px-4 pb-3 pt-0 list-none m-0 space-y-0.5 ml-11">
+                                            <li th:each="line : ${outline}"
+                                                class="text-[11px] text-slate-500 leading-snug flex gap-1.5">
+                                                <span class="text-slate-300 shrink-0 select-none" aria-hidden="true">·</span>
+                                                <span class="min-w-0" th:text="${line}"></span>
+                                            </li>
+                                        </ul>
+                                        <div th:unless="${access == null or access.accessible}" class="px-4 py-3 text-sm bg-slate-50 text-slate-500">
+                                            <div class="font-semibold" th:text="${l.lessonTitle}"></div>
+                                            <ul th:if="${outline != null and !outline.isEmpty()}"
+                                                class="mt-1.5 space-y-0.5 list-none p-0 m-0">
+                                                <li th:each="line : ${outline}"
+                                                    class="text-[11px] text-slate-600 leading-snug flex gap-1.5">
+                                                    <span class="text-slate-300 shrink-0 select-none" aria-hidden="true">·</span>
+                                                    <span class="min-w-0" th:text="${line}"></span>
+                                                </li>
+                                            </ul>
+                                            <div class="text-[11px] mt-1 text-amber-800" th:text="${access.lockedReason}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </aside>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+</div>
+
+<button type="button" id="selection-note-fab"
+        class="hidden fixed z-[70] px-4 py-2 rounded-full bg-primary text-white text-xs font-bold shadow-lg border-0 cursor-pointer hover:opacity-95">
+    Add note from selection
+</button>
+
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script th:inline="javascript">
+(function () {
+    var root = document.getElementById('lesson-content-root');
+    var fab = document.getElementById('selection-note-fab');
+    var pendingExcerpt = '';
+
+    function hideFab() {
+        if (fab) fab.classList.add('hidden');
+    }
+
+    function positionFab(rect) {
+        if (!fab) return;
+        var top = rect.bottom + window.scrollY + 8;
+        var left = Math.min(rect.left + window.scrollX, window.innerWidth + window.scrollX - 140);
+        fab.style.top = top + 'px';
+        fab.style.left = Math.max(window.scrollX + 8, left) + 'px';
+    }
+
+    /** Returns trimmed selected text inside lesson content, or null. */
+    function getLessonSelectionExcerpt() {
+        if (!root) return null;
+        var selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+        var text = (selection.toString() || '').trim();
+        if (text.length < 2) return null;
+        if (!root.contains(selection.anchorNode) || !root.contains(selection.focusNode)) return null;
+        return text.length > 8000 ? text.substring(0, 8000) : text;
+    }
+
+    function openNoteFormWithExcerpt(excerpt) {
+        if (!excerpt) return;
+        var form = document.getElementById('lesson-note-form');
+        if (!form) return;
+        var formWrap = document.getElementById('note-form');
+        var excerptInput = document.getElementById('note-source-excerpt');
+        var preview = document.getElementById('note-excerpt-preview');
+        pendingExcerpt = excerpt;
+        if (formWrap) formWrap.classList.remove('hidden');
+        if (excerptInput) excerptInput.value = excerpt;
+        if (preview) {
+            preview.textContent = 'Quote: "' + excerpt.substring(0, 400) + (excerpt.length > 400 ? '...' : '') + '"';
+            preview.classList.remove('hidden');
+        }
+        hideFab();
+        try { window.getSelection().removeAllRanges(); } catch (e) {}
+        var textarea = document.querySelector('#lesson-note-form textarea[name="content"]');
+        if (textarea) {
+            textarea.focus();
+        }
+    }
+
+    function isLessonNoteFormOpen() {
+        var wrap = document.getElementById('note-form');
+        return wrap && !wrap.classList.contains('hidden');
+    }
+
+    var toggleLessonNotePanel = document.getElementById('toggle-lesson-note-panel');
+    if (toggleLessonNotePanel) {
+        toggleLessonNotePanel.addEventListener('click', function () {
+            var wrap = document.getElementById('note-form');
+            if (!wrap) return;
+            wrap.classList.toggle('hidden');
+            if (!wrap.classList.contains('hidden')) {
+                hideFab();
+                try { window.getSelection().removeAllRanges(); } catch (e) {}
+            }
+        });
+    }
+
+    document.addEventListener('selectionchange', function () {
+        if (!root || !fab) return;
+        if (isLessonNoteFormOpen()) {
+            hideFab();
+            return;
+        }
+        var excerpt = getLessonSelectionExcerpt();
+        if (!excerpt) {
+            hideFab();
+            return;
+        }
+        pendingExcerpt = excerpt;
+        try {
+            var sel = window.getSelection();
+            positionFab(sel.getRangeAt(0).getBoundingClientRect());
+            fab.classList.remove('hidden');
+        } catch (e) {
+            hideFab();
+        }
+    });
+
+    if (root) {
+        root.addEventListener('contextmenu', function (e) {
+            if (e.shiftKey) return;
+            if (!document.getElementById('lesson-note-form')) return;
+            var excerpt = getLessonSelectionExcerpt();
+            if (!excerpt) return;
+            e.preventDefault();
+            openNoteFormWithExcerpt(excerpt);
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        if (root && fab && !fab.classList.contains('hidden') && !root.contains(event.target) && !fab.contains(event.target)) {
+            hideFab();
+        }
+    });
+
+    if (fab) {
+        fab.addEventListener('click', function () {
+            openNoteFormWithExcerpt(pendingExcerpt);
+        });
+    }
+
+    var cancelBtn = document.getElementById('lesson-note-cancel');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            var form = document.getElementById('lesson-note-form');
+            var formWrap = document.getElementById('note-form');
+            var excerptInput = document.getElementById('note-source-excerpt');
+            var preview = document.getElementById('note-excerpt-preview');
+            if (form) form.reset();
+            if (excerptInput) excerptInput.value = '';
+            if (preview) {
+                preview.textContent = '';
+                preview.classList.add('hidden');
+            }
+            var defaultColor = document.querySelector('#lesson-note-form input[name="highlightColor"][value="#FFFF00"]');
+            if (defaultColor) defaultColor.checked = true;
+            if (formWrap) formWrap.classList.add('hidden');
+            hideFab();
+        });
+    }
+
+    function highlightExcerpt(searchText) {
+        if (!root || !searchText) return false;
+        var text = String(searchText).trim();
+        if (text.length < 2) return false;
+        if (text.length > 300) text = text.substring(0, 300);
+        var attempts = [text];
+        if (text.length > 80) attempts.push(text.substring(0, 80));
+        if (text.length > 40) attempts.push(text.substring(0, 40));
+
+        for (var i = 0; i < attempts.length; i++) {
+            var chunk = attempts[i];
+            if (chunk.length < 3) continue;
+            var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+            var node;
+            while ((node = walker.nextNode())) {
+                var index = node.textContent.indexOf(chunk);
+                if (index >= 0) {
+                    try {
+                        var range = document.createRange();
+                        range.setStart(node, index);
+                        range.setEnd(node, index + chunk.length);
+                        var mark = document.createElement('mark');
+                        mark.className = 'bg-amber-200/90 rounded px-0.5 ring-2 ring-amber-400';
+                        range.surroundContents(mark);
+                        mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(function () {
+                            mark.classList.remove('ring-2', 'ring-amber-400');
+                        }, 2800);
+                        return true;
+                    } catch (e) {
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    var focusExcerpt = /*[[${focusSourceExcerpt}]]*/ '';
+    if (focusExcerpt) {
+        setTimeout(function () {
+            highlightExcerpt(focusExcerpt);
+        }, 120);
+    }
+
+    var noteId = /*[[${scrollToNoteId}]]*/ null;
+    if (!focusExcerpt && noteId) {
+        setTimeout(function () {
+            var noteEl = document.getElementById('note-' + noteId);
+            if (noteEl) {
+                noteEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                noteEl.classList.add('lesson-note-flash');
+                setTimeout(function () { noteEl.classList.remove('lesson-note-flash'); }, 2200);
+            }
+        }, 120);
+    }
+})();
+</script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /* ===== GOOGLE FONTS ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
 
 /* ===== CSS VARIABLES ===== */
 :root {
@@ -21,39 +21,25 @@ body {
   display: flex;
   flex-direction: column;
   font-family: var(--font);
-  background: var(--bg);
-  color: #222;
   line-height: 1.65;
   font-size: 16px;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  overflow-x: hidden;
 }
-main { flex: 1; }
+/* Tailwind-driven pages (body.bg-background): do not override background/text colors */
+body:not(.bg-background) {
+  background: var(--bg);
+  color: #222;
+}
+main { flex: 1; min-width: 0; min-height: 0; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; }
 
-/* ===== HEADER ===== */
-header {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 4px rgba(10,102,194,.07);
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-}
-nav {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
+/* ===== TOP NAV =====
+   Never use bare `header { }` or bare `nav { }` here: they would affect inner page headers and sidebar <nav>.
+   Top bar + desktop links use Tailwind on #top-nav in fragments/layout.html. */
 .logo a { font-size: 1.3rem; font-weight: 700; color: var(--primary); text-decoration: none; }
 .nav-toggle { display: none; cursor: pointer; font-size: 1.5rem; color: var(--primary); padding: .25rem; background: none; border: none; font-family: inherit; }
 .links { display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap; }
@@ -69,13 +55,16 @@ nav {
 
 /* ===== FOOTER ===== */
 footer {
+  margin-top: auto;
+}
+/* Legacy pages without the Tailwind layout */
+body:not(.bg-background) footer {
   text-align: center;
   padding: 1.25rem 1rem;
   font-size: .88rem;
   color: #888;
   background: #fff;
   border-top: 1px solid var(--border);
-  margin-top: auto;
 }
 
 /* ===== TOAST ===== */
@@ -163,6 +152,58 @@ input:focus, select:focus, textarea:focus {
 }
 textarea { resize: vertical; min-height: 100px; }
 
+/* Password field + show/hide toggle (auth & forms) */
+.password-field {
+  position: relative;
+  margin-top: .35rem;
+  width: 100%;
+}
+.password-field input[type="password"],
+.password-field input[type="text"] {
+  margin-top: 0;
+  padding-right: 2.75rem;
+}
+.password-toggle {
+  position: absolute;
+  right: .4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.35rem;
+  height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #5c6b7a;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0;
+  line-height: 0;
+}
+.password-toggle:hover {
+  color: var(--primary);
+  background: rgba(10, 102, 194, .08);
+}
+.password-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.password-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+.password-toggle .icon-hide {
+  display: none;
+}
+.password-field.is-visible .password-toggle .icon-show {
+  display: none;
+}
+.password-field.is-visible .password-toggle .icon-hide {
+  display: block;
+}
+
 /* ===== BUTTONS ===== */
 /* Reset native button first */
 button {
@@ -170,7 +211,7 @@ button {
   cursor: pointer;
   border: none;
   background: none;
-  padding: 0;
+  padding: 15;
 }
 /* Utility class for styled buttons */
 .btn {
@@ -213,7 +254,7 @@ form button[type=submit]:active { transform: scale(.98); }
 .btn-outline:hover { background: #e8f0fe; }
 .btn-danger { background: var(--danger); }
 .btn-danger:hover { background: #8a0018; }
-.btn-sm { padding: .4rem .85rem; font-size: .85rem; }
+.btn-sm { padding: .4rem .85rem;; font-size: .85rem; }
 .btn-success { background: var(--success); }
 .btn-success:hover { background: #145d28; }
 
@@ -287,6 +328,17 @@ form button[type=submit]:active { transform: scale(.98); }
   padding: 1.5rem;
   width: 210px;
   text-align: center;
+}
+a.feature-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .2s, transform .15s, border-color .15s;
+}
+a.feature-card-link:hover {
+  box-shadow: 0 4px 16px rgba(10, 102, 194, .15);
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 .feature-icon { font-size: 2rem; margin-bottom: .5rem; }
 .feature-card h3 { color: var(--primary); font-size: .97rem; margin-bottom: .4rem; }
@@ -413,6 +465,13 @@ form button[type=submit]:active { transform: scale(.98); }
 .enroll-box { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e8eef6; }
 .enroll-box form { display: flex; flex-direction: column; gap: .5rem; max-width: 340px; }
 .enroll-box label { margin-top: 0; }
+.enroll-btn {
+  display: inline-block;
+  padding: .72rem 1.5rem;
+  font-weight: 600;
+  align-self: flex-start;
+}
+.enroll-form { margin-top: 0; }
 
 /* ===== LESSON LIST ===== */
 .lesson-list { display: flex; flex-direction: column; gap: .5rem; margin-top: 1rem; }
@@ -461,9 +520,66 @@ form button[type=submit]:active { transform: scale(.98); }
   font-size: .95rem;
   line-height: 1.8;
   color: #333;
-  white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
+}
+.lesson-content-html {
+  white-space: normal;
+}
+.lesson-content-html h2 {
+  font-size: 1.05rem;
+  margin: 1.1rem 0 .5rem;
+  color: #0a3d7a;
+  font-weight: 700;
+}
+.lesson-content-html h2:first-child { margin-top: 0; }
+.lesson-content-html p { margin: .5rem 0 .65rem; }
+.lesson-content-html ul, .lesson-content-html ol {
+  margin: .4rem 0 .75rem 1.35rem;
+}
+.lesson-content-html li { margin: .25rem 0; }
+.lesson-content-html strong { color: #1a1a1a; }
+.lesson-content-html code {
+  background: #eef4ff;
+  padding: .12rem .4rem;
+  border-radius: 4px;
+  font-size: .9em;
+}
+.lesson-content-html pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1rem 1.1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: .86rem;
+  line-height: 1.55;
+  margin: .75rem 0;
+}
+.lesson-content-html iframe,
+.lesson-content-html video,
+.lesson-content-html img {
+  max-width: 100%;
+  height: auto;
+}
+.lesson-content-html iframe {
+  width: 100%;
+  min-height: 320px;
+  border: 0;
+}
+.lesson-content-html table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+.lesson-content-html * {
+  max-width: 100%;
+}
+.lesson-content-html .material-hint {
+  margin-top: 1rem;
+  padding-top: .85rem;
+  border-top: 1px dashed #c8d9f0;
+  font-size: .86rem;
+  color: #555;
 }
 .lesson-view-footer {
   padding: 1rem 1.5rem;
@@ -584,6 +700,68 @@ tr:hover td { background: #f8faff; }
 /* Note items */
 .note-item { padding: .5rem .65rem; border-radius: 6px; background: #fafafa; }
 
+/* My Notes — lesson rows: whole row opens lesson */
+.note-list-lesson-row {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border-radius: 0 8px 8px 0;
+  overflow: hidden;
+}
+.note-list-lesson-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  padding: .85rem 1rem;
+  border-radius: 0 8px 8px 0;
+  transition: background .15s ease;
+  cursor: pointer;
+}
+.note-list-lesson-link:hover {
+  background: #f0f6ff;
+}
+.note-list-lesson-hint {
+  font-size: .75rem;
+  color: #0a66c2;
+  font-weight: 600;
+  margin-bottom: .35rem;
+}
+
+/* Lesson page — note row anchor + scroll highlight */
+.lesson-note-card {
+  scroll-margin-top: 5.5rem;
+}
+.lesson-note-hit {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: .5rem .25rem .5rem 0;
+  border-radius: 0 6px 6px 0;
+  transition: background .15s ease;
+  cursor: pointer;
+}
+.lesson-note-hit:hover {
+  background: #f5f9ff;
+}
+.lesson-note-jump-hint {
+  font-size: .72rem;
+  color: #0a66c2;
+  display: block;
+  margin-bottom: .2rem;
+}
+.lesson-note-flash {
+  animation: lessonNoteFlash 1.8s ease;
+}
+@keyframes lessonNoteFlash {
+  0%, 100% { box-shadow: none; }
+  15% { box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.35); }
+}
+
 /* Continue learning card */
 .continue-card { display: flex; gap: .85rem; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: .85rem 1rem; margin-bottom: .6rem; }
 .continue-thumb img { width: 64px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
@@ -610,3 +788,41 @@ tr:hover td { background: #f8faff; }
   .auth-card, .container { padding: 1.5rem 1.25rem; }
   .auth-wrapper { align-items: flex-start; padding-top: 2rem; }
 }
+
+/* ===== IT Scholar / Tailwind pages: data tables (<th> headers) ===== */
+.it-table-wrap {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+table.it-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+table.it-data-table thead th {
+  text-align: left;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4e5a81;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0.5rem 1rem;
+  font-family: Inter, system-ui, sans-serif;
+}
+table.it-data-table tbody td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f8fafc;
+  vertical-align: middle;
+  color: #202d51;
+}
+table.it-data-table tbody tr:hover {
+  background: #f6f5ff;
+}
+.lesson-content-html {
+  line-height: 1.65;
+  color: #202d51;
+}
+.lesson-content-html img { max-width: 100%; height: auto; }

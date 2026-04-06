@@ -18,6 +18,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,12 +40,14 @@ public class SecurityConfig {
             .authorizeRequests()
                 .antMatchers(
                     "/", "/home", "/courses", "/courses/**",
-                    "/register", "/login", "/forgot-password",
+                    "/announcements",
+                    "/register", "/login",
+                    "/forgot-password", "/reset-password",
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/favicon.ico", "/error"
                 ).permitAll()
-                // Current scope only supports guest + student flows.
-                .antMatchers("/admin/**", "/teacher/**").denyAll()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                 .anyRequest().authenticated()
             .and()
             .formLogin()
@@ -52,7 +55,7 @@ public class SecurityConfig {
                 .loginProcessingUrl("/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/dashboard", true)
+                .successHandler(loginSuccessHandler)
                 .failureUrl("/login?error=true")
                 .permitAll()
             .and()

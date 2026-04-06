@@ -1,29 +1,66 @@
 // ===== E-Learning CNTT – Client-side helpers =====
 
-function toggleNotif() {
+function toggleNotif(ev) {
+    if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
     const d = document.getElementById('notif-dropdown');
     const a = document.getElementById('account-dropdown');
-    if (a) a.style.display = 'none';
-    if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    if (a) a.classList.add('hidden');
+    if (d) d.classList.toggle('hidden');
 }
 
-function toggleAccount() {
+function toggleAccount(ev) {
+    if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
     const d = document.getElementById('account-dropdown');
     const n = document.getElementById('notif-dropdown');
-    if (n) n.style.display = 'none';
-    if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    if (n) n.classList.add('hidden');
+    if (d) d.classList.toggle('hidden');
 }
 
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.account-menu')) {
-        document.querySelectorAll('.dropdown-menu').forEach(function(m) {
-            m.style.display = 'none';
+        document.querySelectorAll('#notif-dropdown, #account-dropdown').forEach(function(m) {
+            if (m) m.classList.add('hidden');
         });
+    }
+
+    if (!e.target.closest('#top-nav')) {
+        const nav = document.getElementById('top-nav');
+        if (nav) {
+            nav.classList.remove('open');
+            const toggle = nav.querySelector('.nav-toggle');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        }
     }
 });
 
 // Auto-hide flash messages after 4 seconds
+function initPasswordToggles() {
+    document.querySelectorAll('.password-field').forEach(function(wrap) {
+        var input = wrap.querySelector('input');
+        var btn = wrap.querySelector('.password-toggle');
+        if (!input || !btn) return;
+        btn.addEventListener('click', function() {
+            var show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            wrap.classList.toggle('is-visible', show);
+            btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+            var hideLabel = 'Hide password';
+            var showLabel = 'Show password';
+            btn.setAttribute('aria-label', show ? hideLabel : showLabel);
+            btn.setAttribute('title', show ? hideLabel : showLabel);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    initPasswordToggles();
+    initActiveNavigation();
     const alerts = document.querySelectorAll('.alert-success, .alert-error, .alert-info');
     alerts.forEach(function(alert) {
         setTimeout(function() {
@@ -47,13 +84,32 @@ document.addEventListener('DOMContentLoaded', function() {
             if (span) span.style.border = '3px solid #0a66c2';
         }
     });
+
+    document.querySelectorAll('#top-nav a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            const nav = document.getElementById('top-nav');
+            if (!nav) return;
+            nav.classList.remove('open');
+            const toggle = nav.querySelector('.nav-toggle');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    });
 });
 
 function showToast(msg, type) {
+    var stack = document.querySelector('.toast-stack');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.className = 'toast-stack';
+        stack.setAttribute('aria-live', 'polite');
+        stack.setAttribute('aria-atomic', 'false');
+        document.body.appendChild(stack);
+    }
     var t = document.createElement('div');
     t.className = 'toast toast-' + (type || 'success');
+    t.setAttribute('role', 'status');
     t.textContent = msg;
-    document.body.appendChild(t);
+    stack.appendChild(t);
     setTimeout(function() { t.classList.add('show'); }, 10);
     setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 400); }, 3500);
 }
