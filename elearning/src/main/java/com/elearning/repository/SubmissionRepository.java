@@ -12,6 +12,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT s FROM Submission s " +
            "JOIN FETCH s.assignment a " +
            "JOIN FETCH a.course c " +
+           "LEFT JOIN FETCH a.lesson l " +
            "JOIN FETCH s.student st " +
            "WHERE a.id = :assignmentId AND st.id = :studentId " +
            "ORDER BY s.attemptNumber DESC, s.submittedAt DESC")
@@ -21,6 +22,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT s FROM Submission s " +
            "JOIN FETCH s.assignment a " +
            "JOIN FETCH a.course c " +
+           "LEFT JOIN FETCH a.lesson l " +
            "JOIN FETCH s.student st " +
            "WHERE a.id = :assignmentId " +
            "ORDER BY st.fullName ASC, s.attemptNumber DESC, s.submittedAt DESC")
@@ -29,6 +31,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT s FROM Submission s " +
            "JOIN FETCH s.assignment a " +
            "JOIN FETCH a.course c " +
+           "LEFT JOIN FETCH a.lesson l " +
            "JOIN FETCH s.student st " +
            "WHERE st.id = :studentId " +
            "ORDER BY s.submittedAt DESC, s.attemptNumber DESC")
@@ -37,6 +40,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT s FROM Submission s " +
            "JOIN FETCH s.assignment a " +
            "JOIN FETCH a.course c " +
+           "LEFT JOIN FETCH a.lesson l " +
            "JOIN FETCH s.student st " +
            "WHERE st.id = :studentId AND c.id = :courseId " +
            "ORDER BY s.submittedAt DESC, s.attemptNumber DESC")
@@ -46,6 +50,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT s FROM Submission s " +
            "JOIN FETCH s.assignment a " +
            "JOIN FETCH a.course c " +
+           "LEFT JOIN FETCH a.lesson l " +
            "JOIN FETCH s.student st " +
            "WHERE s.id = :submissionId")
     Optional<Submission> findDetailedById(@Param("submissionId") Long submissionId);

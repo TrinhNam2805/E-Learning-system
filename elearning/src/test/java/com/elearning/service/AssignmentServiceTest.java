@@ -4,10 +4,8 @@ import com.elearning.exception.AssessmentDeadlineException;
 import com.elearning.exception.AssessmentStorageException;
 import com.elearning.exception.AssessmentValidationException;
 import com.elearning.model.dto.assessment.AssignmentSubmissionForm;
-import com.elearning.model.dto.assessment.SubmissionGradeForm;
 import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.Course;
-import com.elearning.model.entity.Notification;
 import com.elearning.model.entity.Submission;
 import com.elearning.model.entity.User;
 import com.elearning.repository.AssignmentRepository;
@@ -23,6 +21,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,38 +66,31 @@ class AssignmentServiceTest {
                 .id(10L)
                 .role(User.Role.STUDENT)
                 .email("student@elearning.test")
-                .fullName("Sinh vien A")
-                .build();
-
-        User teacher = User.builder()
-                .id(20L)
-                .role(User.Role.TEACHER)
-                .fullName("Giang vien B")
+                .fullName("Student A")
                 .build();
 
         course = Course.builder()
                 .id(30L)
                 .courseCode("SE330")
                 .courseName("Software Engineering")
-                .teacher(teacher)
                 .build();
 
         homework = Assignment.builder()
                 .id(40L)
                 .course(course)
-                .title("Bai tap tuan 1")
+                .title("Week 1 Homework")
                 .type(Assignment.AssignmentType.HOMEWORK)
                 .dueDate(LocalDateTime.now().plusDays(1))
                 .maxScore(10.0)
                 .allowLateSubmission(false)
-                .maxAttempts(2)
+                .maxAttempts(1)
                 .build();
     }
 
     @Test
     void submitOnTimeShouldSaveSubmission() {
         AssignmentSubmissionForm form = new AssignmentSubmissionForm();
-        form.setContent("Noi dung bai lam");
+        form.setContent("Homework content");
 
         when(assignmentRepository.findDetailedById(homework.getId())).thenReturn(Optional.of(homework));
         when(enrollmentService.isEnrolled(student.getId(), course.getId())).thenReturn(true);
@@ -109,10 +101,11 @@ class AssignmentServiceTest {
                 homework.getId(), student, form, new HashMap<String, String>());
 
         assertNotNull(result.getSubmission());
-        assertEquals("Noi dung bai lam", result.getSubmission().getContent());
+        assertEquals("Homework content", result.getSubmission().getContent());
         assertEquals(Submission.SubmissionStatus.SUBMITTED, result.getSubmission().getStatus());
         assertFalse(result.getSubmission().isLateSubmission());
         assertEquals(1, result.getSubmission().getAttemptNumber());
+        assertFalse(result.isUpdatedExisting());
         verify(submissionRepository).save(any(Submission.class));
     }
 
@@ -121,102 +114,110 @@ class AssignmentServiceTest {
         homework.setDueDate(LocalDateTime.now().minusHours(3));
 
         AssignmentSubmissionForm form = new AssignmentSubmissionForm();
-        form.setContent("Noi dung tre han");
+        form.setContent("Late homework");
 
         when(assignmentRepository.findDetailedById(homework.getId())).thenReturn(Optional.of(homework));
         when(enrollmentService.isEnrolled(student.getId(), course.getId())).thenReturn(true);
         when(submissionRepository.countByAssignmentIdAndStudentId(homework.getId(), student.getId())).thenReturn(0L);
 
-        AssessmentDeadlineException ex = assertThrows(AssessmentDeadlineException.class,
+        AssessmentDeadlineException ex = assertThrows(
+                AssessmentDeadlineException.class,
                 () -> assignmentService.submit(homework.getId(), student, form, new HashMap<String, String>()));
 
-        assertEquals("Bài tập đã quá hạn và không cho phép nộp trễ.", ex.getMessage());
+        assertEquals("This assignment is past due and late submission is not allowed.", ex.getMessage());
         verify(submissionRepository, never()).save(any(Submission.class));
     }
 
     @Test
     void submitShouldRejectInvalidFileFormat() {
         AssignmentSubmissionForm form = new AssignmentSubmissionForm();
-        form.setAttachment(new MockMultipartFile("attachment", "malware.exe",
-                "application/octet-stream", "virus".getBytes()));
+        form.setAttachment(new MockMultipartFile(
+                "attachment", "malware.exe", "application/octet-stream", "virus".getBytes()));
 
         when(assignmentRepository.findDetailedById(homework.getId())).thenReturn(Optional.of(homework));
         when(enrollmentService.isEnrolled(student.getId(), course.getId())).thenReturn(true);
         when(submissionRepository.countByAssignmentIdAndStudentId(homework.getId(), student.getId())).thenReturn(0L);
         when(assessmentFileStorageService.storeSubmissionFile(eq(homework.getId()), eq(student.getId()), any(MockMultipartFile.class)))
-                .thenThrow(new AssessmentValidationException("Định dạng tệp không được hỗ trợ."));
+                .thenThrow(new AssessmentValidationException("Unsupported file format."));
 
-        AssessmentValidationException ex = assertThrows(AssessmentValidationException.class,
+        AssessmentValidationException ex = assertThrows(
+                AssessmentValidationException.class,
                 () -> assignmentService.submit(homework.getId(), student, form, new HashMap<String, String>()));
 
-        assertEquals("Định dạng tệp không được hỗ trợ.", ex.getMessage());
+        assertEquals("Unsupported file format.", ex.getMessage());
     }
 
     @Test
     void submitShouldRejectOversizedFile() {
         AssignmentSubmissionForm form = new AssignmentSubmissionForm();
-        form.setAttachment(new MockMultipartFile("attachment", "big.pdf",
-                "application/pdf", new byte[8]));
+        form.setAttachment(new MockMultipartFile("attachment", "big.pdf", "application/pdf", new byte[8]));
 
         when(assignmentRepository.findDetailedById(homework.getId())).thenReturn(Optional.of(homework));
         when(enrollmentService.isEnrolled(student.getId(), course.getId())).thenReturn(true);
         when(submissionRepository.countByAssignmentIdAndStudentId(homework.getId(), student.getId())).thenReturn(0L);
         when(assessmentFileStorageService.storeSubmissionFile(eq(homework.getId()), eq(student.getId()), any(MockMultipartFile.class)))
-                .thenThrow(new AssessmentValidationException("Dung lượng tệp vượt quá giới hạn 5 MB."));
+                .thenThrow(new AssessmentValidationException("File size exceeds the 5 MB limit."));
 
-        AssessmentValidationException ex = assertThrows(AssessmentValidationException.class,
+        AssessmentValidationException ex = assertThrows(
+                AssessmentValidationException.class,
                 () -> assignmentService.submit(homework.getId(), student, form, new HashMap<String, String>()));
 
-        assertEquals("Dung lượng tệp vượt quá giới hạn 5 MB.", ex.getMessage());
+        assertEquals("File size exceeds the 5 MB limit.", ex.getMessage());
     }
 
     @Test
     void submitShouldSurfaceStorageFailure() {
         AssignmentSubmissionForm form = new AssignmentSubmissionForm();
-        form.setAttachment(new MockMultipartFile("attachment", "essay.pdf",
-                "application/pdf", "du lieu".getBytes()));
+        form.setAttachment(new MockMultipartFile("attachment", "essay.pdf", "application/pdf", "data".getBytes()));
 
         when(assignmentRepository.findDetailedById(homework.getId())).thenReturn(Optional.of(homework));
         when(enrollmentService.isEnrolled(student.getId(), course.getId())).thenReturn(true);
         when(submissionRepository.countByAssignmentIdAndStudentId(homework.getId(), student.getId())).thenReturn(0L);
         when(assessmentFileStorageService.storeSubmissionFile(eq(homework.getId()), eq(student.getId()), any(MockMultipartFile.class)))
-                .thenThrow(new AssessmentStorageException("Không thể lưu tệp bài nộp lúc này.", new RuntimeException("network")));
+                .thenThrow(new AssessmentStorageException("Cannot store submission file right now.", new RuntimeException("network")));
 
-        AssessmentStorageException ex = assertThrows(AssessmentStorageException.class,
+        AssessmentStorageException ex = assertThrows(
+                AssessmentStorageException.class,
                 () -> assignmentService.submit(homework.getId(), student, form, new HashMap<String, String>()));
 
-        assertEquals("Không thể lưu tệp bài nộp lúc này.", ex.getMessage());
+        assertEquals("Cannot store submission file right now.", ex.getMessage());
     }
 
     @Test
-    void lecturerShouldGradeSuccessfully() {
-        Submission submission = Submission.builder()
+    void homeworkResubmissionShouldUpdateExistingSubmissionBeforeDueDate() {
+        Submission existingSubmission = Submission.builder()
                 .id(90L)
                 .assignment(homework)
                 .student(student)
-                .content("Noi dung bai tap")
-                .status(Submission.SubmissionStatus.SUBMITTED)
+                .content("Old content")
+                .score(7.5)
+                .feedback("Previous feedback")
+                .status(Submission.SubmissionStatus.GRADED)
                 .attemptNumber(1)
                 .build();
 
-        SubmissionGradeForm form = new SubmissionGradeForm();
-        form.setScore(8.5);
-        form.setFeedback("Bai lam tot");
+        AssignmentSubmissionForm form = new AssignmentSubmissionForm();
+        form.setContent("Updated content");
 
-        when(submissionRepository.findDetailedById(submission.getId())).thenReturn(Optional.of(submission));
-        when(submissionRepository.existsByAssignmentIdAndStudentIdAndScoreIsNotNull(homework.getId(), student.getId())).thenReturn(false);
+        when(assignmentRepository.findDetailedById(homework.getId())).thenReturn(Optional.of(homework));
         when(enrollmentService.isEnrolled(student.getId(), course.getId())).thenReturn(true);
-        when(gamificationService.awardGradedAssignmentXp(student.getId(), course.getId(), 8.5, homework.getMaxScore(), homework.getType()))
-                .thenReturn(43);
+        when(submissionRepository.findHistoryByAssignmentIdAndStudentId(homework.getId(), student.getId()))
+                .thenReturn(List.of(existingSubmission));
+        when(submissionRepository.countByAssignmentIdAndStudentId(homework.getId(), student.getId())).thenReturn(1L);
         when(submissionRepository.save(any(Submission.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        AssignmentService.GradeResult result = assignmentService.grade(submission.getId(), form);
+        AssignmentService.SubmissionResult result = assignmentService.submit(
+                homework.getId(), student, form, new HashMap<String, String>());
 
-        assertEquals(8.5, result.getSubmission().getScore());
-        assertEquals("Bai lam tot", result.getSubmission().getFeedback());
-        assertEquals(Submission.SubmissionStatus.GRADED, result.getSubmission().getStatus());
-        assertEquals(43, result.getAwardedXp());
-        verify(notificationService).send(eq(student), eq("Đã có kết quả bài tập"), any(String.class), eq(Notification.NotifType.GRADE));
+        assertTrue(result.isUpdatedExisting());
+        assertEquals(existingSubmission.getId(), result.getSubmission().getId());
+        assertEquals("Updated content", result.getSubmission().getContent());
+        assertEquals(Submission.SubmissionStatus.SUBMITTED, result.getSubmission().getStatus());
+        assertEquals(null, result.getSubmission().getScore());
+        assertEquals(null, result.getSubmission().getFeedback());
+        assertEquals(1, result.getSubmission().getAttemptNumber());
+        assertEquals(0, result.getAwardedXp());
+        verify(submissionRepository).save(existingSubmission);
     }
 
     @Test
@@ -226,7 +227,7 @@ class AssignmentServiceTest {
                 .student(student)
                 .status(Submission.SubmissionStatus.SUBMITTED)
                 .attemptNumber(1)
-                .content("Dang cho cham")
+                .content("Pending review")
                 .build();
 
         assertFalse(com.elearning.model.dto.assessment.AssessmentSubmissionDto.fromEntity(submission).isGraded());

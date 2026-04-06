@@ -5,7 +5,6 @@ import com.elearning.model.dto.assessment.AssessmentAssignmentDto;
 import com.elearning.model.dto.assessment.AssessmentProgressDto;
 import com.elearning.model.dto.assessment.AssessmentSubmissionDto;
 import com.elearning.model.dto.assessment.AssignmentSubmissionForm;
-import com.elearning.model.dto.assessment.SubmissionGradeForm;
 import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.Submission;
 import com.elearning.model.entity.User;
@@ -13,7 +12,6 @@ import com.elearning.repository.UserRepository;
 import com.elearning.service.AssessmentFileStorageService;
 import com.elearning.service.AssessmentResultTrackingService;
 import com.elearning.service.AssignmentService;
-import com.elearning.service.EnrollmentService;
 import com.elearning.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -25,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -52,7 +51,6 @@ public class AssignmentController {
     private final AssessmentFileStorageService assessmentFileStorageService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
-    private final EnrollmentService enrollmentService;
 
     @GetMapping("/{id}")
     public String view(@PathVariable Long id,
@@ -62,27 +60,27 @@ public class AssignmentController {
         if (user == null) {
             return "redirect:/login";
         }
+        if (user.getRole() != User.Role.STUDENT) {
+            return "redirect:/access-denied";
+        }
 
         Assignment assignment = assignmentService.findById(id).orElse(null);
         if (assignment == null) {
             return "redirect:/courses";
         }
         if (!canAccessAssignment(user, assignment)) {
-            return user.getRole() == User.Role.STUDENT
-                    ? "redirect:/courses/" + assignment.getCourse().getId()
-                    : "redirect:/dashboard";
+            return "redirect:/courses/" + assignment.getCourse().getId();
         }
 
         AssessmentAssignmentDto assignmentView = assessmentResultTrackingService.getAssignmentDetail(id, user.getId());
         List<AssessmentSubmissionDto> submissionHistory = assessmentResultTrackingService.getAssignmentHistory(id, user.getId());
-        AssessmentProgressDto progress = user.getRole() == User.Role.STUDENT
-                ? assessmentResultTrackingService.getCourseProgress(assignment.getCourse().getId(), user.getId())
-                : null;
+        AssessmentProgressDto progress = assessmentResultTrackingService.getCourseProgress(assignment.getCourse().getId(), user.getId());
         AssignmentSubmissionForm submissionForm = new AssignmentSubmissionForm();
         if (assignmentView.isEditableSubmission() && assignmentView.getLatestSubmission() != null) {
             submissionForm.setContent(assignmentView.getLatestSubmission().getContent());
         }
         populateQuizFollowUp(model, assignment, assignmentView);
+        populateHomeworkContext(model, assignmentView);
 
         model.addAttribute("assignment", assignmentView);
         model.addAttribute("submissionHistory", submissionHistory);
@@ -160,77 +158,6 @@ public class AssignmentController {
         return "redirect:/assignments/" + id;
     }
 
-    @GetMapping("/{id}/submissions")
-    public String submissions(@PathVariable Long id,
-                              @AuthenticationPrincipal UserDetails userDetails,
-                              Model model) {
-        User user = getCurrentUser(userDetails);
-        if (user == null) {
-            return "redirect:/login";
-        }
-        if (user.getRole() == User.Role.STUDENT) {
-            return "redirect:/dashboard";
-        }
-
-        Assignment assignment = assignmentService.findById(id).orElse(null);
-        if (assignment == null) {
-            return "redirect:/teacher/dashboard";
-        }
-        if (!canManageAssignment(user, assignment)) {
-            return "redirect:/dashboard";
-        }
-
-        model.addAttribute("assignment", assessmentResultTrackingService.getAssignmentDetail(id, user.getId()));
-        model.addAttribute("submissions", assessmentResultTrackingService.getAssignmentSubmissionsForTeacher(id));
-        model.addAttribute("currentUser", user);
-        model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
-        return "assignment/submission-list";
-    }
-
-    @PostMapping("/grade/{submissionId}")
-    public String grade(@PathVariable Long submissionId,
-                        @Valid @ModelAttribute("gradeForm") SubmissionGradeForm form,
-                        BindingResult bindingResult,
-                        @AuthenticationPrincipal UserDetails userDetails,
-                        RedirectAttributes redirectAttributes) {
-        User user = getCurrentUser(userDetails);
-        if (user == null) {
-            return "redirect:/login";
-        }
-        if (user.getRole() == User.Role.STUDENT) {
-            return "redirect:/dashboard";
-        }
-
-        Submission submission;
-        try {
-            submission = assignmentService.getDetailedSubmissionOrThrow(submissionId);
-        } catch (AssessmentException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-            return "redirect:/dashboard";
-        }
-        if (!canManageAssignment(user, submission.getAssignment())) {
-            return "redirect:/dashboard";
-        }
-
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error", bindingResult.getFieldError().getDefaultMessage());
-            return "redirect:/assignments/" + submission.getAssignment().getId() + "/submissions";
-        }
-
-        try {
-            AssignmentService.GradeResult result = assignmentService.grade(submissionId, form);
-            StringBuilder success = new StringBuilder("Submission graded successfully.");
-            if (result.getAwardedXp() > 0) {
-                success.append(" Awarded ").append(result.getAwardedXp()).append(" XP to the student.");
-            }
-            redirectAttributes.addFlashAttribute("success", success.toString());
-        } catch (AssessmentException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-        }
-
-        return "redirect:/assignments/" + submission.getAssignment().getId() + "/submissions";
-    }
-
     @GetMapping("/results")
     public String results(@AuthenticationPrincipal UserDetails userDetails,
                           @RequestParam(required = false) Long courseId,
@@ -301,29 +228,11 @@ public class AssignmentController {
     }
 
     private boolean canAccessAssignment(User user, Assignment assignment) {
-        if (user.getRole() == User.Role.STUDENT) {
-            return assignmentService.isVisibleToStudent(assignment, user.getId());
-        }
-        return canManageAssignment(user, assignment);
-    }
-
-    private boolean canManageAssignment(User user, Assignment assignment) {
-        if (user.getRole() == User.Role.ADMIN) {
-            return true;
-        }
-        return user.getRole() == User.Role.TEACHER
-                && assignment.getCourse() != null
-                && assignment.getCourse().getTeacher() != null
-                && user.getId().equals(assignment.getCourse().getTeacher().getId());
+        return user.getRole() == User.Role.STUDENT
+                && assignmentService.isVisibleToStudent(assignment, user.getId());
     }
 
     private boolean canDownloadSubmission(User user, Submission submission) {
-        if (user.getRole() == User.Role.ADMIN) {
-            return true;
-        }
-        if (user.getRole() == User.Role.TEACHER) {
-            return canManageAssignment(user, submission.getAssignment());
-        }
         return user.getRole() == User.Role.STUDENT
                 && submission.getStudent() != null
                 && user.getId().equals(submission.getStudent().getId());
@@ -376,6 +285,32 @@ public class AssignmentController {
             model.addAttribute("quizFollowUpLabel", "Back to lesson");
             model.addAttribute("quizFollowUpHint", "Review the related lesson, then retake the quiz until you reach the passing score.");
         }
+    }
+
+    private void populateHomeworkContext(Model model,
+                                         AssessmentAssignmentDto assignmentView) {
+        if (assignmentView == null || "QUIZ".equals(assignmentView.getType())) {
+            return;
+        }
+
+        String homeworkBrief = assignmentView.getDescription();
+        if (!StringUtils.hasText(homeworkBrief)) {
+            if (assignmentView.getLessonTitle() != null && assignmentView.getCourseName() != null) {
+                homeworkBrief = "Complete the homework for lesson \""
+                        + assignmentView.getLessonTitle()
+                        + "\" in "
+                        + assignmentView.getCourseName()
+                        + ". Submit a written response and attach the required deliverable file for review.";
+            } else if (assignmentView.getCourseName() != null) {
+                homeworkBrief = "Complete the current homework in "
+                        + assignmentView.getCourseName()
+                        + " and upload the requested deliverable for instructor review.";
+            } else {
+                homeworkBrief = "Complete the current homework and upload the required deliverable for review.";
+            }
+        }
+
+        model.addAttribute("homeworkBriefText", homeworkBrief);
     }
 
     private boolean isPassingQuiz(Assignment assignment, Submission submission) {

@@ -54,18 +54,10 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         User user = userRepository.findByEmail(email).orElse(null);
         String target = "/dashboard";
         if (user != null) {
-            switch (user.getRole()) {
-                case STUDENT:
-                    target = "/student/dashboard";
-                    break;
-                case TEACHER:
-                    target = "/teacher/dashboard";
-                    break;
-                case ADMIN:
-                    target = "/admin/dashboard";
-                    break;
-                default:
-                    break;
+            if (user.getRole() == User.Role.STUDENT) {
+                target = "/student/dashboard";
+            } else {
+                target = "/access-denied";
             }
         }
         getRedirectStrategy().sendRedirect(request, response, request.getContextPath() + target);

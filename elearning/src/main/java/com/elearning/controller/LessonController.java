@@ -16,6 +16,7 @@ import com.elearning.service.LessonService;
 import com.elearning.service.LessonUnlockService;
 import com.elearning.service.NoteService;
 import com.elearning.service.NotificationService;
+import com.elearning.util.LessonContentHtmlSanitizer;
 import com.elearning.util.VideoEmbedUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -110,6 +111,7 @@ public class LessonController {
 
         model.addAttribute("course", course);
         model.addAttribute("lesson", lesson);
+        model.addAttribute("renderedLessonContent", LessonContentHtmlSanitizer.sanitizeForRender(lesson.getLessonContent()));
         model.addAttribute("allLessons", allLessons);
         model.addAttribute("curriculumSections", curriculumSections);
         model.addAttribute("lessonIndexOneBased", lessonIndexOneBased);

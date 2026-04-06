@@ -3,7 +3,6 @@ package com.elearning.controller;
 import com.elearning.model.dto.ranking.BadgeCollectionDto;
 import com.elearning.model.dto.ranking.LeaderboardEntryDto;
 import com.elearning.model.entity.Assignment;
-import com.elearning.model.entity.Course;
 import com.elearning.model.entity.Enrollment;
 import com.elearning.model.entity.Notification;
 import com.elearning.model.entity.User;
@@ -29,23 +28,15 @@ public class DashboardController {
     private final AssignmentService assignmentService;
     private final RankingService rankingService;
     private final BadgeService badgeService;
-    private final CourseService courseService;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) return "redirect:/login";
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
-        switch (user.getRole()) {
-            case STUDENT:
-                return "redirect:/student/dashboard";
-            case TEACHER:
-                return "redirect:/teacher/dashboard";
-            case ADMIN:
-                return "redirect:/admin/dashboard";
-            default:
-                return "redirect:/access-denied";
-        }
+        return user.getRole() == User.Role.STUDENT
+                ? "redirect:/student/dashboard"
+                : "redirect:/access-denied";
     }
 
     @GetMapping("/student/dashboard")
@@ -77,33 +68,5 @@ public class DashboardController {
         model.addAttribute("earnedBadges", earnedBadges.getBadges().stream().limit(4).collect(Collectors.toList()));
         model.addAttribute("earnedBadgeCount", earnedBadges.getEarnedBadgeCount());
         return "dashboard/student";
-    }
-
-    @GetMapping("/teacher/dashboard")
-    public String teacherDashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) return "redirect:/login";
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
-        if (user == null) return "redirect:/login";
-        if (user.getRole() != User.Role.TEACHER && user.getRole() != User.Role.ADMIN) {
-            return "redirect:/dashboard";
-        }
-
-        List<Course> myCourses = user.getRole() == User.Role.ADMIN
-                ? courseService.findAll()
-                : courseService.findByTeacher(user);
-
-        int totalStudents = myCourses.stream()
-                .mapToInt(c -> (int) enrollmentService.countEnrollmentsByCourse(c.getId()))
-                .sum();
-        int totalLessons = myCourses.stream()
-                .mapToInt(c -> (int) lessonService.countByCourseId(c.getId()))
-                .sum();
-
-        model.addAttribute("currentUser", user);
-        model.addAttribute("myCourses", myCourses);
-        model.addAttribute("totalStudents", totalStudents);
-        model.addAttribute("totalLessons", totalLessons);
-        model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
-        return "dashboard/teacher";
     }
 }

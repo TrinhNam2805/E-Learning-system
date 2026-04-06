@@ -4,7 +4,6 @@ import com.elearning.exception.AssessmentDeadlineException;
 import com.elearning.exception.AssessmentNotFoundException;
 import com.elearning.exception.AssessmentValidationException;
 import com.elearning.model.dto.assessment.AssignmentSubmissionForm;
-import com.elearning.model.dto.assessment.SubmissionGradeForm;
 import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.Notification;
 import com.elearning.model.entity.QuizQuestion;
@@ -222,57 +221,6 @@ public class AssignmentService {
         return new SubmissionResult(saved, 0, false);
     }
 
-    @Transactional
-    public GradeResult grade(Long submissionId, SubmissionGradeForm form) {
-        Submission submission = getDetailedSubmissionOrThrow(submissionId);
-        Assignment assignment = submission.getAssignment();
-
-        if (assignment.getType() == Assignment.AssignmentType.QUIZ && submission.isAutoGraded()) {
-            throw new AssessmentValidationException("This quiz has already been auto-graded.");
-        }
-
-        double validatedScore = validateScore(form.getScore(), assignment.getMaxScore());
-        boolean alreadyHadGradeForAssignment = submissionRepository
-                .existsByAssignmentIdAndStudentIdAndScoreIsNotNull(assignment.getId(), submission.getStudent().getId());
-
-        submission.setScore(validatedScore);
-        submission.setFeedback(normalize(form.getFeedback()));
-        submission.setStatus(Submission.SubmissionStatus.GRADED);
-        submission.setGradedAt(LocalDateTime.now());
-        submission.setAutoGraded(false);
-        Submission saved = submissionRepository.save(submission);
-
-        int awardedXp = 0;
-        boolean firstGradeForAssignment = !alreadyHadGradeForAssignment;
-        if (!alreadyHadGradeForAssignment
-                && enrollmentService.isEnrolled(submission.getStudent().getId(), assignment.getCourse().getId())
-                && assignment.getType() != Assignment.AssignmentType.QUIZ) {
-            awardedXp = gamificationService.awardGradedAssignmentXp(
-                    submission.getStudent().getId(),
-                    assignment.getCourse().getId(),
-                    validatedScore,
-                    assignment.getMaxScore(),
-                    assignment.getType());
-        }
-
-        StringBuilder message = new StringBuilder();
-        message.append("Submission \"").append(assignment.getTitle()).append("\" was graded: ")
-                .append(String.format(Locale.US, "%.1f", validatedScore))
-                .append("/").append(String.format(Locale.US, "%.1f", assignment.getMaxScore())).append(".");
-        if (StringUtils.hasText(saved.getFeedback())) {
-            message.append(" Feedback: ").append(saved.getFeedback());
-        }
-        if (awardedXp > 0) {
-            message.append(" +").append(awardedXp).append(" XP.");
-        }
-        notificationService.send(submission.getStudent(),
-                "Assignment result available",
-                message.toString(),
-                Notification.NotifType.GRADE);
-
-        return new GradeResult(saved, awardedXp, firstGradeForAssignment);
-    }
-
     public boolean isPastDue(Assignment assignment) {
         LocalDateTime dueDate = assignment.getDueDate();
         return dueDate != null && LocalDateTime.now().isAfter(dueDate);
@@ -443,17 +391,6 @@ public class AssignmentService {
             throw new AssessmentValidationException("Please enter submission content or upload a valid file.");
         }
     }
-
-    private double validateScore(Double score, double maxScore) {
-        if (score == null) {
-            throw new AssessmentValidationException("Score is required.");
-        }
-        if (score < 0 || score > maxScore) {
-            throw new AssessmentValidationException("Score must be between 0 and " + maxScore + ".");
-        }
-        return score;
-    }
-
     private String normalize(String value) {
         return StringUtils.hasText(value) ? value.trim() : null;
     }
@@ -476,19 +413,6 @@ public class AssignmentService {
             this.submission = submission;
             this.awardedXp = awardedXp;
             this.updatedExisting = updatedExisting;
-        }
-    }
-
-    @Getter
-    public static class GradeResult {
-        private final Submission submission;
-        private final int awardedXp;
-        private final boolean firstGradeForAssignment;
-
-        public GradeResult(Submission submission, int awardedXp, boolean firstGradeForAssignment) {
-            this.submission = submission;
-            this.awardedXp = awardedXp;
-            this.firstGradeForAssignment = firstGradeForAssignment;
         }
     }
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head(${assignment.title})}"></head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
@@ -20,8 +20,8 @@
             <h1 class="text-xl font-bold font-headline text-on-background" th:text="${assignment.title}"></h1>
             <div class="text-sm text-on-surface-variant mt-2">
                 <span th:if="${assignment.dueDate != null}"
-                      th:text="${'Due: ' + #temporals.format(assignment.dueDate, 'MM/dd/yyyy HH:mm') + ' · Max Score: ' + assignment.maxScore}"></span>
-                <span th:if="${assignment.dueDate == null}" th:text="${'No due date · Max Score: ' + assignment.maxScore}"></span>
+                      th:text="${'Due: ' + #temporals.format(assignment.dueDate, 'MM/dd/yyyy HH:mm') + ' Â· Max Score: ' + assignment.maxScore}"></span>
+                <span th:if="${assignment.dueDate == null}" th:text="${'No due date Â· Max Score: ' + assignment.maxScore}"></span>
             </div>
             <div th:if="${pastDue != null and pastDue}" class="mt-4 rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100">
                 The due date has passed. To submit, check "Late submission" below.
@@ -30,7 +30,7 @@
         </div>
 
         <div th:if="${mySubmission != null}" class="rounded-xl border border-emerald-200 bg-emerald-50/80 p-5">
-            <div class="font-bold text-emerald-800 mb-2">✓ Submitted</div>
+            <div class="font-bold text-emerald-800 mb-2">âœ“ Submitted</div>
             <div th:if="${mySubmission.status != null and mySubmission.status.name() == 'LATE'}" class="text-sm text-amber-800 mb-2">Late submission</div>
             <div class="text-sm text-on-surface" th:if="${mySubmission.score != null}"
                  th:text="${'Score: ' + mySubmission.score + '/' + assignment.maxScore}"></div>
@@ -85,7 +85,7 @@
 
         <div th:if="${mySubmission == null and assignment.type.name() == 'QUIZ' and questions.isEmpty()}"
              class="rounded-lg px-4 py-3 text-sm bg-blue-50 text-blue-900 border border-blue-100">
-            This quiz has no questions yet. Please contact your teacher.
+            This quiz has no questions yet. Please contact support.
         </div>
     </div>
 </main>
@@ -93,3 +93,4 @@
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>
+

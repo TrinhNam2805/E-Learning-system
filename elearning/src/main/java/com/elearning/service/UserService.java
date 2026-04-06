@@ -32,10 +32,6 @@ public class UserService {
         return userRepository.findAllStudents();
     }
 
-    public List<User> findAllTeachers() {
-        return userRepository.findAllTeachers();
-    }
-
     @Transactional
     public User register(String fullName, String email, String password) {
         if (userRepository.existsByEmail(email)) {
@@ -61,14 +57,6 @@ public class UserService {
     @Transactional
     public User save(User user) {
         return userRepository.save(user);
-    }
-
-    @Transactional
-    public void toggleLock(Long userId) {
-        userRepository.findById(userId).ifPresent(u -> {
-            u.setLocked(!u.isLocked());
-            userRepository.save(u);
-        });
     }
 
     @Transactional

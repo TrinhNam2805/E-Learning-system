@@ -3,6 +3,7 @@ package com.elearning.service;
 import com.elearning.model.dto.assessment.AssessmentAssignmentDto;
 import com.elearning.model.dto.assessment.AssessmentProgressDto;
 import com.elearning.model.dto.assessment.AssessmentQuestionDto;
+import com.elearning.model.dto.assessment.AssessmentQuizResponseDto;
 import com.elearning.model.dto.assessment.AssessmentSubmissionDto;
 import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.Enrollment;
@@ -40,22 +41,21 @@ public class AssessmentResultTrackingService {
         for (QuizQuestion question : questions) {
             questionDtos.add(AssessmentQuestionDto.fromEntity(question));
         }
+        List<AssessmentQuizResponseDto> latestQuizResponses = buildLatestQuizResponses(
+                submissionHistory.isEmpty() ? null : submissionHistory.get(0),
+                questions);
 
         return AssessmentAssignmentDto.fromEntity(
                 assignment,
                 latestSubmission,
                 questionDtos,
+                latestQuizResponses,
                 submissionHistory.size(),
                 assignmentService.isPastDue(assignment));
     }
 
     public List<AssessmentSubmissionDto> getAssignmentHistory(Long assignmentId, Long studentId) {
         List<Submission> submissions = submissionRepository.findHistoryByAssignmentIdAndStudentId(assignmentId, studentId);
-        return mapSubmissions(submissions);
-    }
-
-    public List<AssessmentSubmissionDto> getAssignmentSubmissionsForTeacher(Long assignmentId) {
-        List<Submission> submissions = submissionRepository.findDetailedByAssignmentId(assignmentId);
         return mapSubmissions(submissions);
     }
 
@@ -154,5 +154,86 @@ public class AssessmentResultTrackingService {
             }
         }
         return result;
+    }
+
+    private List<AssessmentQuizResponseDto> buildLatestQuizResponses(Submission latestSubmission,
+                                                                     List<QuizQuestion> questions) {
+        List<AssessmentQuizResponseDto> items = new ArrayList<AssessmentQuizResponseDto>();
+        if (latestSubmission == null || questions == null || questions.isEmpty()) {
+            return items;
+        }
+        if (latestSubmission.getAssignment() == null
+                || latestSubmission.getAssignment().getType() != Assignment.AssignmentType.QUIZ) {
+            return items;
+        }
+
+        Map<Long, String> answersByQuestionId = parseQuizAnswers(latestSubmission.getContent());
+        for (QuizQuestion question : questions) {
+            String selectedOption = normalizeOption(answersByQuestionId.get(question.getId()));
+            String correctOption = normalizeOption(question.getCorrectAnswer());
+            items.add(AssessmentQuizResponseDto.builder()
+                    .questionOrder(question.getQuestionOrder())
+                    .questionText(question.getQuestionText())
+                    .selectedOption(selectedOption)
+                    .selectedAnswerText(resolveOptionText(question, selectedOption))
+                    .correctOption(correctOption)
+                    .correctAnswerText(resolveOptionText(question, correctOption))
+                    .correct(selectedOption != null && selectedOption.equals(correctOption))
+                    .build());
+        }
+        return items;
+    }
+
+    private Map<Long, String> parseQuizAnswers(String content) {
+        Map<Long, String> answers = new LinkedHashMap<Long, String>();
+        if (content == null || content.trim().isEmpty()) {
+            return answers;
+        }
+
+        String[] entries = content.split(";");
+        for (String entry : entries) {
+            if (entry == null || entry.trim().isEmpty() || !entry.startsWith("Q")) {
+                continue;
+            }
+            int colonIndex = entry.indexOf(':');
+            if (colonIndex <= 1 || colonIndex >= entry.length() - 1) {
+                continue;
+            }
+            try {
+                Long questionId = Long.valueOf(entry.substring(1, colonIndex));
+                String selectedOption = normalizeOption(entry.substring(colonIndex + 1));
+                if (selectedOption != null) {
+                    answers.put(questionId, selectedOption);
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return answers;
+    }
+
+    private String normalizeOption(String option) {
+        if (option == null) {
+            return null;
+        }
+        String normalized = option.trim().toUpperCase();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private String resolveOptionText(QuizQuestion question, String option) {
+        if (question == null || option == null) {
+            return null;
+        }
+        switch (option) {
+            case "A":
+                return question.getOptionA();
+            case "B":
+                return question.getOptionB();
+            case "C":
+                return question.getOptionC();
+            case "D":
+                return question.getOptionD();
+            default:
+                return null;
+        }
     }
 }

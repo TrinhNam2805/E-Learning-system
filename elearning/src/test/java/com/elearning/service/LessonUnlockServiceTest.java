@@ -61,7 +61,7 @@ class LessonUnlockServiceTest {
                 .id(12L)
                 .course(course)
                 .lessonOrder(2)
-                .lessonTitle("Stack và Queue")
+                .lessonTitle("Stack and Queue")
                 .build();
 
         lesson1Quiz = Assignment.builder()
@@ -96,7 +96,7 @@ class LessonUnlockServiceTest {
         Map<Long, LessonAccessDto> accessMap = lessonUnlockService.buildCourseLessonAccess(course.getId(), 3L);
 
         assertFalse(accessMap.get(lesson2.getId()).isAccessible());
-        assertTrue(accessMap.get(lesson2.getId()).getLockedReason().contains("Bạn cần hoàn thành bài học trước"));
+        assertTrue(accessMap.get(lesson2.getId()).getLockedReason().contains("You need to complete the previous lesson"));
     }
 
     @Test
@@ -118,7 +118,7 @@ class LessonUnlockServiceTest {
         Map<Long, LessonAccessDto> accessMap = lessonUnlockService.buildCourseLessonAccess(course.getId(), 3L);
 
         assertFalse(accessMap.get(lesson2.getId()).isAccessible());
-        assertTrue(accessMap.get(lesson2.getId()).getLockedReason().contains("chưa đạt yêu cầu"));
+        assertTrue(accessMap.get(lesson2.getId()).getLockedReason().contains("does not meet the requirement"));
     }
 
     @Test

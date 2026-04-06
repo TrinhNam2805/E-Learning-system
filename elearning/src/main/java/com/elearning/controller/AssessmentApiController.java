@@ -6,7 +6,6 @@ import com.elearning.model.dto.assessment.AssessmentAssignmentDto;
 import com.elearning.model.dto.assessment.AssessmentProgressDto;
 import com.elearning.model.dto.assessment.AssessmentSubmissionDto;
 import com.elearning.model.dto.assessment.AssignmentSubmissionForm;
-import com.elearning.model.dto.assessment.SubmissionGradeForm;
 import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.User;
 import com.elearning.repository.UserRepository;
@@ -78,25 +77,6 @@ public class AssessmentApiController {
         return AssessmentSubmissionDto.fromEntity(assignmentService.submit(id, user, form, allParams).getSubmission());
     }
 
-    @PostMapping("/submissions/{submissionId}/grade")
-    public AssessmentSubmissionDto grade(@PathVariable Long submissionId,
-                                         @Valid @ModelAttribute SubmissionGradeForm form,
-                                         BindingResult bindingResult,
-                                         @AuthenticationPrincipal UserDetails userDetails) {
-        User user = requireCurrentUser(userDetails);
-        if (user.getRole() == User.Role.STUDENT) {
-            throw new AssessmentAccessException("You do not have permission to grade submissions.");
-        }
-        Assignment assignment = assignmentService.getDetailedSubmissionOrThrow(submissionId).getAssignment();
-        if (!canManageAssignment(user, assignment)) {
-            throw new AssessmentAccessException("You do not have permission to grade assignments for this course.");
-        }
-        if (bindingResult.hasErrors()) {
-            throw new AssessmentValidationException(bindingResult.getFieldError().getDefaultMessage());
-        }
-        return AssessmentSubmissionDto.fromEntity(assignmentService.grade(submissionId, form).getSubmission());
-    }
-
     @GetMapping("/courses/{courseId}/progress")
     public AssessmentProgressDto getCourseProgress(@PathVariable Long courseId,
                                                    @AuthenticationPrincipal UserDetails userDetails) {
@@ -122,19 +102,7 @@ public class AssessmentApiController {
     }
 
     private boolean canAccessAssignment(User user, Assignment assignment) {
-        if (user.getRole() == User.Role.STUDENT) {
-            return enrollmentService.isEnrolled(user.getId(), assignment.getCourse().getId());
-        }
-        return canManageAssignment(user, assignment);
-    }
-
-    private boolean canManageAssignment(User user, Assignment assignment) {
-        if (user.getRole() == User.Role.ADMIN) {
-            return true;
-        }
-        return user.getRole() == User.Role.TEACHER
-                && assignment.getCourse() != null
-                && assignment.getCourse().getTeacher() != null
-                && user.getId().equals(assignment.getCourse().getTeacher().getId());
+        return user.getRole() == User.Role.STUDENT
+                && assignmentService.isVisibleToStudent(assignment, user.getId());
     }
 }

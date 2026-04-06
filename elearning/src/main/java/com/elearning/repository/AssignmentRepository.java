@@ -16,7 +16,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     @EntityGraph(attributePaths = {"course", "lesson"})
     List<Assignment> findByCourseIdAndLessonIdOrderByDueDateAsc(Long courseId, Long lessonId);
 
-    @EntityGraph(attributePaths = {"course", "course.teacher", "lesson"})
+    @EntityGraph(attributePaths = {"course", "lesson"})
     @Query("SELECT a FROM Assignment a WHERE a.id = :id")
     Optional<Assignment> findDetailedById(@Param("id") Long id);
 

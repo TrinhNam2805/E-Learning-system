@@ -58,7 +58,7 @@ public class ForumController {
             model.addAttribute("canCreatePost", mayCreateGlobalForumPost(user));
             model.addAttribute("courseLessons", Collections.<Lesson>emptyList());
             model.addAttribute("forumPageTitle", "Global forum");
-            model.addAttribute("forumPageSubtitle", "Browse topics below. Instructors and admins can create new global topics.");
+            model.addAttribute("forumPageSubtitle", "Browse and create discussion topics across the student community.");
             model.addAttribute("lessonContextTitle", null);
         } else {
             Course course = courseService.findById(courseId).orElse(null);
@@ -141,14 +141,14 @@ public class ForumController {
             return redirectToForumList(courseId);
         }
 
-        if (type == ForumPost.PostType.ANNOUNCEMENT && user.getRole() == User.Role.STUDENT) {
-            ra.addFlashAttribute("error", "Only instructors or admins can post announcements.");
+        if (type == ForumPost.PostType.ANNOUNCEMENT) {
+            ra.addFlashAttribute("error", "Announcement posts are not supported in the student-only version.");
             return redirectToForumList(courseId);
         }
 
         if (courseId == null) {
             if (!mayCreateGlobalForumPost(user)) {
-                ra.addFlashAttribute("error", "Global forum topics can only be created by instructors or admins.");
+                ra.addFlashAttribute("error", "Only signed-in students can create global topics.");
                 return "redirect:/forum";
             }
             forumService.createPost(ForumPost.builder()
@@ -163,9 +163,7 @@ public class ForumController {
         }
 
         if (!mayUseCourseForum(user, courseId)) {
-            ra.addFlashAttribute("error", user.getRole() == User.Role.STUDENT
-                    ? "Enroll in the course to use this forum."
-                    : "You do not have permission to post in this forum.");
+            ra.addFlashAttribute("error", "Enroll in the course to use this forum.");
             return "redirect:/forum?courseId=" + courseId;
         }
 
@@ -233,23 +231,16 @@ public class ForumController {
     }
 
     private static boolean mayCreateGlobalForumPost(User user) {
-        return user.getRole() == User.Role.TEACHER || user.getRole() == User.Role.ADMIN;
+        return user.getRole() == User.Role.STUDENT;
     }
 
     private static boolean mayCommentOnGlobalForum(User user) {
-        return user.getRole() == User.Role.STUDENT
-                || user.getRole() == User.Role.TEACHER
-                || user.getRole() == User.Role.ADMIN;
+        return user.getRole() == User.Role.STUDENT;
     }
 
     private boolean mayUseCourseForum(User user, Long courseId) {
-        if (user.getRole() == User.Role.ADMIN || user.getRole() == User.Role.TEACHER) {
-            return true;
-        }
-        if (user.getRole() == User.Role.STUDENT) {
-            return enrollmentService.isEnrolled(user.getId(), courseId);
-        }
-        return false;
+        return user.getRole() == User.Role.STUDENT
+                && enrollmentService.isEnrolled(user.getId(), courseId);
     }
 
     private boolean mayCommentOnPost(User user, ForumPost post) {

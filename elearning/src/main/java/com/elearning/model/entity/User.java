@@ -69,10 +69,7 @@ public class User {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Enrollment> enrollments;
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Course> taughtCourses;
-
     public enum Role {
-        STUDENT, TEACHER, ADMIN
+        STUDENT
     }
 }

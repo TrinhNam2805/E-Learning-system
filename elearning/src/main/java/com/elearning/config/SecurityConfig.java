@@ -46,8 +46,6 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/favicon.ico", "/error"
                 ).permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                 .anyRequest().authenticated()
             .and()
             .formLogin()

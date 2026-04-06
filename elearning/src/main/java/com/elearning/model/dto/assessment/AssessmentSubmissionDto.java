@@ -15,6 +15,9 @@ public class AssessmentSubmissionDto {
     private final String assignmentTitle;
     private final Long courseId;
     private final String courseCode;
+    private final Long lessonId;
+    private final Integer lessonOrder;
+    private final String lessonTitle;
     private final Long studentId;
     private final String studentName;
     private final String studentEmail;
@@ -45,6 +48,12 @@ public class AssessmentSubmissionDto {
                         ? submission.getAssignment().getCourse().getId() : null)
                 .courseCode(submission.getAssignment() != null && submission.getAssignment().getCourse() != null
                         ? submission.getAssignment().getCourse().getCourseCode() : null)
+                .lessonId(submission.getAssignment() != null && submission.getAssignment().getLesson() != null
+                        ? submission.getAssignment().getLesson().getId() : null)
+                .lessonOrder(submission.getAssignment() != null && submission.getAssignment().getLesson() != null
+                        ? submission.getAssignment().getLesson().getLessonOrder() : null)
+                .lessonTitle(submission.getAssignment() != null && submission.getAssignment().getLesson() != null
+                        ? submission.getAssignment().getLesson().getLessonTitle() : null)
                 .studentId(submission.getStudent() != null ? submission.getStudent().getId() : null)
                 .studentName(submission.getStudent() != null ? submission.getStudent().getFullName() : null)
                 .studentEmail(submission.getStudent() != null ? submission.getStudent().getEmail() : null)

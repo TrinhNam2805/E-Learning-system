@@ -3,6 +3,7 @@ package com.elearning.service;
 import com.elearning.model.dto.CurriculumSectionDto;
 import com.elearning.model.entity.Lesson;
 import com.elearning.repository.LessonRepository;
+import com.elearning.util.LessonContentHtmlSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,9 @@ public class LessonService {
 
     @Transactional
     public Lesson save(Lesson lesson) {
+        if (lesson != null) {
+            lesson.setLessonContent(LessonContentHtmlSanitizer.sanitizeForStorage(lesson.getLessonContent()));
+        }
         return lessonRepository.save(lesson);
     }
 

@@ -31,11 +31,6 @@
             </div>
         </div>
 
-        <div th:if="${globalForum and !canCreatePost and currentUser.role.name() == 'STUDENT'}"
-             class="rounded-lg px-4 py-3 text-sm bg-slate-50 text-slate-800 border border-slate-200">
-            <span class="font-semibold">Students:</span> open a topic below to read and comment. You cannot create new topics in the global forum.
-        </div>
-
         <div th:if="${canCreatePost}" class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm">
             <h3 class="text-sm font-bold font-headline text-on-background mb-4"
                 th:text="${globalForum} ? 'New topic' : 'New discussion post'">New post</h3>
@@ -62,7 +57,6 @@
                     <select name="postType" class="w-full rounded-lg border-slate-200 text-sm bg-white">
                         <option value="QUESTION">Question</option>
                         <option value="DISCUSSION">Discussion</option>
-                        <option value="ANNOUNCEMENT" th:if="${currentUser.role.name() != 'STUDENT'}">Announcement</option>
                     </select>
                 </div>
                 <div>

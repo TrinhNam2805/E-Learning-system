@@ -140,6 +140,11 @@
                             <div class="text-[11px] text-on-surface-variant" th:text="${item.graded ? 'Graded' : 'Pending grading'}"></div>
                             <div th:if="${item.lateSubmission}" class="text-[11px] text-amber-800">Late</div>
                             <div th:if="${item.autoGraded}" class="text-[11px] text-sky-700">Auto-graded</div>
+                            <a th:if="${item.lessonId != null}" th:href="@{/lessons/{id}(id=${item.lessonId}, courseId=${item.courseId})}"
+                               class="inline-flex items-center gap-1 mt-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-primary/20 text-primary text-[11px] font-bold no-underline hover:bg-primary hover:text-on-primary transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                                <span th:text="${item.lessonOrder != null ? ('Back to lesson ' + item.lessonOrder) : 'Back to lesson'}">Back to lesson</span>
+                            </a>
                         </td>
                         <td>
                             <div class="font-semibold text-on-surface" th:text="${'#' + item.attemptNumber}"></div>

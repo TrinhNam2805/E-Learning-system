@@ -1,7 +1,6 @@
 package com.elearning.service;
 
 import com.elearning.model.entity.Course;
-import com.elearning.model.entity.User;
 import com.elearning.repository.CourseRepository;
 import com.elearning.repository.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +38,6 @@ public class CourseService {
 
     public Optional<Course> findById(Long id) {
         return courseRepository.findById(id);
-    }
-
-    public List<Course> findByTeacher(User teacher) {
-        return courseRepository.findByTeacher(teacher);
     }
 
     public List<Course> search(String q) {

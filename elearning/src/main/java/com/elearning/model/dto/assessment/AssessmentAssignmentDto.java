@@ -33,10 +33,12 @@ public class AssessmentAssignmentDto {
     private final boolean canSubmit;
     private final AssessmentSubmissionDto latestSubmission;
     private final List<AssessmentQuestionDto> questions;
+    private final List<AssessmentQuizResponseDto> latestQuizResponses;
 
     public static AssessmentAssignmentDto fromEntity(Assignment assignment,
                                                      AssessmentSubmissionDto latestSubmission,
                                                      List<AssessmentQuestionDto> questions,
+                                                     List<AssessmentQuizResponseDto> latestQuizResponses,
                                                      int submissionCount,
                                                      boolean pastDue) {
         boolean editableSubmission = assignment.getType() == Assignment.AssignmentType.HOMEWORK
@@ -80,6 +82,7 @@ public class AssessmentAssignmentDto {
                 .canSubmit(canSubmit)
                 .latestSubmission(latestSubmission)
                 .questions(questions)
+                .latestQuizResponses(latestQuizResponses)
                 .build();
     }
 }

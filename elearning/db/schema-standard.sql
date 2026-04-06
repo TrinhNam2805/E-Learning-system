@@ -1,17 +1,17 @@
--- =============================================================================
--- Lược đồ CSDL chuẩn hóa cho hệ E-Learning học thuật (Khoa CNTT / đại học)
+﻿-- =============================================================================
+-- LÆ°á»£c Ä‘á»“ CSDL chuáº©n hÃ³a cho há»‡ E-Learning há»c thuáº­t (Khoa CNTT / Ä‘áº¡i há»c)
 -- MySQL 8.x, InnoDB, utf8mb4_unicode_ci
 -- =============================================================================
--- Nguyên tắc thiết kế (tham chiếu giáo trình CSDL / quy trình đào tạo):
---   1) Khóa chính surrogate (BIGINT AUTO_INCREMENT), khóa nghiệp vụ (mã môn, MSSV) UNIQUE.
---   2) 3NF: mô tả khoa tách bảng departments; không lồng giá trị đa trị trong một cột.
---   3) Toàn vẹn tham chiếu: FK ON DELETE RESTRICT (hoặc CASCADE có chủ đích) — tránh mồ côi dữ liệu.
---   4) Đăng ký học phần: enrollments = quan hệ N:M sinh viên ↔ lớp học phần (courses = một lần mở lớp theo kỳ).
---   5) Tiên quyết học phần: bảng course_prerequisites (mã môn tiên quyết theo mã CTĐT — lưu mã chuỗi để linh hoạt nhiều kỳ mở lớp).
---   6) Chỉ mục trên FK và các cột lọc thường dùng (status, role, semester).
+-- NguyÃªn táº¯c thiáº¿t káº¿ (tham chiáº¿u giÃ¡o trÃ¬nh CSDL / quy trÃ¬nh Ä‘Ã o táº¡o):
+--   1) KhÃ³a chÃ­nh surrogate (BIGINT AUTO_INCREMENT), khÃ³a nghiá»‡p vá»¥ (mÃ£ mÃ´n, MSSV) UNIQUE.
+--   2) 3NF: mÃ´ táº£ khoa tÃ¡ch báº£ng departments; khÃ´ng lá»“ng giÃ¡ trá»‹ Ä‘a trá»‹ trong má»™t cá»™t.
+--   3) ToÃ n váº¹n tham chiáº¿u: FK ON DELETE RESTRICT (hoáº·c CASCADE cÃ³ chá»§ Ä‘Ã­ch) â€” trÃ¡nh má»“ cÃ´i dá»¯ liá»‡u.
+--   4) ÄÄƒng kÃ½ há»c pháº§n: enrollments = quan há»‡ N:M sinh viÃªn â†” lá»›p há»c pháº§n (courses = má»™t láº§n má»Ÿ lá»›p theo ká»³).
+--   5) TiÃªn quyáº¿t há»c pháº§n: báº£ng course_prerequisites (mÃ£ mÃ´n tiÃªn quyáº¿t theo mÃ£ CTÄT â€” lÆ°u mÃ£ chuá»—i Ä‘á»ƒ linh hoáº¡t nhiá»u ká»³ má»Ÿ lá»›p).
+--   6) Chá»‰ má»¥c trÃªn FK vÃ  cÃ¡c cá»™t lá»c thÆ°á»ng dÃ¹ng (status, role, semester).
 --
--- Cách dùng: tạo database rồi chạy file này, sau đó chạy seed-data.sql (ddl-auto=none).
--- DB đã tạo từ bản cũ (thiếu course_sections / lessons.section_id): chạy thêm db/migration-course-sections.sql.
+-- CÃ¡ch dÃ¹ng: táº¡o database rá»“i cháº¡y file nÃ y, sau Ä‘Ã³ cháº¡y seed-data.sql (ddl-auto=none).
+-- DB Ä‘Ã£ táº¡o tá»« báº£n cÅ© (thiáº¿u course_sections / lessons.section_id): cháº¡y thÃªm db/migration-course-sections.sql.
 --   mysql -u root -p --default-character-set=utf8mb4 -e "CREATE DATABASE IF NOT EXISTS \`e-learning\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 --   mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/schema-standard.sql
 -- =============================================================================
@@ -41,20 +41,20 @@ DROP TABLE IF EXISTS `departments`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- -----------------------------------------------------------------------------
--- Khoa / đơn vị đào tạo (ví dụ: Khoa Công nghệ Thông tin)
+-- Khoa / Ä‘Æ¡n vá»‹ Ä‘Ã o táº¡o (vÃ­ dá»¥: Khoa CÃ´ng nghá»‡ ThÃ´ng tin)
 -- -----------------------------------------------------------------------------
 CREATE TABLE `departments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `code` VARCHAR(20) NOT NULL COMMENT 'Mã khoa, ví dụ CNTT',
-  `name` VARCHAR(200) NOT NULL COMMENT 'Tên đầy đủ',
+  `code` VARCHAR(20) NOT NULL COMMENT 'MÃ£ khoa, vÃ­ dá»¥ CNTT',
+  `name` VARCHAR(200) NOT NULL COMMENT 'TÃªn Ä‘áº§y Ä‘á»§',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_departments_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Đơn vị quản lý học phần và cán bộ';
+COMMENT='ÄÆ¡n vá»‹ quáº£n lÃ½ há»c pháº§n vÃ  cÃ¡n bá»™';
 
 -- -----------------------------------------------------------------------------
--- Người dùng: sinh viên / giảng viên / quản trị
--- student_code: MSSV (NULL với giảng viên/admin)
+-- NgÆ°á»i dÃ¹ng: sinh viÃªn / giáº£ng viÃªn / quáº£n trá»‹
+-- student_code: MSSV
 -- -----------------------------------------------------------------------------
 CREATE TABLE `users` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -62,13 +62,13 @@ CREATE TABLE `users` (
   `email` VARCHAR(100) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(100) NOT NULL,
-  `role` VARCHAR(20) NOT NULL COMMENT 'STUDENT | TEACHER | ADMIN',
+  `role` VARCHAR(20) NOT NULL COMMENT 'Current scope: STUDENT',
   `phone` VARCHAR(20) DEFAULT NULL,
   `active` BIT(1) NOT NULL DEFAULT b'1',
   `locked` BIT(1) NOT NULL DEFAULT b'0',
   `created_at` DATE DEFAULT NULL,
-  `department_id` BIGINT DEFAULT NULL COMMENT 'Khoa / đơn vị trực thuộc',
-  `student_code` VARCHAR(20) DEFAULT NULL COMMENT 'Mã số sinh viên',
+  `department_id` BIGINT DEFAULT NULL COMMENT 'Khoa / Ä‘Æ¡n vá»‹ trá»±c thuá»™c',
+  `student_code` VARCHAR(20) DEFAULT NULL COMMENT 'MÃ£ sá»‘ sinh viÃªn',
   `password_reset_token` VARCHAR(100) DEFAULT NULL,
   `password_reset_expires` DATETIME(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -81,7 +81,7 @@ CREATE TABLE `users` (
   CONSTRAINT `fk_users_department` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Tài khoản hệ thống';
+COMMENT='TÃ i khoáº£n há»‡ thá»‘ng';
 
 CREATE TABLE `badge_definitions` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -96,7 +96,7 @@ CREATE TABLE `badge_definitions` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_badge_definitions_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Danh mục badge và rule trao badge';
+COMMENT='Danh má»¥c badge vÃ  rule trao badge';
 
 CREATE TABLE `user_badges` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -111,43 +111,39 @@ CREATE TABLE `user_badges` (
   CONSTRAINT `fk_user_badges_badge_definition` FOREIGN KEY (`badge_definition_id`) REFERENCES `badge_definitions` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Badge mà người dùng đã đạt được';
+COMMENT='Badge mÃ  ngÆ°á»i dÃ¹ng Ä‘Ã£ Ä‘áº¡t Ä‘Æ°á»£c';
 
 -- -----------------------------------------------------------------------------
--- Học phần theo kỳ (lớp học phần): một hàng = một lần mở lớp (HK + năm học)
--- credits / theory_hours / practice_hours: khối lượng theo đề cương CTĐT
+-- Há»c pháº§n theo ká»³ (lá»›p há»c pháº§n): má»™t hÃ ng = má»™t láº§n má»Ÿ lá»›p (HK + nÄƒm há»c)
+-- credits / theory_hours / practice_hours: khá»‘i lÆ°á»£ng theo Ä‘á» cÆ°Æ¡ng CTÄT
 -- -----------------------------------------------------------------------------
 CREATE TABLE `courses` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `course_code` VARCHAR(20) NOT NULL COMMENT 'Mã học phần (theo CTĐT)',
+  `course_code` VARCHAR(20) NOT NULL COMMENT 'MÃ£ há»c pháº§n (theo CTÄT)',
   `course_name` VARCHAR(200) NOT NULL,
   `description` TEXT,
-  `teacher_id` BIGINT DEFAULT NULL,
   `enroll_password` VARCHAR(100) DEFAULT NULL,
-  `semester` VARCHAR(20) DEFAULT NULL COMMENT 'Ví dụ HK1, HK2',
-  `academic_year` VARCHAR(10) DEFAULT NULL COMMENT 'Ví dụ 2024-2025',
+  `semester` VARCHAR(20) DEFAULT NULL COMMENT 'VÃ­ dá»¥ HK1, HK2',
+  `academic_year` VARCHAR(10) DEFAULT NULL COMMENT 'VÃ­ dá»¥ 2024-2025',
   `status` VARCHAR(20) NOT NULL DEFAULT 'DRAFT' COMMENT 'DRAFT | PUBLISHED | ARCHIVED',
   `max_students` INT NOT NULL DEFAULT 50,
   `thumbnail` VARCHAR(255) DEFAULT NULL,
   `department_id` BIGINT DEFAULT NULL,
-  `credits` INT NOT NULL DEFAULT 3 COMMENT 'Số tín chỉ',
-  `theory_hours` INT NOT NULL DEFAULT 30 COMMENT 'Giờ lý thuyết (đề cương)',
-  `practice_hours` INT NOT NULL DEFAULT 15 COMMENT 'Giờ thực hành / bài tập',
+  `credits` INT NOT NULL DEFAULT 3 COMMENT 'Sá»‘ tÃ­n chá»‰',
+  `theory_hours` INT NOT NULL DEFAULT 30 COMMENT 'Giá» lÃ½ thuyáº¿t (Ä‘á» cÆ°Æ¡ng)',
+  `practice_hours` INT NOT NULL DEFAULT 15 COMMENT 'Giá» thá»±c hÃ nh / bÃ i táº­p',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_courses_offering` (`course_code`, `semester`, `academic_year`),
-  KEY `idx_courses_teacher_id` (`teacher_id`),
   KEY `idx_courses_department_id` (`department_id`),
   KEY `idx_courses_status` (`status`),
-  CONSTRAINT `fk_courses_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`)
-    ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_courses_department` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Lớp học phần (instance theo học kỳ)';
+COMMENT='Lá»›p há»c pháº§n (instance theo há»c ká»³)';
 
 -- -----------------------------------------------------------------------------
--- Tiên quyết: học phần (course_id) yêu cầu đã qua môn có mã prerequisite_course_code
--- (Chuẩn CTĐT: quan hệ giữa các mã học phần; không ràng buộc FK tới courses để trùng mã nhiều kỳ)
+-- TiÃªn quyáº¿t: há»c pháº§n (course_id) yÃªu cáº§u Ä‘Ã£ qua mÃ´n cÃ³ mÃ£ prerequisite_course_code
+-- (Chuáº©n CTÄT: quan há»‡ giá»¯a cÃ¡c mÃ£ há»c pháº§n; khÃ´ng rÃ ng buá»™c FK tá»›i courses Ä‘á»ƒ trÃ¹ng mÃ£ nhiá»u ká»³)
 -- -----------------------------------------------------------------------------
 CREATE TABLE `course_prerequisites` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -159,9 +155,9 @@ CREATE TABLE `course_prerequisites` (
   CONSTRAINT `fk_prereq_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Môn tiên quyết theo mã học phần';
+COMMENT='MÃ´n tiÃªn quyáº¿t theo mÃ£ há»c pháº§n';
 
--- Phần/chương trong khóa (curriculum kiểu Udemy)
+-- Pháº§n/chÆ°Æ¡ng trong khÃ³a (curriculum kiá»ƒu Udemy)
 CREATE TABLE `course_sections` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `course_id` BIGINT NOT NULL,
@@ -172,7 +168,7 @@ CREATE TABLE `course_sections` (
   CONSTRAINT `fk_course_sections_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Phần nội dung trong khóa học';
+COMMENT='Pháº§n ná»™i dung trong khÃ³a há»c';
 
 CREATE TABLE `lessons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -200,7 +196,7 @@ CREATE TABLE `enrollments` (
   `enrolled_at` DATE DEFAULT NULL,
   `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'ACTIVE | COMPLETED | DROPPED',
   `progress_percentage` INT NOT NULL DEFAULT 0,
-  `activity_xp` INT NOT NULL DEFAULT 0 COMMENT 'XP từ quiz, bài được chấm',
+  `activity_xp` INT NOT NULL DEFAULT 0 COMMENT 'XP tá»« quiz, bÃ i Ä‘Æ°á»£c cháº¥m',
   `total_xp` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_enrollment_student_course` (`student_id`, `course_id`),
@@ -210,7 +206,7 @@ CREATE TABLE `enrollments` (
   CONSTRAINT `fk_enrollments_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Đăng ký lớp học phần';
+COMMENT='ÄÄƒng kÃ½ lá»›p há»c pháº§n';
 
 CREATE TABLE `assignments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -277,8 +273,8 @@ CREATE TABLE `submissions` (
 
 CREATE TABLE `forum_posts` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `course_id` BIGINT DEFAULT NULL COMMENT 'NULL = diễn đàn chung toàn kênh',
-  `lesson_id` BIGINT DEFAULT NULL COMMENT 'Tuỳ chọn: thảo luận gắn một bài học',
+  `course_id` BIGINT DEFAULT NULL COMMENT 'NULL = diá»…n Ä‘Ã n chung toÃ n kÃªnh',
+  `lesson_id` BIGINT DEFAULT NULL COMMENT 'Tuá»³ chá»n: tháº£o luáº­n gáº¯n má»™t bÃ i há»c',
   `author_id` BIGINT NOT NULL,
   `title` VARCHAR(300) NOT NULL,
   `content` TEXT NOT NULL,
@@ -336,8 +332,8 @@ CREATE TABLE `notes` (
   `highlight_color` VARCHAR(10) NOT NULL DEFAULT '#FFFF00',
   `title` VARCHAR(200) DEFAULT NULL,
   `note_type` VARCHAR(20) DEFAULT 'LESSON',
-  `source_excerpt` TEXT COMMENT 'Trích dẫn từ bài giảng (truy vết)',
-  `tags` VARCHAR(500) DEFAULT NULL COMMENT 'Nhãn phân tách bằng dấu phẩy',
+  `source_excerpt` TEXT COMMENT 'TrÃ­ch dáº«n tá»« bÃ i giáº£ng (truy váº¿t)',
+  `tags` VARCHAR(500) DEFAULT NULL COMMENT 'NhÃ£n phÃ¢n tÃ¡ch báº±ng dáº¥u pháº©y',
   `created_at` DATETIME(6) DEFAULT NULL,
   `updated_at` DATETIME(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -366,7 +362,7 @@ CREATE TABLE `note_links` (
   CONSTRAINT `fk_note_links_to` FOREIGN KEY (`to_note_id`) REFERENCES `notes` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Liên kết ghi chú (đồ thị tri thức cá nhân)';
+COMMENT='LiÃªn káº¿t ghi chÃº (Ä‘á»“ thá»‹ tri thá»©c cÃ¡ nhÃ¢n)';
 
 CREATE TABLE `notifications` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -381,3 +377,4 @@ CREATE TABLE `notifications` (
   CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

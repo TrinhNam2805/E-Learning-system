@@ -33,10 +33,6 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "teacher_id")
-    private User teacher;
-
     @Column(length = 100)
     private String enrollPassword;
 

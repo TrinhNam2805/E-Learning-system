@@ -1,4 +1,4 @@
-# Trien khai CSDL va du lieu (E-Learning IT)
+﻿# Trien khai CSDL va du lieu (E-Learning IT)
 
 ## Thu tu buoc (database moi)
 
@@ -14,38 +14,32 @@ mysql -u root -p --default-character-set=utf8mb4 -e "CREATE DATABASE IF NOT EXIS
 mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/schema-standard.sql
 ```
 
-3. Neu can ban demo khong co sinh vien mau, nhung van co day du 8 khoa hoc CNTT, 12 bai hoc moi khoa, quiz, homework va forum:
-
-```bash
-mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/seed-academic-demo.sql
-```
-
-4. Neu can bo du lieu day du de test nhanh giao dien va chuc nang hoc tap:
+3. Nap bo du lieu day du de test nhanh giao dien va chuc nang hoc tap:
 
 ```bash
 mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/seed-data.sql
 ```
 
+4. Neu muon tao database moi va nap schema + seed chi trong 1 lan chay:
+
+```bash
+mysql -u root -p --default-character-set=utf8mb4 < elearning/db/bootstrap-full-demo.sql
+```
+
 5. Cau hinh `application.properties`: `spring.datasource.url`, user/password MySQL, `app.base-url`.
 
-## Database da co san
-
-Chay lan luot cac migration can thiet (doc file truoc khi chay production):
-
-- `elearning/db/migration-password-reset.sql`
-- `elearning/db/migration-activity-xp-notes.sql`
-- `elearning/db/migration-lesson-sequential-unlock.sql`
-
-## Tai khoan sau seed-academic-demo
+## Tai khoan sau seed-data
 
 | Email | Vai tro | Mat khau demo |
 |-------|---------|----------------|
-| `teacher@cntt.edu.vn` | `TEACHER` | `Demo@2024` |
-| `bich.tran@cntt.edu.vn` | `TEACHER` | `Demo@2024` |
-| `quang.le@cntt.edu.vn` | `TEACHER` | `Demo@2024` |
-| `admin@cntt.edu.vn` | `ADMIN` | `Demo@2024` |
+| `minh.chau@student.cntt.edu.vn` | `STUDENT` | `Demo@2024` |
+| `thu.dung@student.cntt.edu.vn` | `STUDENT` | `Demo@2024` |
+| `van.giang@student.cntt.edu.vn` | `STUDENT` | `Demo@2024` |
+| `hoang.nam@student.cntt.edu.vn` | `STUDENT` | `Demo@2024` |
+| `ngoc.mai@student.cntt.edu.vn` | `STUDENT` | `Demo@2024` |
+| `quoc.bao@student.cntt.edu.vn` | `STUDENT` | `Demo@2024` |
 
-Sinh vien co the dang ky tai `/register`, sau do dang nhap va enroll vao khoa hoc.
+Du an hien duoc gioi han trong pham vi `student-only`, vi vay bo seed chi tao tai khoan sinh vien.
 
 ## Bo du lieu moi
 
@@ -67,9 +61,6 @@ Moi khoa hoc co 12 bai hoc. Moi bai hoc co quiz mo khoa bai tiep theo va homewor
 | File | Muc dich |
 |------|----------|
 | `schema-standard.sql` | DDL day du |
-| `migration-*.sql` | ALTER cho DB cu |
-| `seed-academic-demo.sql` | Ban demo 8 khoa hoc, khong co sinh vien/enrollment/note/submission |
 | `seed-data.sql` | Ban day du co sinh vien, progress, note, forum, submission, badge |
-| `seed-quiz-content-sample.sql` | Them quiz test bo sung cho bo course moi |
-| `seed-file-upload-assignment-sample.sql` | Them homework upload bo sung |
-| `seed-assessment-demo.sql` | Them lich su nop bai, cham diem va notification de demo assessment |
+| `bootstrap-full-demo.sql` | Tao database moi, tao schema va nap seed trong 1 lan chay |
+
