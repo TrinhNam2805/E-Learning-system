@@ -112,16 +112,33 @@
             <span class="material-symbols-outlined">menu</span>
         </button>
         <th:block th:if="${currentUser != null}">
-            <div class="account-menu relative">
+            <div class="notif-menu account-menu relative">
                 <button type="button" class="relative p-2 text-slate-500 hover:bg-blue-50/50 rounded-lg transition-all active:scale-95" onclick="toggleNotif()" title="Notifications">
                     <span class="material-symbols-outlined text-[22px]">notifications</span>
                     <span class="notif-badge absolute top-1 right-1 min-w-[18px] h-[18px] text-[10px] font-bold bg-error text-white rounded-full flex items-center justify-center px-0.5"
                           th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
                 </button>
-                <div id="notif-dropdown" class="dropdown-menu hidden absolute right-0 mt-2 w-[min(100vw-2rem,320px)] bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-[60]">
-                    <div class="px-4 py-2 font-semibold text-on-surface text-sm border-b border-slate-100">Notifications</div>
-                    <div class="px-4 py-2 text-sm text-on-surface-variant">
-                        <a th:href="@{/notifications}" class="text-primary font-medium no-underline hover:underline">View all</a>
+                <div id="notif-dropdown" class="dropdown-menu hidden absolute right-0 mt-2 w-[min(100vw-2rem,360px)] max-h-[420px] overflow-y-auto bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-[60]">
+                    <div class="px-4 py-2 font-semibold text-on-surface text-sm border-b border-slate-100 flex items-center justify-between gap-3">
+                        <span>New notifications</span>
+                        <span class="text-[11px] font-medium text-slate-400" th:text="${unreadCount != null ? unreadCount : 0}">0</span>
+                    </div>
+                    <div th:if="${unreadNotificationsPreview == null or unreadNotificationsPreview.isEmpty()}" class="px-4 py-4 text-sm text-on-surface-variant">
+                        No unread notifications.
+                    </div>
+                    <a th:each="notif : ${unreadNotificationsPreview}" th:href="@{/notifications}"
+                       class="block px-4 py-3 border-b border-slate-50 hover:bg-surface-container-low no-underline text-inherit">
+                        <div class="flex items-start gap-3">
+                            <span class="mt-1 h-2.5 w-2.5 rounded-full bg-primary shrink-0"></span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-sm font-semibold text-on-surface" th:text="${notif.title}">Notification</div>
+                                <div class="text-xs text-on-surface-variant mt-1" th:text="${#strings.abbreviate(notif.message, 96)}">Summary</div>
+                                <div class="text-[11px] text-slate-400 mt-1" th:text="${notif.createdAt != null ? #temporals.format(notif.createdAt, 'MM/dd HH:mm') : ''}">01/01 08:00</div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="px-4 pt-2">
+                        <a th:href="@{/notifications}" class="text-primary font-medium no-underline hover:underline">View all notifications</a>
                     </div>
                 </div>
             </div>

@@ -77,6 +77,37 @@
                         </div>
                     </article>
 
+                    <section th:if="${currentUser != null and currentUser.role.name() == 'STUDENT' and !lessonAssignments.isEmpty()}"
+                             class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
+                        <div>
+                            <h2 class="text-lg font-bold font-headline text-on-background">Lesson quiz and homework</h2>
+                            <p class="text-sm text-on-surface-variant mt-1" th:if="${!isCompleted}">
+                                Mark this lesson as complete to unlock its quiz and homework.
+                            </p>
+                            <p class="text-sm text-on-surface-variant mt-1" th:if="${isCompleted}">
+                                Open the linked quiz and homework for this lesson directly from here.
+                            </p>
+                        </div>
+
+                        <div th:if="${!isCompleted}" class="rounded-xl border border-dashed border-slate-200 bg-surface-container-low/50 px-4 py-4 text-sm text-on-surface-variant">
+                            Lesson assessments stay hidden until you complete the lesson content above.
+                        </div>
+
+                        <div th:if="${isCompleted}" class="grid gap-3 md:grid-cols-2">
+                            <a th:each="a : ${lessonAssignments}" th:href="@{/assignments/{id}(id=${a.id})}"
+                               class="block rounded-xl border border-slate-100 bg-surface-container-low p-4 no-underline text-inherit hover:border-primary-container/40 hover:bg-white transition-colors">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/25 text-primary" th:text="${a.type.name() == 'QUIZ' ? 'Quiz' : (a.type.name() == 'EXAM' ? 'Exam' : 'Homework')}">Quiz</span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:if="${a.dueDate != null}"
+                                          th:text="${'Due ' + #temporals.format(a.dueDate, 'MM/dd HH:mm')}">Due 01/01 08:00</span>
+                                </div>
+                                <div class="font-semibold text-on-background" th:text="${a.title}">Lesson assignment</div>
+                                <div class="text-sm text-on-surface-variant mt-1" th:text="${a.description}">Description</div>
+                                <div class="text-xs font-bold text-primary mt-3">Open assessment -></div>
+                            </a>
+                        </div>
+                    </section>
+
                     <section th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}"
                              class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-3">

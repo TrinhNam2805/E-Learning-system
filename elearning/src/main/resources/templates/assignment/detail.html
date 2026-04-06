@@ -9,9 +9,14 @@
     <main class="flex-1 min-w-0 min-h-0 p-4 md:p-8 bg-background">
     <div class="max-w-6xl mx-auto space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <a th:href="@{/courses/{id}(id=${assignment.courseId})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
-                <span class="material-symbols-outlined text-lg">arrow_back</span> Back to course
-            </a>
+            <div class="flex flex-wrap items-center gap-3">
+                <a th:if="${assignment.lessonId != null}" th:href="@{/lessons/{id}(id=${assignment.lessonId}, courseId=${assignment.courseId})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to lesson
+                </a>
+                <a th:href="@{/courses/{id}(id=${assignment.courseId})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to course
+                </a>
+            </div>
             <div class="flex flex-wrap items-center gap-3">
                 <a th:if="${currentUser.role.name() == 'STUDENT'}" th:href="@{/assignments/results}" class="text-sm font-semibold text-primary hover:underline no-underline">
                     View all results
@@ -32,7 +37,10 @@
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:text="${assignment.courseName}"></span>
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white"
                           th:text="${assignment.type == 'QUIZ' ? 'Quiz' : (assignment.type == 'EXAM' ? 'Exam' : 'Assignment')}"></span>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface" th:text="${'Up to ' + assignment.maxAttempts + ' attempts'}"></span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface"
+                          th:text="${assignment.unlimitedAttempts ? 'Unlimited quiz attempts' : ('Up to ' + assignment.maxAttempts + ' attempts')}"></span>
+                    <span th:if="${assignment.lessonId != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-on-surface"
+                          th:text="${'Lesson ' + assignment.lessonOrder + ' - ' + assignment.lessonTitle}"></span>
                     <span th:if="${assignment.allowLateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800">Late submission allowed</span>
                     <span th:unless="${assignment.allowLateSubmission}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800">Late submission locked</span>
                 </div>
@@ -57,13 +65,15 @@
                 </div>
                 <div class="rounded-xl bg-white border border-slate-100 p-4">
                     <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Attempts used</div>
-                    <div class="mt-2 font-bold text-on-background" th:text="${assignment.submissionCount + ' / ' + assignment.maxAttempts}"></div>
-                    <div class="text-sm text-on-surface-variant mt-1" th:text="${assignment.remainingAttempts + ' remaining'}"></div>
+                    <div class="mt-2 font-bold text-on-background"
+                         th:text="${assignment.type == 'HOMEWORK' ? (assignment.submissionCount > 0 ? '1 saved submission' : 'Not submitted yet') : (assignment.unlimitedAttempts ? (assignment.submissionCount + ' attempts recorded') : (assignment.submissionCount + ' / ' + assignment.maxAttempts))}"></div>
+                    <div class="text-sm text-on-surface-variant mt-1"
+                         th:text="${assignment.type == 'HOMEWORK' ? (assignment.editableSubmission ? 'You can keep editing this homework until the deadline.' : 'Homework supports one submission record only.') : (assignment.unlimitedAttempts ? 'Retake the quiz as often as you need before the deadline.' : (assignment.remainingAttempts + ' remaining'))}"></div>
                 </div>
                 <div class="rounded-xl bg-white border border-slate-100 p-4">
                     <div class="text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">Current state</div>
                     <div class="mt-2 font-bold text-on-background"
-                         th:text="${assignment.latestSubmission != null ? (assignment.latestSubmission.graded ? 'Graded submission' : 'Awaiting review') : (assignment.canSubmit ? 'Ready to submit' : 'Submission closed')}"></div>
+                         th:text="${assignment.latestSubmission != null ? (assignment.editableSubmission ? 'Open for edits' : (assignment.latestSubmission.graded ? 'Graded submission' : 'Awaiting review')) : (assignment.canSubmit ? (assignment.unlimitedAttempts ? 'Ready for another attempt' : 'Ready to submit') : 'Submission closed')}"></div>
                     <div class="text-sm text-on-surface-variant mt-1"
                          th:text="${assignment.allowLateSubmission ? 'Late confirmation available' : 'Strict deadline'}"></div>
                 </div>
@@ -149,15 +159,42 @@
                     <span class="material-symbols-outlined text-lg">download</span>
                     <span th:text="${assignment.latestSubmission.fileName}">file.pdf</span>
                 </a>
-                <span class="text-xs text-on-surface-variant" th:text="${assignment.remainingAttempts + ' attempts remaining'}"></span>
+                <span class="text-xs text-on-surface-variant"
+                      th:text="${assignment.type == 'HOMEWORK' ? (assignment.editableSubmission ? 'Editing stays open until the deadline' : 'Homework editing is closed') : (assignment.unlimitedAttempts ? 'Unlimited retakes available' : (assignment.remainingAttempts + ' attempts remaining'))}"></span>
             </div>
+        </section>
+
+        <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.type == 'QUIZ' and assignment.latestSubmission != null and quizFollowUpUrl != null}"
+                 class="rounded-2xl border p-5 md:p-6 space-y-3"
+                 th:classappend="${quizPassed} ? ' border-sky-200 bg-sky-50/80' : ' border-amber-200 bg-amber-50/80'">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <div class="text-xs font-semibold uppercase tracking-[0.18em]"
+                         th:classappend="${quizPassed} ? ' text-sky-700' : ' text-amber-700'">Quiz next step</div>
+                    <h2 class="mt-1 text-lg font-bold font-headline"
+                        th:classappend="${quizPassed} ? ' text-sky-900' : ' text-amber-900'"
+                        th:text="${quizPassed} ? 'You passed this quiz' : 'You need to review this lesson first'}">Quiz next step</h2>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold"
+                      th:classappend="${quizPassed} ? ' bg-sky-100 text-sky-800' : ' bg-amber-100 text-amber-800'"
+                      th:text="${'Required score: ' + quizRequiredScore}">Required score: 6</span>
+            </div>
+            <p class="text-sm"
+               th:classappend="${quizPassed} ? ' text-sky-900' : ' text-amber-900'"
+               th:text="${quizFollowUpHint}">Follow-up hint</p>
+            <a th:href="${quizFollowUpUrl}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold no-underline"
+               th:classappend="${quizPassed} ? ' bg-sky-700 text-white hover:opacity-90' : ' bg-amber-600 text-white hover:opacity-90'">
+                <span class="material-symbols-outlined text-base" th:text="${quizPassed} ? 'arrow_forward' : 'school'">arrow_forward</span>
+                <span th:text="${quizFollowUpLabel}">Open next step</span>
+            </a>
         </section>
 
         <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.canSubmit and assignment.type == 'QUIZ' and !assignment.questions.isEmpty()}" class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="text-lg font-bold font-headline text-on-background">Take quiz</h2>
-                    <p class="text-sm text-on-surface-variant mt-1">Answer every question before you submit this attempt.</p>
+                    <p class="text-sm text-on-surface-variant mt-1">Answer every question before you submit this attempt. You can retake the quiz to improve your score.</p>
                 </div>
                 <span class="text-sm text-on-surface-variant" th:text="'Next attempt: #' + (${assignment.submissionCount} + 1)"></span>
             </div>
@@ -188,10 +225,12 @@
         <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.canSubmit and assignment.type != 'QUIZ'}" class="bg-surface-container-lowest rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 class="text-lg font-bold font-headline text-on-background">Submit work</h2>
-                    <p class="text-sm text-on-surface-variant mt-1">Write your answer clearly and attach supporting files only when needed.</p>
+                    <h2 class="text-lg font-bold font-headline text-on-background" th:text="${assignment.editableSubmission ? 'Edit homework' : 'Submit work'}">Submit work</h2>
+                    <p class="text-sm text-on-surface-variant mt-1"
+                       th:text="${assignment.editableSubmission ? 'Update your saved homework before the deadline. Submitting again will replace the current version instead of creating a second attempt.' : 'Write your answer clearly and attach supporting files only when needed.'}">Write your answer clearly and attach supporting files only when needed.</p>
                 </div>
-                <span class="text-sm text-on-surface-variant" th:text="'Next attempt: #' + (${assignment.submissionCount} + 1)"></span>
+                <span class="text-sm text-on-surface-variant"
+                      th:text="${assignment.type == 'HOMEWORK' ? (assignment.editableSubmission ? 'Editing current submission' : 'Single submission') : ('Next attempt: #' + (${assignment.submissionCount} + 1))}">Single submission</span>
             </div>
             <form th:action="@{/assignments/{id}/submit(id=${assignment.id})}" th:object="${submissionForm}" method="post" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
@@ -208,13 +247,15 @@
                     <input type="file" th:field="*{attachment}" class="block w-full text-sm text-on-surface">
                     <p class="text-xs text-on-surface-variant mt-2" th:text="${'Allowed formats: ' + allowedExtensions + ' | Max size: ' + (maxFileSizeBytes / 1024 / 1024) + ' MB'}"></p>
                 </div>
-                <button type="submit" class="px-6 py-3 bg-primary text-on-primary font-bold text-sm rounded-lg border-0 cursor-pointer hover:opacity-90">Submit assignment</button>
+                <button type="submit" class="px-6 py-3 bg-primary text-on-primary font-bold text-sm rounded-lg border-0 cursor-pointer hover:opacity-90"
+                        th:text="${assignment.editableSubmission ? 'Save changes' : 'Submit assignment'}">Submit assignment</button>
             </form>
         </section>
 
         <section th:if="${currentUser.role.name() == 'STUDENT' and !assignment.canSubmit}" class="rounded-lg px-4 py-3 text-sm border bg-slate-50 text-on-surface border-slate-200">
-            <span th:if="${assignment.remainingAttempts == 0}">You have used all available submissions for this assignment.</span>
-            <span th:if="${assignment.remainingAttempts > 0 and assignment.pastDue and !assignment.allowLateSubmission}">This assignment is past due and late submission is not allowed.</span>
+            <span th:if="${assignment.type == 'HOMEWORK' and assignment.latestSubmission != null and !assignment.editableSubmission}">This homework has already been submitted. Editing is closed.</span>
+            <span th:if="${assignment.type != 'HOMEWORK' and !assignment.unlimitedAttempts and assignment.remainingAttempts == 0}">You have used all available submissions for this assignment.</span>
+            <span th:if="${assignment.pastDue and !assignment.allowLateSubmission}">This assignment is past due and late submission is not allowed.</span>
         </section>
 
         <section th:if="${currentUser.role.name() == 'STUDENT' and assignment.type == 'QUIZ' and assignment.questions.isEmpty()}" class="rounded-lg px-4 py-3 text-sm bg-blue-50 text-blue-900 border border-blue-100">

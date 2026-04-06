@@ -77,6 +77,9 @@ public class LessonUnlockService {
                 .findByCourseIdAndLessonIdOrderByDueDateAsc(courseId, previousLesson.getId());
 
         for (Assignment assignment : linkedAssignments) {
+            if (assignment.getType() != Assignment.AssignmentType.QUIZ) {
+                continue;
+            }
             Double requiredScore = assignment.getMinimumPassingScore();
             if (requiredScore == null) {
                 continue;

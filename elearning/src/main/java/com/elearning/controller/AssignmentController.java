@@ -40,6 +40,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/assignments")
@@ -77,11 +78,16 @@ public class AssignmentController {
         AssessmentProgressDto progress = user.getRole() == User.Role.STUDENT
                 ? assessmentResultTrackingService.getCourseProgress(assignment.getCourse().getId(), user.getId())
                 : null;
+        AssignmentSubmissionForm submissionForm = new AssignmentSubmissionForm();
+        if (assignmentView.isEditableSubmission() && assignmentView.getLatestSubmission() != null) {
+            submissionForm.setContent(assignmentView.getLatestSubmission().getContent());
+        }
+        populateQuizFollowUp(model, assignment, assignmentView);
 
         model.addAttribute("assignment", assignmentView);
         model.addAttribute("submissionHistory", submissionHistory);
         model.addAttribute("progress", progress);
-        model.addAttribute("submissionForm", new AssignmentSubmissionForm());
+        model.addAttribute("submissionForm", submissionForm);
         model.addAttribute("allowedExtensions", assessmentFileStorageService.getAllowedExtensions());
         model.addAttribute("maxFileSizeBytes", assessmentFileStorageService.getMaxFileSizeBytes());
         model.addAttribute("currentUser", user);
@@ -129,13 +135,23 @@ public class AssignmentController {
                 if (result.getAwardedXp() > 0) {
                     success.append(" +").append(result.getAwardedXp()).append(" XP.");
                 }
+                if (isPassingQuiz(assignment, submission)) {
+                    success.append(" You passed this quiz. Use the next-step button below to continue.");
+                } else {
+                    success.append(" Review the linked lesson, then try again to unlock the next step.");
+                }
                 redirectAttributes.addFlashAttribute("success", success.toString());
+                return "redirect:/assignments/" + id;
             } else {
-                StringBuilder success = new StringBuilder("Assignment submitted successfully. Your work is awaiting instructor grading.");
+                String assignmentLabel = assignment.getType() == Assignment.AssignmentType.HOMEWORK ? "Homework" : "Assignment";
+                StringBuilder success = new StringBuilder(result.isUpdatedExisting()
+                        ? assignmentLabel + " updated successfully. Your latest version is awaiting instructor grading."
+                        : assignmentLabel + " submitted successfully. Your work is awaiting instructor grading.");
                 if (submission.isLateSubmission()) {
                     success.append(" The submission was recorded as late.");
                 }
                 redirectAttributes.addFlashAttribute("success", success.toString());
+                return "redirect:/assignments/" + id;
             }
         } catch (AssessmentException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -286,7 +302,7 @@ public class AssignmentController {
 
     private boolean canAccessAssignment(User user, Assignment assignment) {
         if (user.getRole() == User.Role.STUDENT) {
-            return enrollmentService.isEnrolled(user.getId(), assignment.getCourse().getId());
+            return assignmentService.isVisibleToStudent(assignment, user.getId());
         }
         return canManageAssignment(user, assignment);
     }
@@ -320,5 +336,65 @@ public class AssignmentController {
         } catch (UnsupportedEncodingException ex) {
             return "attachment; filename=\"submission\"";
         }
+    }
+
+    private void populateQuizFollowUp(Model model,
+                                      Assignment assignment,
+                                      AssessmentAssignmentDto assignmentView) {
+        if (assignment == null || assignmentView == null || assignment.getType() != Assignment.AssignmentType.QUIZ) {
+            return;
+        }
+
+        AssessmentSubmissionDto latestSubmission = assignmentView.getLatestSubmission();
+        if (latestSubmission == null || latestSubmission.getScore() == null) {
+            return;
+        }
+
+        double requiredScore = assignment.getMinimumPassingScore() != null
+                ? assignment.getMinimumPassingScore()
+                : 0.0;
+        boolean quizPassed = latestSubmission.getScore() >= requiredScore;
+        model.addAttribute("quizPassed", quizPassed);
+        model.addAttribute("quizRequiredScore", formatScore(requiredScore));
+
+        if (quizPassed) {
+            Optional<Assignment> nextAssignment = assignmentService.findNextLessonWorkflowAssignment(assignment);
+            if (nextAssignment.isPresent()) {
+                Assignment target = nextAssignment.get();
+                model.addAttribute("quizFollowUpUrl", "/assignments/" + target.getId());
+                model.addAttribute("quizFollowUpLabel", target.getType() == Assignment.AssignmentType.HOMEWORK
+                        ? "Open homework"
+                        : "Open next assignment");
+                model.addAttribute("quizFollowUpHint", "Your score meets the passing requirement. Continue with the next assessment in this lesson.");
+            } else if (assignmentView.getLessonId() != null && assignmentView.getCourseId() != null) {
+                model.addAttribute("quizFollowUpUrl", "/lessons/" + assignmentView.getLessonId() + "?courseId=" + assignmentView.getCourseId());
+                model.addAttribute("quizFollowUpLabel", "Back to lesson");
+                model.addAttribute("quizFollowUpHint", "You passed this quiz. Return to the lesson to continue learning.");
+            }
+        } else if (assignmentView.getLessonId() != null && assignmentView.getCourseId() != null) {
+            model.addAttribute("quizFollowUpUrl", "/lessons/" + assignmentView.getLessonId() + "?courseId=" + assignmentView.getCourseId());
+            model.addAttribute("quizFollowUpLabel", "Back to lesson");
+            model.addAttribute("quizFollowUpHint", "Review the related lesson, then retake the quiz until you reach the passing score.");
+        }
+    }
+
+    private boolean isPassingQuiz(Assignment assignment, Submission submission) {
+        if (assignment == null || submission == null || submission.getScore() == null) {
+            return false;
+        }
+        if (assignment.getType() != Assignment.AssignmentType.QUIZ) {
+            return false;
+        }
+        if (assignment.getMinimumPassingScore() == null) {
+            return true;
+        }
+        return submission.getScore() >= assignment.getMinimumPassingScore();
+    }
+
+    private String formatScore(double score) {
+        if (score == Math.floor(score)) {
+            return String.valueOf((int) score);
+        }
+        return String.format(java.util.Locale.US, "%.1f", score);
     }
 }

@@ -49,6 +49,12 @@ public class AssignmentService {
         return assignmentRepository.findByCourseIdOrderByDueDateAsc(courseId);
     }
 
+    public List<Assignment> findVisibleForStudent(Long courseId, Long studentId) {
+        List<Assignment> assignments = findByCourseId(courseId);
+        assignments.removeIf(assignment -> !isVisibleToStudent(assignment, studentId));
+        return assignments;
+    }
+
     public Optional<Assignment> findById(Long id) {
         return assignmentRepository.findDetailedById(id);
     }
@@ -68,7 +74,9 @@ public class AssignmentService {
 
     @Transactional
     public Assignment save(Assignment assignment) {
-        if (assignment.getMaxAttempts() <= 0) {
+        if (assignment.getType() == Assignment.AssignmentType.HOMEWORK) {
+            assignment.setMaxAttempts(1);
+        } else if (assignment.getMaxAttempts() <= 0) {
             assignment.setMaxAttempts(1);
         }
         if (assignment.getMaxScore() <= 0) {
@@ -97,6 +105,67 @@ public class AssignmentService {
                 assignmentId, studentId);
     }
 
+    public List<Assignment> findLessonWorkflowAssignments(Long courseId, Long lessonId) {
+        List<Assignment> assignments = assignmentRepository.findByCourseIdAndLessonIdOrderByDueDateAsc(courseId, lessonId);
+        assignments.sort((left, right) -> {
+            int typeCompare = Integer.compare(workflowPriority(left), workflowPriority(right));
+            if (typeCompare != 0) {
+                return typeCompare;
+            }
+            if (left.getDueDate() == null && right.getDueDate() == null) {
+                return left.getId().compareTo(right.getId());
+            }
+            if (left.getDueDate() == null) {
+                return 1;
+            }
+            if (right.getDueDate() == null) {
+                return -1;
+            }
+            int dueDateCompare = left.getDueDate().compareTo(right.getDueDate());
+            return dueDateCompare != 0 ? dueDateCompare : left.getId().compareTo(right.getId());
+        });
+        return assignments;
+    }
+
+    public Optional<Assignment> findFirstLessonWorkflowAssignment(Long courseId, Long lessonId) {
+        List<Assignment> workflowAssignments = findLessonWorkflowAssignments(courseId, lessonId);
+        return workflowAssignments.isEmpty() ? Optional.empty() : Optional.of(workflowAssignments.get(0));
+    }
+
+    public Optional<Assignment> findNextLessonWorkflowAssignment(Assignment currentAssignment) {
+        if (currentAssignment == null || currentAssignment.getCourse() == null || currentAssignment.getLesson() == null) {
+            return Optional.empty();
+        }
+
+        List<Assignment> workflowAssignments = findLessonWorkflowAssignments(
+                currentAssignment.getCourse().getId(),
+                currentAssignment.getLesson().getId());
+
+        for (int i = 0; i < workflowAssignments.size(); i++) {
+            if (workflowAssignments.get(i).getId().equals(currentAssignment.getId())) {
+                if (i + 1 < workflowAssignments.size()) {
+                    return Optional.of(workflowAssignments.get(i + 1));
+                }
+                break;
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public boolean isVisibleToStudent(Assignment assignment, Long studentId) {
+        if (assignment == null || studentId == null || assignment.getCourse() == null) {
+            return false;
+        }
+        if (!enrollmentService.isEnrolled(studentId, assignment.getCourse().getId())) {
+            return false;
+        }
+        if (assignment.getLesson() == null) {
+            return true;
+        }
+        return enrollmentService.isLessonCompleted(studentId, assignment.getLesson().getId());
+    }
+
     public List<Submission> findSubmissionHistory(Long assignmentId, Long studentId) {
         return submissionRepository.findHistoryByAssignmentIdAndStudentId(assignmentId, studentId);
     }
@@ -117,13 +186,21 @@ public class AssignmentService {
         Assignment assignment = getDetailedAssignmentOrThrow(assignmentId);
         validateStudentMaySubmit(assignment, student);
 
+        List<Submission> submissionHistory = submissionRepository.findHistoryByAssignmentIdAndStudentId(assignmentId, student.getId());
         long existingAttempts = submissionRepository.countByAssignmentIdAndStudentId(assignmentId, student.getId());
-        if (existingAttempts >= Math.max(assignment.getMaxAttempts(), 1)) {
+        boolean editableSingleSubmission = isEditableSingleSubmissionAssignment(assignment);
+        if (!hasUnlimitedAttempts(assignment)
+                && !editableSingleSubmission
+                && existingAttempts >= Math.max(assignment.getMaxAttempts(), 1)) {
             throw new AssessmentValidationException("You have used all available submissions for this assignment.");
         }
 
         boolean pastDue = isPastDue(assignment);
         validateDeadline(assignment, pastDue, form.isConfirmLate());
+
+        if (editableSingleSubmission && !submissionHistory.isEmpty()) {
+            return updateExistingSubmission(assignment, submissionHistory.get(0), form, pastDue);
+        }
 
         Submission submission = Submission.builder()
                 .assignment(assignment)
@@ -142,7 +219,7 @@ public class AssignmentService {
         validateOpenSubmission(submission);
 
         Submission saved = submissionRepository.save(submission);
-        return new SubmissionResult(saved, 0);
+        return new SubmissionResult(saved, 0, false);
     }
 
     @Transactional
@@ -274,7 +351,31 @@ public class AssignmentService {
                 message.toString(),
                 Notification.NotifType.GRADE);
 
-        return new SubmissionResult(saved, awardedXp);
+        return new SubmissionResult(saved, awardedXp, false);
+    }
+
+    private boolean hasUnlimitedAttempts(Assignment assignment) {
+        return assignment != null && assignment.getType() == Assignment.AssignmentType.QUIZ;
+    }
+
+    private boolean isEditableSingleSubmissionAssignment(Assignment assignment) {
+        return assignment != null && assignment.getType() == Assignment.AssignmentType.HOMEWORK;
+    }
+
+    private int workflowPriority(Assignment assignment) {
+        if (assignment == null || assignment.getType() == null) {
+            return 99;
+        }
+        switch (assignment.getType()) {
+            case QUIZ:
+                return 0;
+            case HOMEWORK:
+                return 1;
+            case EXAM:
+                return 2;
+            default:
+                return 99;
+        }
     }
 
     private void validateStudentMaySubmit(Assignment assignment, User student) {
@@ -283,6 +384,9 @@ public class AssignmentService {
         }
         if (!enrollmentService.isEnrolled(student.getId(), assignment.getCourse().getId())) {
             throw new AssessmentValidationException("You are not enrolled in this course.");
+        }
+        if (!isVisibleToStudent(assignment, student.getId())) {
+            throw new AssessmentValidationException("Complete the lesson first to unlock this quiz or homework.");
         }
     }
 
@@ -307,6 +411,29 @@ public class AssignmentService {
         submission.setFileUrl(storedFile.getStoredFileName());
         submission.setOriginalFileName(storedFile.getOriginalFileName());
         submission.setFileSize(storedFile.getSize());
+    }
+
+    private SubmissionResult updateExistingSubmission(Assignment assignment,
+                                                      Submission existingSubmission,
+                                                      AssignmentSubmissionForm form,
+                                                      boolean pastDue) {
+        if (pastDue) {
+            throw new AssessmentValidationException("This homework can no longer be edited because the submission window has closed.");
+        }
+
+        existingSubmission.setContent(normalize(form.getContent()));
+        existingSubmission.setLateSubmission(false);
+        existingSubmission.setStatus(Submission.SubmissionStatus.SUBMITTED);
+        existingSubmission.setScore(null);
+        existingSubmission.setFeedback(null);
+        existingSubmission.setAutoGraded(false);
+        existingSubmission.setGradedAt(null);
+        existingSubmission.setSubmittedAt(LocalDateTime.now());
+        attachFile(existingSubmission, form.getAttachment(), assignment.getId(), existingSubmission.getStudent().getId());
+        validateOpenSubmission(existingSubmission);
+
+        Submission saved = submissionRepository.save(existingSubmission);
+        return new SubmissionResult(saved, 0, true);
     }
 
     private void validateOpenSubmission(Submission submission) {
@@ -339,10 +466,16 @@ public class AssignmentService {
     public static class SubmissionResult {
         private final Submission submission;
         private final int awardedXp;
+        private final boolean updatedExisting;
 
         public SubmissionResult(Submission submission, int awardedXp) {
+            this(submission, awardedXp, false);
+        }
+
+        public SubmissionResult(Submission submission, int awardedXp, boolean updatedExisting) {
             this.submission = submission;
             this.awardedXp = awardedXp;
+            this.updatedExisting = updatedExisting;
         }
     }
 

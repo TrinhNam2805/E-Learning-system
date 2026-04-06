@@ -37,8 +37,18 @@
                 </div>
                 <h4 class="font-bold text-on-surface" th:text="${c.courseName}"></h4>
                 <p class="text-xs text-on-surface-variant mt-2 line-clamp-3 flex-1" th:text="${#strings.abbreviate(c.description, 120)}"></p>
-                <p class="text-[11px] text-slate-500 mt-2" th:text="${(c.teacher != null ? c.teacher.fullName : '') + ' · Max ' + c.maxStudents + ' students'}"></p>
-                <span class="text-primary text-xs font-bold mt-3">View details →</span>
+                <p class="text-[11px] text-slate-500 mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                    <span th:if="${c.teacher != null}" th:text="${c.teacher.fullName}"></span>
+                    <span th:if="${c.teacher != null}" class="text-slate-300">|</span>
+                    <span>Duration</span>
+                    <span class="font-semibold text-slate-700" th:text="${c.theoryHours + c.practiceHours}">60</span>
+                    <span>hours</span>
+                    <span class="text-slate-300">|</span>
+                    <span>Max</span>
+                    <span class="font-semibold text-slate-700" th:text="${c.maxStudents}">50</span>
+                    <span>students</span>
+                </p>
+                <span class="text-primary text-xs font-bold mt-3">View details -></span>
             </div>
         </a>
     </div>

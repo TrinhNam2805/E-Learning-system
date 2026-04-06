@@ -57,6 +57,9 @@ public class ForumController {
             model.addAttribute("posts", forumService.findGlobalPosts());
             model.addAttribute("canCreatePost", mayCreateGlobalForumPost(user));
             model.addAttribute("courseLessons", Collections.<Lesson>emptyList());
+            model.addAttribute("forumPageTitle", "Global forum");
+            model.addAttribute("forumPageSubtitle", "Browse topics below. Instructors and admins can create new global topics.");
+            model.addAttribute("lessonContextTitle", null);
         } else {
             Course course = courseService.findById(courseId).orElse(null);
             if (course == null) {
@@ -68,13 +71,17 @@ public class ForumController {
             model.addAttribute("posts", forumService.findByCourseId(courseId));
             model.addAttribute("canCreatePost", mayUseCourseForum(user, courseId));
             model.addAttribute("courseLessons", lessonService.findPublishedByCourseId(courseId));
+            model.addAttribute("forumPageTitle", "Forum - " + course.getCourseName());
+            model.addAttribute("forumPageSubtitle", "Enrolled students can start discussions for this course.");
+            model.addAttribute("lessonContextTitle", null);
 
             if (lessonId != null) {
                 lessonService.findById(lessonId)
                         .filter(l -> l.getCourse().getId().equals(courseId))
                         .ifPresent(l -> {
                             model.addAttribute("prefillLessonId", lessonId);
-                            model.addAttribute("prefillPostTitle", "Lesson: " + l.getLessonTitle());
+                            model.addAttribute("prefillPostTitle", "Lesson " + l.getLessonOrder() + " - " + l.getLessonTitle());
+                            model.addAttribute("lessonContextTitle", "Discussing lesson " + l.getLessonOrder() + ": " + l.getLessonTitle());
                         });
             }
         }
@@ -211,8 +218,12 @@ public class ForumController {
             ra.addFlashAttribute("error", "You do not have permission to comment on this post.");
             return "redirect:/forum/post/" + postId;
         }
+        if (content == null || content.trim().isEmpty()) {
+            ra.addFlashAttribute("error", "Comment content cannot be empty.");
+            return "redirect:/forum/post/" + postId;
+        }
 
-        forumService.addComment(Comment.builder().post(post).author(user).content(content).build());
+        forumService.addComment(Comment.builder().post(post).author(user).content(content.trim()).build());
         ra.addFlashAttribute("success", "Comment added.");
         return "redirect:/forum/post/" + postId;
     }

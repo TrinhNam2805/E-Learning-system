@@ -1,342 +1,694 @@
 -- =============================================================================
--- Dữ liệu mẫu học thuật cho hệ thống E-Learning (MySQL 8, utf8mb4)
--- =============================================================================
--- Chạy sau khi đã áp dụng schema:  schema-standard.sql  (khuyến nghị) hoặc DDL tương đương.
--- ddl-auto=none trong application.properties.
--- Mật khẩu đăng nhập demo (tất cả tài khoản dưới đây): Demo@2024
--- Hash BCrypt (strength 10), tương thích BCryptPasswordEncoder của Spring Security.
---
--- Cách chạy (ví dụ):
---   mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/seed-data.sql
---
--- Lưu ý MySQL: TRUNCATE bảng cha thường lỗi #1701 dù tắt FK checks. Dùng DELETE theo thứ tự con → cha.
+-- Full demo seed for the E-Learning system
+-- 8 progressive IT courses
+-- 12 lessons per course
+-- Each lesson has a quiz and a homework assignment
 -- =============================================================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DELETE FROM `comments`;
+DELETE FROM `forum_posts`;
 DELETE FROM `quiz_questions`;
 DELETE FROM `submissions`;
+DELETE FROM `assignments`;
+DELETE FROM `lesson_progress`;
 DELETE FROM `note_links`;
 DELETE FROM `notes`;
 DELETE FROM `notifications`;
-DELETE FROM `lesson_progress`;
 DELETE FROM `enrollments`;
-DELETE FROM `forum_posts`;
-DELETE FROM `assignments`;
-DELETE FROM `lessons`;
 DELETE FROM `course_sections`;
 DELETE FROM `course_prerequisites`;
 DELETE FROM `courses`;
+DELETE FROM `user_badges`;
+DELETE FROM `badge_definitions`;
 DELETE FROM `users`;
 DELETE FROM `departments`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- Mật khẩu: Demo@2024
-SET @pwd := '$2b$10$IgwunfhzoNX76OVOOWU1.eKSB7SmLMjNAdTvjYpuY79/U0ebJmcpy';
+SET @pwd := ' ';
 
 INSERT INTO `departments` (`id`, `code`, `name`) VALUES
-(1, 'CNTT', 'Khoa Công nghệ Thông tin');
+(1, 'CNTT', 'Faculty of Information Technology');
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `full_name`, `role`, `phone`, `active`, `locked`, `created_at`, `department_id`, `student_code`) VALUES
-(1, 'gv.nguyenvanan', 'nguyen.van.an@univ.edu.vn', @pwd, 'TS. Nguyễn Văn An', 'TEACHER', '0901234567', 1, 0, '2024-08-15', 1, NULL),
-(2, 'gv.tranthib', 'tran.thi.b@univ.edu.vn', @pwd, 'ThS. Trần Thị Bích', 'TEACHER', '0902345678', 1, 0, '2024-08-15', 1, NULL),
-(3, 'sv.phamminhc', 'pham.minh.c@student.univ.edu.vn', @pwd, 'Phạm Minh Châu', 'STUDENT', '0913456789', 1, 0, '2024-09-01', 1, 'B2201001'),
-(4, 'sv.lethid', 'le.thi.d@student.univ.edu.vn', @pwd, 'Lê Thị Diệu', 'STUDENT', '0914567890', 1, 0, '2024-09-01', 1, 'B2201002'),
-(5, 'sv.hoangvane', 'hoang.van.e@student.univ.edu.vn', @pwd, 'Hoàng Văn Em', 'STUDENT', '0915678901', 1, 0, '2024-09-01', 1, 'B2201003'),
-(6, 'sv.vothif', 'vo.thi.f@student.univ.edu.vn', @pwd, 'Võ Thị Phương', 'STUDENT', '0916789012', 1, 0, '2024-09-02', 1, 'B2201004'),
-(7, 'sv.dangvang', 'dang.van.g@student.univ.edu.vn', @pwd, 'Đặng Văn Giang', 'STUDENT', '0917890123', 1, 0, '2024-09-02', 1, 'B2201005');
+INSERT INTO `users`
+(`id`, `username`, `email`, `password`, `full_name`, `role`, `phone`, `active`, `locked`, `created_at`, `department_id`, `student_code`) VALUES
+(1, 'gv.nguyenvanan', 'teacher@cntt.edu.vn', @pwd, 'Dr. Nguyen Van An', 'TEACHER', '0901234567', 1, 0, '2025-08-15', 1, NULL),
+(2, 'gv.tranthibich', 'bich.tran@cntt.edu.vn', @pwd, 'MSc. Tran Thi Bich', 'TEACHER', '0902345678', 1, 0, '2025-08-15', 1, NULL),
+(3, 'gv.lequang', 'quang.le@cntt.edu.vn', @pwd, 'MSc. Le Quang', 'TEACHER', '0903456789', 1, 0, '2025-08-15', 1, NULL),
+(4, 'admin.cntt', 'admin@cntt.edu.vn', @pwd, 'System Administrator', 'ADMIN', '0900000000', 1, 0, '2025-08-15', 1, NULL),
+(5, 'sv.phamminhchau', 'minh.chau@student.cntt.edu.vn', @pwd, 'Pham Minh Chau', 'STUDENT', '0913456789', 1, 0, '2025-09-01', 1, 'B2201001'),
+(6, 'sv.lethudung', 'thu.dung@student.cntt.edu.vn', @pwd, 'Le Thu Dung', 'STUDENT', '0914567890', 1, 0, '2025-09-01', 1, 'B2201002'),
+(7, 'sv.dangvangiang', 'van.giang@student.cntt.edu.vn', @pwd, 'Dang Van Giang', 'STUDENT', '0915678901', 1, 0, '2025-09-01', 1, 'B2201003'),
+(8, 'sv.nguyenhoangnam', 'hoang.nam@student.cntt.edu.vn', @pwd, 'Nguyen Hoang Nam', 'STUDENT', '0916789012', 1, 0, '2025-09-02', 1, 'B2201004'),
+(9, 'sv.vongocmai', 'ngoc.mai@student.cntt.edu.vn', @pwd, 'Vo Ngoc Mai', 'STUDENT', '0917890123', 1, 0, '2025-09-02', 1, 'B2201005'),
+(10, 'sv.tranquocbao', 'quoc.bao@student.cntt.edu.vn', @pwd, 'Tran Quoc Bao', 'STUDENT', '0918901234', 1, 0, '2025-09-02', 1, 'B2201006');
 
-INSERT INTO `courses` (`id`, `course_code`, `course_name`, `description`, `teacher_id`, `enroll_password`, `semester`, `academic_year`, `status`, `max_students`, `thumbnail`, `department_id`, `credits`, `theory_hours`, `practice_hours`) VALUES
-(1, 'CS201', 'Cấu trúc dữ liệu và giải thuật (DSA)',
-'Môn nền tảng: phân tích độ phức tạp (Big-O), danh sách, stack, queue, cây (BST), sắp xếp, tìm kiếm và duyệt đồ thị cơ bản. Phù hợp CTĐT CNTT.',
-1, 'CS201HK1', 'HK1', '2024-2025', 'PUBLISHED', 60,
-'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80', 1, 4, 45, 30),
+CREATE TEMPORARY TABLE `tmp_course_seed` (
+  `sort_order` INT NOT NULL,
+  `course_code` VARCHAR(20) NOT NULL,
+  `course_name` VARCHAR(200) NOT NULL,
+  `description` TEXT NOT NULL,
+  `teacher_id` BIGINT NOT NULL,
+  `enroll_password` VARCHAR(100) NOT NULL,
+  `thumbnail` VARCHAR(255) NOT NULL,
+  `credits` INT NOT NULL,
+  `theory_hours` INT NOT NULL,
+  `practice_hours` INT NOT NULL,
+  `deliverable` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`sort_order`),
+  UNIQUE KEY `uk_tmp_course_seed_code` (`course_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-(2, 'WEB101', 'HTML &amp; CSS — Thiết kế trang web',
-'Ngữ nghĩa HTML5, biểu mẫu, CSS (box model, màu sắc, typography), bố cục Flexbox và responsive cơ bản. Nội dung hiển thị trực tiếp trên LMS; tài liệu PDF/DOC có thể bổ sung sau qua mục tài liệu hoặc liên kết ngoài.',
-2, 'WEB101HK1', 'HK1', '2024-2025', 'PUBLISHED', 50,
-'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80', 1, 3, 30, 45),
+INSERT INTO `tmp_course_seed`
+(`sort_order`, `course_code`, `course_name`, `description`, `teacher_id`, `enroll_password`, `thumbnail`, `credits`, `theory_hours`, `practice_hours`, `deliverable`) VALUES
+(1, 'ITF101', 'Introduction to IT and Digital Skills', 'Start the IT learning journey with computer hardware, operating systems, the internet, problem-solving thinking, and effective technical study habits.', 1, 'ITF101-START', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80', 3, 30, 30, 'PDF checklist or learning roadmap'),
+(2, 'PRG101', 'Programming Fundamentals with Python', 'Build programming thinking in Python from variables, loops, and functions to file handling and a mini project.', 1, 'PRG101-PY', 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1200&q=80', 3, 30, 45, 'Python file package with a short README'),
+(3, 'DBI201', 'Databases and Practical SQL', 'Study relational data models, SQL data manipulation, schema design, and application-to-database integration.', 2, 'DBI201-SQL', 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80', 3, 30, 45, 'SQL script plus result screenshots'),
+(4, 'WEB201', 'Web Frontend Development with HTML, CSS, and JavaScript', 'Move from semantic HTML and CSS layout to responsive design, JavaScript DOM work, and a complete frontend mini project.', 2, 'WEB201-FE', 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80', 3, 30, 45, 'ZIP file containing the HTML, CSS, and JavaScript project'),
+(5, 'OOP201', 'Object-Oriented Programming with Java', 'Practice object-oriented programming in Java through classes, interfaces, exceptions, collections, testing, and application modeling.', 3, 'OOP201-JAVA', 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80', 4, 45, 30, 'Java project ZIP with a model description'),
+(6, 'DSA201', 'Data Structures and Algorithms', 'Develop skill in Big-O analysis, recursion, data structures, and algorithms needed for more advanced programming.', 3, 'DSA201-ALG', 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1200&q=80', 4, 45, 30, 'PDF report or source-code demonstration'),
+(7, 'API301', 'Backend Development with Spring Boot', 'Design a client-server backend with Spring Boot, REST APIs, JPA, authentication, file upload, testing, and release workflow.', 1, 'API301-BE', 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80', 4, 45, 30, 'Spring Boot project ZIP with API collection'),
+(8, 'DEV301', 'DevOps and Application Deployment', 'Bring together Docker, CI/CD, monitoring, security, and the steps required to deploy an application to a real environment.', 2, 'DEV301-OPS', 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80', 3, 30, 45, 'Docker Compose setup, deployment checklist, and PDF report');
 
-(3, 'JAVA101', 'Lập trình Java cơ bản',
-'Cú pháp Java, kiểu dữ liệu, điều khiển, mảng, lớp và đối tượng, kế thừa, đa hình, interface, xử lý ngoại lệ, generics giới thiệu và Collection cơ bản.',
-1, 'JAVA101HK1', 'HK1', '2024-2025', 'PUBLISHED', 55,
-'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80', 1, 3, 30, 45);
+CREATE TEMPORARY TABLE `tmp_prereq_seed` (
+  `course_code` VARCHAR(20) NOT NULL,
+  `prerequisite_course_code` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`course_code`, `prerequisite_course_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tiên quyết (mã CTĐT): WEB101 và JAVA101 gợi ý đã qua CS201
-INSERT INTO `course_prerequisites` (`id`, `course_id`, `prerequisite_course_code`) VALUES
-(1, 2, 'CS201'),
-(2, 3, 'CS201');
+INSERT INTO `tmp_prereq_seed` (`course_code`, `prerequisite_course_code`) VALUES
+('PRG101', 'ITF101'),
+('DBI201', 'PRG101'),
+('WEB201', 'ITF101'),
+('OOP201', 'PRG101'),
+('DSA201', 'PRG101'),
+('API301', 'DBI201'),
+('API301', 'WEB201'),
+('API301', 'OOP201'),
+('DEV301', 'API301');
 
-INSERT INTO `course_sections` (`id`, `course_id`, `section_order`, `title`) VALUES
-(1, 1, 1, 'Phần 1 — Cấu trúc dữ liệu và giải thuật'),
-(2, 2, 1, 'Phần 1 — HTML & CSS'),
-(3, 3, 1, 'Phần 1 — Lập trình Java');
+CREATE TEMPORARY TABLE `tmp_lesson_seed` (
+  `course_code` VARCHAR(20) NOT NULL,
+  `section_order` INT NOT NULL,
+  `lesson_order` INT NOT NULL,
+  `lesson_title` VARCHAR(200) NOT NULL,
+  `duration_minutes` INT NOT NULL,
+  PRIMARY KEY (`course_code`, `lesson_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `lessons` (`id`, `course_id`, `section_id`, `lesson_order`, `lesson_title`, `lesson_content`, `video_url`, `duration_minutes`, `published`) VALUES
-(1, 1, 1, 1, 'Phân tích độ phức tạp và ký hiệu asymptotic',
-CONCAT(
-'<h2>Mục tiêu học tập</h2><ul>',
-'<li>Phân biệt thời gian chạy thực nghiệm và phân tích tiệm cận.</li>',
-'<li>Sử dụng ký hiệu O, Omega, Theta để mô tả tốc độ tăng trưởng.</li></ul>',
-'<h2>Nội dung cốt lõi</h2>',
-'<p>Khi đánh giá thuật toán, ta quan tâm hành vi khi kích thước đầu vào <em>n</em> đủ lớn. Ký hiệu <strong>O(f(n))</strong> mô tả cận trên (worst-case thường dùng trong giảng dạy); Omega mô tả cận dưới; Theta khi cận trên và dưới cùng bậc.</p>',
-'<p>Ví dụ: nếu số phép gán trong hai vòng lặp lồng nhau tỷ lệ n(n-1)/2 thì độ phức tạp thời gian là Theta(n²), không phải Theta(n³).</p>',
-'<h2>Ghi chú</h2><p>Phân tích asymptotic mô tả xu hướng khi n lớn; không thay thế benchmark trên dữ liệu thực.</p>',
-'<div class="material-hint"><strong>Về PDF/DOCX:</strong> Nội dung bài học trên LMS là HTML. Giảng viên có thể đính kèm thêm file PDF hoặc DOCX qua kho tài liệu khóa học hoặc liên kết ngoài — sinh viên tải về để đọc sâu.</div>'
-),
-NULL, 90, 1),
+INSERT INTO `tmp_lesson_seed`
+(`course_code`, `section_order`, `lesson_order`, `lesson_title`, `duration_minutes`) VALUES
+('ITF101', 1, 1, 'The Role of Computer Systems and the Internet', 60),
+('ITF101', 1, 2, 'Hardware, Operating Systems, and Files', 75),
+('ITF101', 1, 3, 'Core Tools: Terminal, Editor, and Browser', 75),
+('ITF101', 1, 4, 'Account Security and Safe Online Work', 75),
+('ITF101', 2, 5, 'Problem-Solving Thinking and Flowcharts', 75),
+('ITF101', 2, 6, 'Data Representation: Bits, Bytes, Text, and Images', 75),
+('ITF101', 2, 7, 'Getting Started with the Command Line', 75),
+('ITF101', 2, 8, 'GitHub, Issues, and Submission Workflow', 75),
+('ITF101', 3, 9, 'Finding Technical Documentation Effectively', 75),
+('ITF101', 3, 10, 'Teamwork and Technical Communication', 75),
+('ITF101', 3, 11, 'Reading Requirements and Writing Study Reports', 75),
+('ITF101', 3, 12, 'Wrap-up: Building a Long-Term IT Learning Plan', 60),
+('PRG101', 1, 1, 'Installing Python and Running Your First Script', 60),
+('PRG101', 1, 2, 'Variables, Data Types, and Operators', 75),
+('PRG101', 1, 3, 'Branching with if-elif-else', 75),
+('PRG101', 1, 4, 'Loops with for, while, and range', 75),
+('PRG101', 2, 5, 'Functions, Parameters, and Return Values', 75),
+('PRG101', 2, 6, 'Lists, Tuples, and Dictionaries', 75),
+('PRG101', 2, 7, 'String Processing and File I/O', 75),
+('PRG101', 2, 8, 'Basic Debugging and Reading Tracebacks', 75),
+('PRG101', 3, 9, 'Breaking Problems into Small Functions', 75),
+('PRG101', 3, 10, 'Working with Simple Modules and Packages', 75),
+('PRG101', 3, 11, 'Reading and Writing JSON and Tabular Data', 75),
+('PRG101', 3, 12, 'Mini Project: Task Manager Script', 60),
+('DBI201', 1, 1, 'Data Modeling and Relational Tables', 60),
+('DBI201', 1, 2, 'Primary Keys, Foreign Keys, and Constraints', 75),
+('DBI201', 1, 3, 'Basic SELECT Queries', 75),
+('DBI201', 1, 4, 'WHERE, ORDER BY, and Aggregate Functions', 75),
+('DBI201', 2, 5, 'JOINs and Combining Data from Multiple Tables', 75),
+('DBI201', 2, 6, 'GROUP BY, HAVING, and Reporting', 75),
+('DBI201', 2, 7, 'Safe INSERT, UPDATE, and DELETE', 75),
+('DBI201', 2, 8, 'Normalization up to 3NF', 75),
+('DBI201', 3, 9, 'Designing a Schema for a Learning Platform', 75),
+('DBI201', 3, 10, 'Indexes and Basic Query Optimization', 75),
+('DBI201', 3, 11, 'Connecting Python/Java to a Database', 75),
+('DBI201', 3, 12, 'Mini Project: LMS Database Design', 60),
+('WEB201', 1, 1, 'Semantic HTML Structure', 60),
+('WEB201', 1, 2, 'Forms and Basic Validation', 75),
+('WEB201', 1, 3, 'CSS Box Model and Typography', 75),
+('WEB201', 1, 4, 'Flexbox and Grid Layout', 75),
+('WEB201', 2, 5, 'Mobile-First Responsive Design', 75),
+('WEB201', 2, 6, 'JavaScript Basics for the DOM', 75),
+('WEB201', 2, 7, 'Event Handling and Form Data', 75),
+('WEB201', 2, 8, 'Fetch API and Backend Calls', 75),
+('WEB201', 3, 9, 'Organizing Static Files and Assets', 75),
+('WEB201', 3, 10, 'Accessibility and Semantic UI', 75),
+('WEB201', 3, 11, 'Basic Frontend Performance Optimization', 75),
+('WEB201', 3, 12, 'Mini Project: Course Landing Page', 60),
+('OOP201', 1, 1, 'JDK, JVM, and the Classpath', 60),
+('OOP201', 1, 2, 'Classes, Objects, and Constructors', 75),
+('OOP201', 1, 3, 'Encapsulation and Access Modifiers', 75),
+('OOP201', 1, 4, 'Inheritance and Polymorphism', 75),
+('OOP201', 2, 5, 'Interfaces and Abstract Classes', 75),
+('OOP201', 2, 6, 'Exceptions and Error Handling', 75),
+('OOP201', 2, 7, 'Collection Framework', 75),
+('OOP201', 2, 8, 'Basics of Generics', 75),
+('OOP201', 3, 9, 'File I/O and Simple Serialization', 75),
+('OOP201', 3, 10, 'Unit Testing with JUnit Basics', 75),
+('OOP201', 3, 11, 'Designing the Model Layer for a Management App', 75),
+('OOP201', 3, 12, 'Mini Project: Student Management Application', 60),
+('DSA201', 1, 1, 'Time Complexity and Big-O', 60),
+('DSA201', 1, 2, 'Recursion and the Call Stack', 75),
+('DSA201', 1, 3, 'Arrays, Linked Lists, and Dynamic Arrays', 75),
+('DSA201', 1, 4, 'Stacks and Queues', 75),
+('DSA201', 2, 5, 'Hash Maps and Sets', 75),
+('DSA201', 2, 6, 'Trees and Binary Search Trees', 75),
+('DSA201', 2, 7, 'Heaps and Priority Queues', 75),
+('DSA201', 2, 8, 'Core Sorting Algorithms', 75),
+('DSA201', 3, 9, 'Binary Search and Two Pointers', 75),
+('DSA201', 3, 10, 'Graphs, BFS, and DFS', 75),
+('DSA201', 3, 11, 'Dynamic Programming Basics', 75),
+('DSA201', 3, 12, 'Mini Project: Algorithm Utility Toolkit', 60),
+('API301', 1, 1, 'Client-Server Architecture and HTTP', 60),
+('API301', 1, 2, 'Bootstrapping a Spring Boot Project', 75),
+('API301', 1, 3, 'Controllers, Services, and Repositories', 75),
+('API301', 1, 4, 'REST APIs and JSON', 75),
+('API301', 2, 5, 'Validation and Exception Handling', 75),
+('API301', 2, 6, 'JPA Entities and Relationship Mapping', 75),
+('API301', 2, 7, 'Basic Authentication and Authorization', 75),
+('API301', 2, 8, 'File Upload and Storage Handling', 75),
+('API301', 3, 9, 'Logging and Environment Configuration', 75),
+('API301', 3, 10, 'Writing API Tests', 75),
+('API301', 3, 11, 'API Documentation and Release Workflow', 75),
+('API301', 3, 12, 'Mini Project: LMS Backend', 60),
+('DEV301', 1, 1, 'Linux Commands and Processes', 60),
+('DEV301', 1, 2, 'Environment Variables and Secrets', 75),
+('DEV301', 1, 3, 'Docker Images and Containers', 75),
+('DEV301', 1, 4, 'Docker Compose for Multi-Service Systems', 75),
+('DEV301', 2, 5, 'CI/CD Pipeline Basics', 75),
+('DEV301', 2, 6, 'Reverse Proxies and Domains', 75),
+('DEV301', 2, 7, 'Logging and Basic Monitoring', 75),
+('DEV301', 2, 8, 'Backup, Rollback, and Versioning', 75),
+('DEV301', 3, 9, 'Performance, Caching, and Horizontal Scaling', 75),
+('DEV301', 3, 10, 'Deployment Security Essentials', 75),
+('DEV301', 3, 11, 'Basic Cloud Deployment', 75),
+('DEV301', 3, 12, 'Mini Project: Deploying the LMS Demo', 60);
 
-(2, 1, 1, 2, 'Danh sách liên kết, stack và queue',
-CONCAT(
-'<h2>Mục tiêu</h2><ul>',
-'<li>So sánh mảng với danh sách liên kết đơn/kép.</li>',
-'<li>Hiểu stack (LIFO) và queue (FIFO).</li></ul>',
-'<h2>Stack</h2><p>Thao tác push/pop ở một đầu. Ứng dụng: duyệt DFS, kiểm tra ngoặc, undo.</p>',
-'<h2>Queue</h2><p>Enqueue ở đuôi, dequeue ở đầu. Ứng dụng: BFS theo lớp, xử lý hàng đợi tác vụ.</p>',
-'<h2>Độ phức tạp</h2><p>Với cài đặt chuẩn, push/pop/enqueue/dequeue đều O(1) trong mô hình tính toán thông thường.</p>'
-),
-NULL, 90, 1),
+CREATE TEMPORARY TABLE `tmp_enrollment_seed` (
+  `student_id` BIGINT NOT NULL,
+  `course_code` VARCHAR(20) NOT NULL,
+  `enrolled_at` DATE NOT NULL,
+  `completed_lessons` INT NOT NULL,
+  `activity_xp` INT NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`student_id`, `course_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-(3, 1, 1, 3, 'Cây BST và duyệt cây',
-CONCAT(
-'<h2>Định nghĩa BST</h2>',
-'<p>Cây nhị phân tìm kiếm: với mỗi nút v, mọi khóa cây con trái nhỏ hơn khóa(v), mọi khóa cây con phải lớn hơn (giả sử không trùng khóa).</p>',
-'<h2>Trường hợp xấu nhất</h2>',
-'<p>Chèn theo thứ tự đã sắp có thể làm BST suy biến thành danh sách; chiều cao O(n). Cây cân bằng (AVL, Red-Black) giữ chiều cao O(log n).</p>',
-'<h2>Duyệt cây</h2><p>Preorder, inorder, postorder. Duyệt inorder trên BST cho dãy khóa tăng dần.</p>'
-),
-NULL, 90, 1),
+INSERT INTO `tmp_enrollment_seed`
+(`student_id`, `course_code`, `enrolled_at`, `completed_lessons`, `activity_xp`, `status`) VALUES
+(5, 'ITF101', '2026-01-05', 12, 180, 'COMPLETED'),
+(5, 'PRG101', '2026-01-20', 8, 110, 'ACTIVE'),
+(5, 'DBI201', '2026-02-10', 5, 60, 'ACTIVE'),
+(5, 'WEB201', '2026-02-18', 6, 70, 'ACTIVE'),
+(5, 'OOP201', '2026-03-01', 3, 30, 'ACTIVE'),
+(6, 'ITF101', '2026-01-07', 10, 120, 'ACTIVE'),
+(6, 'PRG101', '2026-01-25', 6, 60, 'ACTIVE'),
+(6, 'DBI201', '2026-02-14', 2, 20, 'ACTIVE'),
+(6, 'WEB201', '2026-02-22', 4, 40, 'ACTIVE'),
+(7, 'ITF101', '2026-01-03', 12, 170, 'COMPLETED'),
+(7, 'PRG101', '2026-01-17', 12, 190, 'COMPLETED'),
+(7, 'DBI201', '2026-02-05', 9, 120, 'ACTIVE'),
+(7, 'WEB201', '2026-02-12', 8, 100, 'ACTIVE'),
+(7, 'OOP201', '2026-02-25', 7, 90, 'ACTIVE'),
+(7, 'DSA201', '2026-03-02', 6, 75, 'ACTIVE'),
+(7, 'API301', '2026-03-10', 3, 40, 'ACTIVE'),
+(8, 'ITF101', '2026-01-15', 7, 50, 'ACTIVE'),
+(8, 'PRG101', '2026-02-01', 5, 45, 'ACTIVE'),
+(8, 'OOP201', '2026-03-05', 2, 15, 'ACTIVE'),
+(8, 'DSA201', '2026-03-12', 2, 20, 'ACTIVE'),
+(9, 'ITF101', '2026-01-04', 12, 160, 'COMPLETED'),
+(9, 'DBI201', '2026-02-08', 8, 100, 'ACTIVE'),
+(9, 'WEB201', '2026-02-16', 10, 130, 'ACTIVE'),
+(9, 'API301', '2026-03-18', 1, 10, 'ACTIVE'),
+(10, 'ITF101', '2026-01-22', 4, 20, 'ACTIVE'),
+(10, 'PRG101', '2026-02-06', 1, 5, 'ACTIVE');
 
-(4, 2, 2, 1, 'HTML5: cấu trúc và ngữ nghĩa',
-CONCAT(
-'<h2>Giới thiệu</h2>',
-'<p>HTML mô tả cấu trúc tài liệu web: tiêu đề, đoạn, danh sách, liên kết, biểu mẫu. HTML5 chuẩn hóa các thẻ ngữ nghĩa như <code>header</code>, <code>nav</code>, <code>main</code>, <code>article</code>, <code>section</code>, <code>footer</code>.</p>',
-'<h2>Ví dụ khung trang</h2>',
-'<pre>&lt;!DOCTYPE html&gt;\n&lt;html lang="vi"&gt;\n&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Trang mẫu&lt;/title&gt;&lt;/head&gt;\n&lt;body&gt;&lt;h1&gt;Tiêu đề&lt;/h1&gt;&lt;p&gt;Đoạn văn.&lt;/p&gt;&lt;/body&gt;\n&lt;/html&gt;</pre>',
-'<h2>Form cơ bản</h2>',
-'<p>Dùng <code>label</code> gắn với <code>input</code>, <code>type</code> phù hợp (text, email, password), và <code>button type="submit"</code> để gửi dữ liệu.</p>'
-),
-NULL, 60, 1),
+INSERT INTO `courses`
+(`course_code`, `course_name`, `description`, `teacher_id`, `enroll_password`, `semester`, `academic_year`, `status`, `max_students`, `thumbnail`, `department_id`, `credits`, `theory_hours`, `practice_hours`)
+SELECT
+  tcs.course_code,
+  tcs.course_name,
+  tcs.description,
+  tcs.teacher_id,
+  tcs.enroll_password,
+  'SEM1',
+  '2026-2027',
+  'PUBLISHED',
+  60,
+  tcs.thumbnail,
+  1,
+  tcs.credits,
+  tcs.theory_hours,
+  tcs.practice_hours
+FROM `tmp_course_seed` tcs
+ORDER BY tcs.sort_order;
 
-(5, 2, 2, 2, 'CSS: box model, màu và typography',
-CONCAT(
-'<h2>Box model</h2>',
-'<p>Mỗi phần tử có <strong>content</strong>, <strong>padding</strong>, <strong>border</strong>, <strong>margin</strong>. Thuộc tính <code>box-sizing: border-box</code> giúp tính kích thước trực quan hơn.</p>',
-'<h2>Màu và font</h2>',
-'<p>Dùng mã hex, rgb/rgba, hoặc tên màu. Khai báo font-family với danh sách dự phòng; <code>line-height</code> cải thiện khả năng đọc.</p>',
-'<h2>Ví dụ</h2>',
-'<pre>.card {\n  max-width: 480px;\n  padding: 1rem;\n  border: 1px solid #e0e7ef;\n  border-radius: 8px;\n}</pre>'
-),
-NULL, 60, 1),
+INSERT INTO `course_prerequisites` (`course_id`, `prerequisite_course_code`)
+SELECT c.id, tps.prerequisite_course_code
+FROM `tmp_prereq_seed` tps
+JOIN `courses` c ON c.course_code = tps.course_code
+ORDER BY c.id, tps.prerequisite_course_code;
 
-(6, 2, 2, 3, 'Flexbox và responsive cơ bản',
-CONCAT(
-'<h2>Flexbox</h2>',
-'<p>Đặt <code>display: flex</code> trên container; dùng <code>justify-content</code> (trục chính) và <code>align-items</code> (trục phụ) để căn chỉnh hàng/cột.</p>',
-'<h2>Responsive</h2>',
-'<p>Thiết kế mobile-first: bắt đầu từ layout hẹp, sau đó dùng <code>@media (min-width: ...)</code> để mở rộng. Đơn vị <code>rem</code>/<code>%</code> giúp co giãn chữ và khối.</p>',
-'<h2>Gợi ý</h2>',
-'<p>Kết hợp Flexbox với <code>gap</code> để tạo khoảng cách đều giữa các mục mà không cần margin thủ công.</p>'
-),
-NULL, 60, 1),
+INSERT INTO `course_sections` (`course_id`, `section_order`, `title`)
+SELECT
+  c.id,
+  s.section_order,
+  CASE s.section_order
+    WHEN 1 THEN CONCAT('Section 1 - Foundations of ', c.course_code)
+    WHEN 2 THEN CONCAT('Section 2 - Core Practice of ', c.course_code)
+    ELSE CONCAT('Section 3 - Integration and Mini Project of ', c.course_code)
+  END
+FROM `courses` c
+JOIN (
+  SELECT 1 AS section_order
+  UNION ALL SELECT 2
+  UNION ALL SELECT 3
+) s
+ORDER BY c.id, s.section_order;
 
-(7, 3, 3, 1, 'Java: JVM, Hello World và kiểu dữ liệu',
-CONCAT(
-'<h2>Nền tảng Java</h2>',
-'<p>Mã nguồn <code>.java</code> biên dịch thành bytecode chạy trên JVM — đa nền tảng. Mỗi ứng dụng có hàm <code>public static void main(String[] args)</code> làm điểm vào.</p>',
-'<h2>Hello World</h2>',
-'<pre>public class Hello {\n  public static void main(String[] args) {\n    System.out.println("Xin chao");\n  }\n}</pre>',
-'<h2>Kiểu dữ liệu</h2>',
-'<p>Kiểu nguyên thủy: <code>int</code>, <code>long</code>, <code>double</code>, <code>boolean</code>, <code>char</code>. Kiểu tham chiếu: chuỗi, mảng, đối tượng. Chuỗi bất biến dùng lớp <code>String</code>.</p>'
-),
-NULL, 75, 1),
+INSERT INTO `lessons`
+(`course_id`, `section_id`, `lesson_order`, `lesson_title`, `lesson_content`, `video_url`, `duration_minutes`, `published`)
+SELECT
+  c.id,
+  cs.id,
+  tls.lesson_order,
+  tls.lesson_title,
+  CONCAT(
+    '<h2>Objective</h2><p>This lesson helps students master <strong>', tls.lesson_title,
+    '</strong> in the course <strong>', c.course_name, '</strong>.</p>',
+    '<h2>Core content</h2><p>', c.course_name,
+    ' is designed as a progressive path from fundamentals to more advanced work. This lesson focuses on "', tls.lesson_title,
+    '" and connects directly to the next lesson in the 12-lesson sequence.</p>',
+    '<p><strong>Key idea:</strong> Lesson "', tls.lesson_title,
+    '" is a required checkpoint that lets students take the quiz, submit the file-based homework, and unlock the next lesson.</p>',
+    '<div class="material-hint"><strong>Outside work:</strong> After finishing the lesson, students must complete the external assignment and upload a file so the system can record the result.</div>'
+  ),
+  NULL,
+  tls.duration_minutes,
+  b'1'
+FROM `tmp_lesson_seed` tls
+JOIN `courses` c ON c.course_code = tls.course_code
+JOIN `course_sections` cs ON cs.course_id = c.id AND cs.section_order = tls.section_order
+ORDER BY c.id, tls.lesson_order;
 
-(8, 3, 3, 2, 'Lớp, đối tượng và constructor',
-CONCAT(
-'<h2>Lớp và đối tượng</h2>',
-'<p>Lớp là khuôn mẫu; đối tượng là thể hiện. Thuộc tính lưu trạng thái, phương thức định nghĩa hành vi. Từ khóa <code>this</code> tham chiếu thể hiện hiện tại.</p>',
-'<h2>Constructor</h2>',
-'<p>Hàm khởi tạo trùng tên lớp, không kiểu trả về. Có thể nạp chồng constructor. Khối khởi tạo chạy trước thân constructor.</p>',
-'<h2>Ví dụ ngắn</h2>',
-'<pre>public class Point {\n  private final int x, y;\n  public Point(int x, int y) { this.x = x; this.y = y; }\n  public int sum() { return x + y; }\n}</pre>'
-),
-NULL, 75, 1),
+INSERT INTO `enrollments`
+(`student_id`, `course_id`, `enrolled_at`, `status`, `progress_percentage`, `activity_xp`, `total_xp`)
+SELECT
+  tes.student_id,
+  c.id,
+  tes.enrolled_at,
+  tes.status,
+  ROUND(tes.completed_lessons * 100.0 / 12),
+  tes.activity_xp,
+  tes.completed_lessons * 20 + tes.activity_xp
+FROM `tmp_enrollment_seed` tes
+JOIN `courses` c ON c.course_code = tes.course_code
+ORDER BY tes.student_id, c.id;
 
-(9, 3, 3, 3, 'Kế thừa, interface và xử lý ngoại lệ',
-CONCAT(
-'<h2>Kế thừa</h2>',
-'<p>Dùng <code>extends</code> cho một lớp cha. Ghi đè phương thức với <code>@Override</code>; đa hình cho phép tham chiếu kiểu cha trỏ tới thể hiện lớp con.</p>',
-'<h2>Interface</h2>',
-'<p>Định nghĩa hợp đồng hành vi; lớp <code>implements</code> một hoặc nhiều interface. Từ Java 8 có phương thức <code>default</code> trên interface.</p>',
-'<h2>Ngoại lệ</h2>',
-'<p>Dùng <code>try / catch / finally</code>; ném ngoại lệ với <code>throw</code>. Ưu tiên bắt ngoại lệ cụ thể; tránh bắt <code>Exception</code> quá rộng nếu không cần.</p>'
-),
-NULL, 75, 1);
+INSERT INTO `assignments`
+(`course_id`, `lesson_id`, `title`, `description`, `type`, `due_date`, `max_score`, `minimum_passing_score`, `allow_late_submission`, `max_attempts`)
+SELECT
+  c.id,
+  l.id,
+  CONCAT('[QUIZ] ', c.course_code, ' - Lesson ', LPAD(l.lesson_order, 2, '0'), ': ', l.lesson_title),
+  CONCAT('Three-question quiz for lesson "', l.lesson_title, '". Score at least 6/10 to unlock the next lesson.'),
+  'QUIZ',
+  TIMESTAMP(DATE_ADD('2026-09-01', INTERVAL ((tcs.sort_order - 1) * 18 + l.lesson_order) DAY), '23:59:00'),
+  10.0,
+  6.0,
+  b'0',
+  1
+FROM `lessons` l
+JOIN `courses` c ON c.id = l.course_id
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+ORDER BY c.id, l.lesson_order;
 
-INSERT INTO `enrollments` (`id`, `student_id`, `course_id`, `enrolled_at`, `status`, `progress_percentage`, `activity_xp`, `total_xp`) VALUES
-(1, 3, 1, '2024-09-05', 'ACTIVE', 35, 40, 120),
-(2, 4, 1, '2024-09-06', 'ACTIVE', 28, 15, 95),
-(3, 5, 1, '2024-09-07', 'ACTIVE', 15, 0, 40),
-(4, 3, 2, '2024-09-08', 'ACTIVE', 20, 20, 60),
-(5, 6, 2, '2024-09-08', 'ACTIVE', 10, 10, 30),
-(6, 7, 3, '2024-09-09', 'ACTIVE', 12, 5, 35);
+INSERT INTO `assignments`
+(`course_id`, `lesson_id`, `title`, `description`, `type`, `due_date`, `max_score`, `minimum_passing_score`, `allow_late_submission`, `max_attempts`)
+SELECT
+  c.id,
+  l.id,
+  CONCAT('[HOMEWORK] ', c.course_code, ' - Lesson ', LPAD(l.lesson_order, 2, '0'), ': ', l.lesson_title),
+  CONCAT('Complete the outside-work assignment for lesson "', l.lesson_title, '" and submit ', tcs.deliverable, '.'),
+  'HOMEWORK',
+  TIMESTAMP(DATE_ADD('2026-09-03', INTERVAL ((tcs.sort_order - 1) * 18 + l.lesson_order) DAY), '23:59:00'),
+  10.0,
+  NULL,
+  CASE WHEN MOD(l.lesson_order, 4) = 0 THEN b'1' ELSE b'0' END,
+  2
+FROM `lessons` l
+JOIN `courses` c ON c.id = l.course_id
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+ORDER BY c.id, l.lesson_order;
 
-INSERT INTO `assignments` (`id`, `course_id`, `title`, `description`, `type`, `due_date`, `max_score`) VALUES
-(1, 1, 'Kiểm tra nhanh: Độ phức tạp và cấu trúc dữ liệu cơ bản',
-'Làm trắc nghiệm. Thời gian gợi ý: 25 phút. Đọc kỹ đề trước khi chọn đáp án.',
-'QUIZ', '2025-12-15 23:59:00', 10.0),
+INSERT INTO `quiz_questions`
+(`assignment_id`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_answer`, `question_order`, `points`)
+SELECT
+  a.id,
+  CONCAT('Lesson "', l.lesson_title, '" belongs to which course?'),
+  c.course_name,
+  'Advanced Information Security',
+  'Computer Graphics',
+  'Game Design',
+  'A',
+  1,
+  1.0
+FROM `assignments` a
+JOIN `lessons` l ON l.id = a.lesson_id
+JOIN `courses` c ON c.id = a.course_id
+WHERE a.type = 'QUIZ'
+ORDER BY a.id;
 
-(2, 1, 'Bài tập: Phân tích độ phức tạp của hai đoạn giả mã',
-'Cho hai đoạn giả mã trong tài liệu bài 1. Yêu cầu: xác định Big-O theo n, giải thích từng bước lập luận (số vòng lặp, chi phối số hạng). Nộp file PDF hoặc văn bản trong khung nộp bài.',
-'HOMEWORK', '2025-12-20 23:59:00', 10.0),
+INSERT INTO `quiz_questions`
+(`assignment_id`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_answer`, `question_order`, `points`)
+SELECT
+  a.id,
+  CONCAT('What is the main focus of lesson "', l.lesson_title, '"?'),
+  l.lesson_title,
+  'Waterfall planning',
+  'Shader pipeline',
+  'Quantum circuit',
+  'A',
+  2,
+  1.0
+FROM `assignments` a
+JOIN `lessons` l ON l.id = a.lesson_id
+WHERE a.type = 'QUIZ'
+ORDER BY a.id;
 
-(3, 2, 'Quiz: HTML5 và CSS cơ bản',
-'Trắc nghiệm về thẻ ngữ nghĩa, form, box model và Flexbox.',
-'QUIZ', '2025-12-18 23:59:00', 10.0),
+INSERT INTO `quiz_questions`
+(`assignment_id`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_answer`, `question_order`, `points`)
+SELECT
+  a.id,
+  CONCAT('What must you submit for the outside-work assignment of lesson "', l.lesson_title, '"?'),
+  tcs.deliverable,
+  'Only forum participation',
+  'No deliverable is required',
+  'Only mark the lesson as complete',
+  'A',
+  3,
+  1.0
+FROM `assignments` a
+JOIN `lessons` l ON l.id = a.lesson_id
+JOIN `courses` c ON c.id = a.course_id
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+WHERE a.type = 'QUIZ'
+ORDER BY a.id;
 
-(4, 3, 'Quiz: Java cơ bản',
-'Trắc nghiệm về kiểu dữ liệu, lớp, kế thừa và xử lý ngoại lệ.',
-'QUIZ', '2025-12-22 23:59:00', 10.0);
+INSERT INTO `lesson_progress`
+(`student_id`, `lesson_id`, `completed`, `completed_at`)
+SELECT
+  tes.student_id,
+  l.id,
+  b'1',
+  DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order DAY)
+FROM `tmp_enrollment_seed` tes
+JOIN `courses` c ON c.course_code = tes.course_code
+JOIN `lessons` l ON l.course_id = c.id
+WHERE l.lesson_order <= tes.completed_lessons
+ORDER BY tes.student_id, l.id;
 
-UPDATE `assignments`
-SET `lesson_id` = 1,
-    `minimum_passing_score` = 6.0
-WHERE `id` = 1;
+INSERT INTO `forum_posts`
+(`course_id`, `lesson_id`, `author_id`, `title`, `content`, `post_type`, `view_count`, `created_at`) VALUES
+(NULL, NULL, 4, 'Welcome to the progressive IT learning path', 'This demo dataset now contains 8 linked IT courses, each with 12 lessons, quizzes, homework, notes and forum topics so the LMS feels like a live learning environment.', 'ANNOUNCEMENT', 45, '2026-03-01 08:00:00'),
+(NULL, NULL, 4, 'How to use notes, quiz and file submission together', 'Complete the current lesson, pass the lesson quiz, save notes while studying and upload your outside-work file in the homework assignment for each lesson.', 'ANNOUNCEMENT', 39, '2026-03-01 09:00:00');
 
-UPDATE `assignments`
-SET `lesson_id` = 2,
-    `minimum_passing_score` = 6.0
-WHERE `id` = 2;
+INSERT INTO `forum_posts`
+(`course_id`, `lesson_id`, `author_id`, `title`, `content`, `post_type`, `view_count`, `created_at`)
+SELECT
+  c.id,
+  NULL,
+  c.teacher_id,
+  CONCAT('Schedule and study guide for ', c.course_code),
+  CONCAT('Course ', c.course_name, ' has 12 lessons, and each lesson includes a quiz and a file-submission homework assignment. Use notes inside the lesson and ask questions in the forum whenever you get stuck.'),
+  'ANNOUNCEMENT',
+  20 + tcs.sort_order * 3,
+  TIMESTAMP(DATE_ADD('2026-03-02', INTERVAL tcs.sort_order DAY), '08:30:00')
+FROM `courses` c
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+ORDER BY tcs.sort_order;
 
-UPDATE `assignments`
-SET `lesson_id` = 4,
-    `minimum_passing_score` = 5.0
-WHERE `id` = 3;
+INSERT INTO `forum_posts`
+(`course_id`, `lesson_id`, `author_id`, `title`, `content`, `post_type`, `view_count`, `created_at`)
+SELECT
+  c.id,
+  l.id,
+  5 + MOD(tcs.sort_order - 1, 6),
+  CONCAT('Lesson 04 Q&A - ', l.lesson_title),
+  CONCAT('I am currently studying lesson "', l.lesson_title, '" in course ', c.course_code, '. Could anyone share a fast study approach and tips for completing the file-submission homework for this lesson?'),
+  'QUESTION',
+  12 + tcs.sort_order * 2,
+  TIMESTAMP(DATE_ADD('2026-03-05', INTERVAL tcs.sort_order DAY), '10:15:00')
+FROM `courses` c
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 4
+ORDER BY tcs.sort_order;
 
-UPDATE `assignments`
-SET `lesson_id` = 7,
-    `minimum_passing_score` = 5.0
-WHERE `id` = 4;
+INSERT INTO `forum_posts`
+(`course_id`, `lesson_id`, `author_id`, `title`, `content`, `post_type`, `view_count`, `created_at`)
+SELECT
+  c.id,
+  l.id,
+  5 + MOD(tcs.sort_order + 1, 6),
+  CONCAT('Mini project wrap-up - ', c.course_code),
+  CONCAT('Lesson 12 "', l.lesson_title, '" requires submitting ', tcs.deliverable, '. Our group is collecting experience and a checklist before submission.'),
+  'DISCUSSION',
+  16 + tcs.sort_order * 2,
+  TIMESTAMP(DATE_ADD('2026-03-07', INTERVAL tcs.sort_order DAY), '15:45:00')
+FROM `courses` c
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 12
+ORDER BY tcs.sort_order;
 
-INSERT INTO `quiz_questions` (`id`, `assignment_id`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_answer`, `question_order`, `points`) VALUES
-(1, 1,
-'Cho đoạn mã duyệt một mảng một chiều n phần tử đúng một lần, mỗi phần tử thực hiện O(1) phép toán. Độ phức tạp thời gian tiệm cận (worst-case) là gì?',
-'O(n²)', 'O(n)', 'O(log n)', 'O(1)', 'B', 1, 2.0),
+INSERT INTO `comments`
+(`post_id`, `author_id`, `content`, `created_at`)
+SELECT
+  fp.id,
+  c.teacher_id,
+  CONCAT('For lesson "', l.lesson_title, '", break the task into input, process, and output. Finish the quiz first, then package the results into a file for homework submission.'),
+  DATE_ADD(fp.created_at, INTERVAL 45 MINUTE)
+FROM `forum_posts` fp
+JOIN `courses` c ON c.id = fp.course_id
+JOIN `lessons` l ON l.id = fp.lesson_id
+WHERE fp.title = CONCAT('Lesson 04 Q&A - ', l.lesson_title)
+ORDER BY fp.id;
 
-(2, 1,
-'Cấu trúc dữ liệu nào phù hợp nhất với nguyên tắc "vào sau ra trước" (LIFO)?',
-'Hàng đợi (queue)', 'Ngăn xếp (stack)', 'Danh sách liên kết đơn (chỉ duyệt từ đầu)', 'Bảng băm (hash table)', 'B', 2, 2.0),
+INSERT INTO `comments`
+(`post_id`, `author_id`, `content`, `created_at`)
+SELECT
+  fp.id,
+  5 + MOD(tcs.sort_order + 2, 6),
+  CONCAT('Our group will submit ', tcs.deliverable, ' and include summary notes from lessons 1 to 11 to review everything before the mini project.'),
+  DATE_ADD(fp.created_at, INTERVAL 90 MINUTE)
+FROM `forum_posts` fp
+JOIN `courses` c ON c.id = fp.course_id
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+WHERE fp.title = CONCAT('Mini project wrap-up - ', c.course_code)
+ORDER BY fp.id;
 
-(3, 1,
-'Trong BST không cân bằng, trường hợp xấu nhất khi chèn n khóa đã sắp xếp có thể dẫn đến chiều cao cây xấp xỉ:',
-'log n', 'n', '√n', '1', 'B', 3, 2.0),
+INSERT INTO `notes`
+(`student_id`, `lesson_id`, `course_id`, `content`, `highlight_color`, `title`, `note_type`, `source_excerpt`, `tags`, `created_at`, `updated_at`)
+SELECT
+  5 + MOD(tcs.sort_order - 1, 6),
+  NULL,
+  c.id,
+  CONCAT('Course overview for ', c.course_code, ': follow the 12 lessons in order, pass the quiz to unlock the next lesson, and submit ', tcs.deliverable, ' for each homework assignment.'),
+  '#FDE68A',
+  CONCAT('Overview note - ', c.course_code),
+  'STANDALONE',
+  NULL,
+  CONCAT(LOWER(c.course_code), ',roadmap,course-note'),
+  TIMESTAMP(DATE_ADD('2026-03-10', INTERVAL tcs.sort_order DAY), '07:30:00'),
+  TIMESTAMP(DATE_ADD('2026-03-10', INTERVAL tcs.sort_order DAY), '07:30:00')
+FROM `courses` c
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+ORDER BY tcs.sort_order;
 
-(4, 1,
-'Thuật toán tìm kiếm nhị phân trên mảng đã sắp có độ phức tạp thời gian (worst-case) là:',
-'O(n)', 'O(log n)', 'O(n log n)', 'O(1)', 'B', 4, 2.0),
+INSERT INTO `notes`
+(`student_id`, `lesson_id`, `course_id`, `content`, `highlight_color`, `title`, `note_type`, `source_excerpt`, `tags`, `created_at`, `updated_at`)
+SELECT
+  5 + MOD(tcs.sort_order + l.lesson_order - 2, 6),
+  l.id,
+  c.id,
+  CONCAT('Remember that lesson "', l.lesson_title, '" is a mandatory checkpoint in the ', c.course_code, ' learning path. After this lesson, complete the quiz and submit the homework in the required format.'),
+  CASE MOD(l.lesson_order, 4)
+    WHEN 0 THEN '#BFDBFE'
+    WHEN 1 THEN '#FDE68A'
+    WHEN 2 THEN '#C7F9CC'
+    ELSE '#FBCFE8'
+  END,
+  CONCAT('Note - ', c.course_code, ' - Lesson ', LPAD(l.lesson_order, 2, '0')),
+  'LESSON',
+  CONCAT('Lesson "', l.lesson_title, '" is a required checkpoint so students can take the quiz, submit the file-based homework, and unlock the next lesson.'),
+  CONCAT(LOWER(c.course_code), ',lesson-', LPAD(l.lesson_order, 2, '0'), ',study'),
+  TIMESTAMP(DATE_ADD('2026-03-12', INTERVAL (tcs.sort_order * 2 + l.lesson_order) DAY), '20:00:00'),
+  TIMESTAMP(DATE_ADD('2026-03-12', INTERVAL (tcs.sort_order * 2 + l.lesson_order) DAY), '20:00:00')
+FROM `lessons` l
+JOIN `courses` c ON c.id = l.course_id
+JOIN `tmp_course_seed` tcs ON tcs.course_code = c.course_code
+ORDER BY c.id, l.lesson_order;
 
-(5, 1,
-'Ký hiệu Θ(f(n)) nghĩa là:',
-'Chỉ cận trên', 'Chỉ cận dưới', 'Cận trên và cận dưới cùng bậc (cùng tốc độ tăng)', 'Luôn tương đương O(n²)', 'C', 5, 2.0),
+INSERT INTO `note_links`
+(`from_note_id`, `to_note_id`, `relation_label`, `created_at`)
+SELECT
+  cn.id,
+  ln.id,
+  'course-roadmap',
+  DATE_ADD(cn.created_at, INTERVAL 1 HOUR)
+FROM `notes` cn
+JOIN `courses` c ON c.id = cn.course_id
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 1
+JOIN `notes` ln ON ln.lesson_id = l.id
+WHERE cn.lesson_id IS NULL
+ORDER BY c.id;
 
-(6, 3,
-'Thẻ HTML5 nào thích hợp cho khối nội dung chính của trang?',
-'&lt;div&gt;', '&lt;main&gt;', '&lt;span&gt;', '&lt;meta&gt;', 'B', 1, 2.5),
+INSERT INTO `note_links`
+(`from_note_id`, `to_note_id`, `relation_label`, `created_at`)
+SELECT
+  n4.id,
+  n12.id,
+  'project-prep',
+  DATE_ADD(n4.created_at, INTERVAL 2 HOUR)
+FROM `courses` c
+JOIN `lessons` l4 ON l4.course_id = c.id AND l4.lesson_order = 4
+JOIN `lessons` l12 ON l12.course_id = c.id AND l12.lesson_order = 12
+JOIN `notes` n4 ON n4.lesson_id = l4.id
+JOIN `notes` n12 ON n12.lesson_id = l12.id
+ORDER BY c.id;
 
-(7, 3,
-'Thuộc tính CSS nào thường dùng cùng Flexbox để căn các phần tử theo trục chính?',
-'align-items', 'justify-content', 'float', 'z-index', 'B', 2, 2.5),
+INSERT INTO `submissions`
+(`assignment_id`, `student_id`, `content`, `file_url`, `original_file_name`, `file_size`, `score`, `feedback`, `status`, `attempt_number`, `late_submission`, `auto_graded`, `submitted_at`, `graded_at`)
+SELECT
+  a.id,
+  tes.student_id,
+  CONCAT('Seed quiz answers for ', c.course_code, ' lesson ', l.lesson_order),
+  NULL,
+  NULL,
+  NULL,
+  ROUND(6 + MOD(tes.student_id + c.id, 5), 1),
+  CONCAT('Auto-graded seed result for ', c.course_code, ' lesson ', l.lesson_order, '.'),
+  'GRADED',
+  1,
+  b'0',
+  b'1',
+  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 10 DAY), '20:00:00'),
+  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 10 DAY), '20:00:00')
+FROM `tmp_enrollment_seed` tes
+JOIN `courses` c ON c.course_code = tes.course_code
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 1
+JOIN `assignments` a ON a.course_id = c.id AND a.lesson_id = l.id AND a.type = 'QUIZ'
+WHERE tes.completed_lessons >= 1
+ORDER BY tes.student_id, c.id;
 
-(8, 3,
-'Box model gồm các phần nào (từ trong ra ngoài)?',
-'content, padding, border, margin', 'margin, border, padding, content', 'chỉ content và margin', 'chỉ padding', 'A', 3, 2.5),
+INSERT INTO `submissions`
+(`assignment_id`, `student_id`, `content`, `file_url`, `original_file_name`, `file_size`, `score`, `feedback`, `status`, `attempt_number`, `late_submission`, `auto_graded`, `submitted_at`, `graded_at`)
+SELECT
+  a.id,
+  tes.student_id,
+  CONCAT('Seed homework submission for ', c.course_code, ' lesson ', l.lesson_order, '.'),
+  CONCAT('uploads/seed/', LOWER(c.course_code), '-lesson-', LPAD(l.lesson_order, 2, '0'), '-student-', tes.student_id, '.pdf'),
+  CONCAT(LOWER(c.course_code), '-lesson-', LPAD(l.lesson_order, 2, '0'), '-student-', tes.student_id, '.pdf'),
+  180000 + tes.student_id * 1000 + l.lesson_order * 500,
+  CASE WHEN tes.completed_lessons >= 2 THEN ROUND(7 + MOD(tes.student_id + c.id, 4) * 0.75, 1) ELSE NULL END,
+  CASE
+    WHEN tes.completed_lessons >= 2 THEN CONCAT('Graded homework sample for ', c.course_code, ' lesson ', l.lesson_order, '.')
+    ELSE NULL
+  END,
+  CASE
+    WHEN tes.completed_lessons >= 2 THEN 'GRADED'
+    ELSE 'SUBMITTED'
+  END,
+  1,
+  b'0',
+  b'0',
+  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 12 DAY), '21:00:00'),
+  CASE
+    WHEN tes.completed_lessons >= 2 THEN TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 13 DAY), '09:00:00')
+    ELSE NULL
+  END
+FROM `tmp_enrollment_seed` tes
+JOIN `courses` c ON c.course_code = tes.course_code
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 1
+JOIN `assignments` a ON a.course_id = c.id AND a.lesson_id = l.id AND a.type = 'HOMEWORK'
+WHERE tes.completed_lessons >= 1
+ORDER BY tes.student_id, c.id;
 
-(9, 3,
-'Media query trong CSS dùng để:',
-'Chỉ đổi màu nền', 'Áp dụng style theo kích thước màn hình hoặc điều kiện thiết bị', 'Tắt JavaScript', 'Nén ảnh tự động', 'B', 4, 2.5),
+INSERT INTO `submissions`
+(`assignment_id`, `student_id`, `content`, `file_url`, `original_file_name`, `file_size`, `score`, `feedback`, `status`, `attempt_number`, `late_submission`, `auto_graded`, `submitted_at`, `graded_at`)
+SELECT
+  a.id,
+  tes.student_id,
+  CONCAT('Seed quiz answers for ', c.course_code, ' lesson ', l.lesson_order),
+  NULL,
+  NULL,
+  NULL,
+  ROUND(6 + MOD(tes.student_id + c.id + 1, 5), 1),
+  CONCAT('Auto-graded seed result for ', c.course_code, ' lesson ', l.lesson_order, '.'),
+  'GRADED',
+  1,
+  b'0',
+  b'1',
+  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 15 DAY), '20:15:00'),
+  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 15 DAY), '20:15:00')
+FROM `tmp_enrollment_seed` tes
+JOIN `courses` c ON c.course_code = tes.course_code
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 2
+JOIN `assignments` a ON a.course_id = c.id AND a.lesson_id = l.id AND a.type = 'QUIZ'
+WHERE tes.completed_lessons >= 2
+ORDER BY tes.student_id, c.id;
 
-(10, 4,
-'Kiểu nguyên thủy nào trong Java dùng để lưu true/false?',
-'int', 'boolean', 'String', 'double', 'B', 1, 2.5),
-
-(11, 4,
-'Từ khóa nào dùng để lớp con kế thừa lớp cha?',
-'implements', 'extends', 'inherits', 'superclass', 'B', 2, 2.5),
-
-(12, 4,
-'Khối nào bắt buộc có khi xử lý checked exception trong Java?',
-'if', 'try-catch hoặc khai báo throws', 'switch', 'for', 'B', 3, 2.5),
-
-(13, 4,
-'Phương thức khởi tạo trong Java có kiểu trả về là gì?',
-'void', 'int', 'không có kiểu trả về (trùng tên lớp)', 'Object', 'C', 4, 2.5);
-
-INSERT INTO `forum_posts` (`id`, `course_id`, `author_id`, `title`, `content`, `post_type`, `view_count`, `created_at`) VALUES
-(1, 1, 3, 'Thắc mắc về phân biệt O và Θ',
-'Thầy/cô và các bạn cho em hỏi: nếu thuật toán có worst-case O(n²) nhưng trung bình O(n log n) thì khi báo cáo độ phức tạp nên nêu rõ ngữ cảnh worst-case hay average-case? Em cảm ơn.',
-'QUESTION', 42, '2024-10-01 09:15:00'),
-
-(2, 1, 2, 'Tài liệu tham khảo: Introduction to Algorithms (Cormen et al.)',
-'Nhắc nhóm mình có thể đối chiếu định nghĩa asymptotic trong sách Cormen, chương 3. Thư viện trường có bản mượn.',
-'ANNOUNCEMENT', 128, '2024-10-03 14:00:00'),
-
-(3, 2, 4, 'Flexbox: justify-content vs align-items',
-'Mình hay nhầm hai thuộc tính này khi đổi trục row/column. Có mẹo gốc nhớ nhanh không các bạn?',
-'DISCUSSION', 33, '2024-10-05 11:20:00'),
-
-(4, 3, 5, 'Checked exception và throws',
-'Khi nào nên khai báo throws trên main thay vì bọc try-catch? Em muốn hiểu convention trong dự án thực tế.',
-'QUESTION', 19, '2024-10-08 16:45:00');
-
-INSERT INTO `comments` (`id`, `post_id`, `author_id`, `content`, `created_at`) VALUES
-(1, 1, 1, 'Em nên nêu rõ worst-case, average-case và best-case nếu có dữ liệu; trong báo cáo khoa học thường ghi worst-case cho giới hạn trên và trung bình nếu phân phối đầu vào được giả định.', '2024-10-01 10:05:00'),
-(2, 1, 4, 'Mình hay ghi: "Worst-case time O(...); expected time O(...)" nếu có randomized algorithm.', '2024-10-01 11:30:00'),
-(3, 3, 2, 'Với Flexbox: nhớ trục chính phụ thuộc flex-direction; justify-content căn theo trục chính, align-items theo trục phụ (khi row thì ngang/dọc đổi vai khi chuyển column).', '2024-10-05 15:00:00');
-
-INSERT INTO `submissions` (`id`, `assignment_id`, `student_id`, `content`, `file_url`, `score`, `feedback`, `status`, `submitted_at`) VALUES
-(1, 1, 3, '{"answers":["B","B","B","B","C"]}', NULL, 10.0, 'Đáp án đúng cả 5 câu. Rất tốt.', 'GRADED', '2024-11-10 20:00:00'),
-(2, 1, 4, '{"answers":["B","B","B","B","C"]}', NULL, 8.0, 'Đúng 4/5; câu 4 cần ôn lại tìm kiếm nhị phân.', 'GRADED', '2024-11-11 18:30:00'),
-(3, 2, 3,
-'Phân tích đoạn 1: vòng lặp đơn O(n). Đoạn 2: hai vòng lồng O(n²). Giải thích: số lần lặp lồng tỷ lệ n(n-1)/2 ~ Θ(n²).',
-NULL, 9.0, 'Lập luận chặt chẽ, trình bày rõ ràng.', 'GRADED', '2024-11-12 09:00:00');
-
-INSERT INTO `lesson_progress` (`id`, `student_id`, `lesson_id`, `completed`, `completed_at`) VALUES
-(1, 3, 1, 1, '2024-09-20'),
-(2, 3, 2, 1, '2024-09-22'),
-(3, 4, 1, 1, '2024-09-21'),
-(4, 6, 4, 1, '2024-10-10');
-
-INSERT INTO `notes` (`id`, `student_id`, `lesson_id`, `course_id`, `content`, `highlight_color`, `title`, `note_type`, `source_excerpt`, `tags`, `created_at`, `updated_at`) VALUES
-(1, 3, 1, 1, 'Nhớ phân biệt worst-case và average-case khi báo cáo.', '#FFF59D', 'Ghi chú bài 1', 'LESSON',
-'Ký hiệu O(f(n)) mô tả cận trên (worst-case thường dùng trong giảng dạy); Omega mô tả cận dưới.',
-'big-o,asymptotic,exam',
-'2024-09-20 10:00:00', '2024-09-20 10:00:00'),
-(2, 4, NULL, 1, 'Ôn lại định nghĩa BST và trường hợp suy biến.', '#FFCCBC', 'Ôn tập giữa kỳ', 'STANDALONE', NULL,
-'bst,tree,review',
-'2024-10-01 08:00:00', '2024-10-01 08:00:00');
-
-INSERT INTO `note_links` (`id`, `from_note_id`, `to_note_id`, `relation_label`, `created_at`) VALUES
-(1, 2, 1, 'relates-to', '2024-10-01 09:00:00');
-
-INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `type`, `is_read`, `created_at`) VALUES
-(1, 3, 'Điểm bài kiểm tra đã có', 'Bài "Kiểm tra nhanh: Độ phức tạp..." đã được chấm. Điểm: 10/10.', 'GRADE', 1, '2024-11-11 08:00:00'),
-(2, 4, 'Điểm bài kiểm tra đã có', 'Bài kiểm tra đã được chấm. Xem phản hồi trong mục nộp bài.', 'GRADE', 0, '2024-11-11 08:05:00'),
-(3, 3, 'Thông báo khóa học', 'Diễn đàn CS201 có thêm công bố tài liệu tham khảo.', 'ANNOUNCEMENT', 0, '2024-10-03 14:30:00');
+INSERT INTO `notifications`
+(`id`, `user_id`, `title`, `message`, `type`, `is_read`, `created_at`) VALUES
+(1, 5, 'Completed course ITF101', 'You have completed ITF101 and unlocked the next stage of the IT learning path.', 'BADGE', b'0', '2026-03-28 08:15:00'),
+(2, 5, 'Homework graded', 'Your homework in PRG101 has been graded. Open assignment history to read the feedback.', 'GRADE', b'0', '2026-03-29 09:30:00'),
+(3, 6, 'Next lesson unlocked', 'You passed the latest quiz and the next lesson in WEB201 is now unlocked.', 'ASSIGNMENT', b'0', '2026-03-29 10:00:00'),
+(4, 7, 'Mini project reminder', 'API301 mini project is open. Use your lesson notes and forum checklist before submitting.', 'ASSIGNMENT', b'0', '2026-03-30 14:20:00'),
+(5, 8, 'Quiz result available', 'Your quiz in DSA201 has been auto-graded. Review the result and continue to the next lesson.', 'GRADE', b'1', '2026-03-30 19:15:00'),
+(6, 9, 'Forum discussion updated', 'There is a new reply in the WEB201 mini project discussion topic.', 'ANNOUNCEMENT', b'0', '2026-03-31 07:45:00'),
+(7, 10, 'Study note saved', 'Your note in PRG101 lesson 1 was saved successfully.', 'SYSTEM', b'1', '2026-03-31 08:10:00'),
+(8, 7, 'Course progress milestone', 'You have passed 5 or more lessons in several courses. Keep your streak going.', 'BADGE', b'0', '2026-03-31 12:30:00');
 
 INSERT INTO `badge_definitions`
 (`id`, `code`, `name`, `description`, `icon`, `criterion_type`, `threshold_value`, `active`, `display_order`) VALUES
-(1, 'FIRST_STEP', 'Bước khởi đầu', 'Hoàn thành 1 bài học đầu tiên trong hệ thống.', 'rocket_launch', 'COMPLETED_LESSONS', 1, 1, 1),
-(2, 'LEARNING_STREAK', 'Tiến bộ bền bỉ', 'Hoàn thành ít nhất 5 bài học.', 'local_fire_department', 'COMPLETED_LESSONS', 5, 1, 2),
-(3, 'FIRST_GRADE', 'Có điểm đầu tiên', 'Có ít nhất 1 bài nộp đã được chấm điểm.', 'fact_check', 'GRADED_SUBMISSIONS', 1, 1, 3),
-(4, 'QUIZ_ACE', 'Chuyên gia quiz', 'Đạt điểm tuyệt đối ở ít nhất 1 bài quiz.', 'psychology', 'PERFECT_QUIZZES', 1, 1, 4),
-(5, 'XP_BRONZE', 'XP Đồng', 'Đạt ít nhất 100 XP tích lũy.', 'workspace_premium', 'TOTAL_XP', 100, 1, 5),
-(6, 'XP_SILVER', 'XP Bạc', 'Đạt ít nhất 300 XP tích lũy.', 'workspace_premium', 'TOTAL_XP', 300, 1, 6),
-(7, 'COURSE_FINISHER', 'Hoàn tất học phần', 'Hoàn thành ít nhất 1 khóa học với tiến độ 100%.', 'school', 'COMPLETED_COURSES', 1, 1, 7);
+(1, 'FIRST_STEP', 'First Step', 'Complete the first lesson in the system.', 'rocket_launch', 'COMPLETED_LESSONS', 1, b'1', 1),
+(2, 'LEARNING_STREAK', 'Steady Progress', 'Complete at least 5 lessons.', 'local_fire_department', 'COMPLETED_LESSONS', 5, b'1', 2),
+(3, 'FIRST_GRADE', 'First Grade', 'Receive a grade for at least 1 submission.', 'fact_check', 'GRADED_SUBMISSIONS', 1, b'1', 3),
+(4, 'QUIZ_ACE', 'Quiz Specialist', 'Earn a perfect score on at least 1 quiz.', 'psychology', 'PERFECT_QUIZZES', 1, b'1', 4),
+(5, 'XP_BRONZE', 'XP Bronze', 'Reach at least 100 accumulated XP.', 'workspace_premium', 'TOTAL_XP', 100, b'1', 5),
+(6, 'XP_SILVER', 'XP Silver', 'Reach at least 300 accumulated XP.', 'workspace_premium', 'TOTAL_XP', 300, b'1', 6),
+(7, 'COURSE_FINISHER', 'Course Finisher', 'Complete at least 1 course with 100% progress.', 'school', 'COMPLETED_COURSES', 1, b'1', 7);
 
--- Reset AUTO_INCREMENT để id không chồng lấn khi thêm bản ghi mới sau này
+INSERT INTO `user_badges`
+(`id`, `user_id`, `badge_definition_id`, `earned_at`) VALUES
+(1, 5, 1, '2026-01-12 10:00:00'),
+(2, 5, 3, '2026-02-05 18:15:00'),
+(3, 5, 5, '2026-03-10 09:00:00'),
+(4, 5, 7, '2026-03-28 08:10:00'),
+(5, 7, 1, '2026-01-10 09:00:00'),
+(6, 7, 2, '2026-02-20 17:00:00'),
+(7, 7, 4, '2026-03-05 20:15:00'),
+(8, 7, 5, '2026-03-05 20:16:00'),
+(9, 9, 1, '2026-01-14 11:30:00');
+
+DROP TEMPORARY TABLE IF EXISTS `tmp_enrollment_seed`;
+DROP TEMPORARY TABLE IF EXISTS `tmp_lesson_seed`;
+DROP TEMPORARY TABLE IF EXISTS `tmp_prereq_seed`;
+DROP TEMPORARY TABLE IF EXISTS `tmp_course_seed`;
+
 ALTER TABLE `departments` AUTO_INCREMENT = 100;
 ALTER TABLE `users` AUTO_INCREMENT = 100;
 ALTER TABLE `badge_definitions` AUTO_INCREMENT = 100;
@@ -346,8 +698,8 @@ ALTER TABLE `course_prerequisites` AUTO_INCREMENT = 100;
 ALTER TABLE `course_sections` AUTO_INCREMENT = 100;
 ALTER TABLE `lessons` AUTO_INCREMENT = 100;
 ALTER TABLE `enrollments` AUTO_INCREMENT = 100;
-ALTER TABLE `assignments` AUTO_INCREMENT = 100;
-ALTER TABLE `quiz_questions` AUTO_INCREMENT = 100;
+ALTER TABLE `assignments` AUTO_INCREMENT = 1000;
+ALTER TABLE `quiz_questions` AUTO_INCREMENT = 5000;
 ALTER TABLE `forum_posts` AUTO_INCREMENT = 100;
 ALTER TABLE `comments` AUTO_INCREMENT = 100;
 ALTER TABLE `submissions` AUTO_INCREMENT = 100;

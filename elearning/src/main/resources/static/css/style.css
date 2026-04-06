@@ -57,6 +57,39 @@ img { display: block; max-width: 100%; }
 footer {
   margin-top: auto;
 }
+body.public-course-list-page,
+body.fixed-footer-page {
+  padding-bottom: 4.5rem;
+}
+body.public-course-list-page > footer,
+body.fixed-footer-page > footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+}
+body.public-course-list-page .public-course-list-main,
+body.public-course-list-page .page-main-with-fixed-footer,
+body.fixed-footer-page .page-main-with-fixed-footer {
+  padding-bottom: 5rem;
+}
+@media (max-width: 640px) {
+  body.public-course-list-page,
+  body.fixed-footer-page {
+    padding-bottom: 5.5rem;
+  }
+  body.public-course-list-page .public-course-list-main,
+  body.public-course-list-page .page-main-with-fixed-footer,
+  body.fixed-footer-page .page-main-with-fixed-footer {
+    padding-bottom: 6rem;
+  }
+}
+.notif-menu:hover #notif-dropdown,
+.notif-menu:focus-within #notif-dropdown {
+  display: block !important;
+}
 /* Legacy pages without the Tailwind layout */
 body:not(.bg-background) footer {
   text-align: center;

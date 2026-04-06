@@ -35,17 +35,30 @@
                         </div>
                         <h1 class="text-2xl font-extrabold font-headline text-on-background" th:text="${course.courseName}"></h1>
                         <p class="text-sm text-on-surface-variant mt-2 leading-relaxed" th:text="${course.description}"></p>
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-on-surface-variant">
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-sm text-on-surface-variant">
                             <span th:if="${course.teacher != null}" class="flex items-center gap-1">
                                 <span class="material-symbols-outlined text-lg text-slate-500">person</span>
                                 <span th:text="${course.teacher.fullName}"></span>
                             </span>
+                            <span th:if="${course.teacher != null}" class="text-slate-300">|</span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-lg text-slate-500">menu_book</span>
+                                <span class="font-medium text-on-surface" th:text="${totalLectures}">12</span>
+                                <span>lessons</span>
+                            </span>
                             <span class="text-slate-300">|</span>
-                            <span th:text="${totalLectures} + ' lessons'"></span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-lg text-slate-500">schedule</span>
+                                <span>Total</span>
+                                <span class="font-medium text-on-surface" th:text="${courseDurationLabel}">15h</span>
+                            </span>
                             <span class="text-slate-300">|</span>
-                            <span th:text="'Total ' + courseDurationLabel"></span>
-                            <span class="text-slate-300">|</span>
-                            <span th:text="'Up to ' + course.maxStudents + ' students'"></span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-lg text-slate-500">groups</span>
+                                <span>Up to</span>
+                                <span class="font-medium text-on-surface" th:text="${course.maxStudents}">50</span>
+                                <span>students</span>
+                            </span>
                         </div>
                     </div>
                 </section>
@@ -120,12 +133,16 @@
                 </div>
             </section>
 
-            <section th:if="${enrolled == true and !assignments.isEmpty()}">
+            <section th:if="${enrolled == true}">
                 <h2 class="text-lg font-bold font-headline text-on-background mb-4">Assignments and quizzes</h2>
-                <div class="it-table-wrap">
+                <div th:if="${assignments.isEmpty()}" class="rounded-xl border border-dashed border-slate-200 bg-surface-container-low/50 px-4 py-6 text-sm text-on-surface-variant">
+                    Complete a lesson to unlock its quiz and homework.
+                </div>
+                <div th:unless="${assignments.isEmpty()}" class="it-table-wrap">
                     <table class="it-data-table">
                         <thead>
                         <tr>
+                            <th>Lesson</th>
                             <th>Title</th>
                             <th>Type</th>
                             <th>Due date</th>
@@ -135,6 +152,10 @@
                         </thead>
                         <tbody>
                         <tr th:each="a : ${assignments}">
+                            <td>
+                                <div class="font-semibold text-on-surface" th:text="${a.lesson != null ? ('Lesson ' + a.lesson.lessonOrder) : 'Course'}"></div>
+                                <div class="text-[11px] text-on-surface-variant" th:text="${a.lesson != null ? a.lesson.lessonTitle : 'General assessment'}"></div>
+                            </td>
                             <td th:text="${a.title}"></td>
                             <td><span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100" th:text="${a.type.name() == 'QUIZ' ? 'Quiz' : (a.type.name() == 'EXAM' ? 'Exam' : 'Assignment')}"></span></td>
                             <td>

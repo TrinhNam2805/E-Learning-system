@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Forums')}"></head>
-<body class="bg-background text-on-background min-h-screen flex flex-col">
+<head th:replace="~{fragments/layout :: head(${forumPageTitle != null ? forumPageTitle : 'Forums'})}"></head>
+<body class="bg-background text-on-background min-h-screen flex flex-col fixed-footer-page">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<main class="flex-1 min-h-0 pt-16 p-4 md:p-8 bg-background">
+<main class="page-main-with-fixed-footer flex-1 min-h-0 bg-background px-4 pb-8 pt-20 md:px-8 md:pb-10 md:pt-24">
     <div class="max-w-3xl mx-auto space-y-6">
         <div class="flex flex-wrap items-center gap-3 text-sm">
             <a th:if="${globalForum}" th:href="@{/courses}" class="inline-flex items-center gap-1 font-semibold text-primary hover:underline no-underline">
@@ -22,9 +22,13 @@
 
         <div>
             <h1 class="text-2xl font-extrabold font-headline text-on-background"
-                th:text="${globalForum} ? 'Global forum' : ('Forum | ' + course.courseName)">Forum</h1>
+                th:text="${forumPageTitle}">Forum</h1>
             <p class="text-sm text-on-surface-variant mt-1"
-               th:text="${globalForum} ? 'Browse topics below. Instructors and admins can create new global topics.' : 'Enrolled students can start discussions for this course.'"></p>
+               th:text="${forumPageSubtitle}">Discussion space</p>
+            <div th:if="${lessonContextTitle != null}" class="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                <span class="material-symbols-outlined text-base">forum</span>
+                <span th:text="${lessonContextTitle}">Discussing lesson</span>
+            </div>
         </div>
 
         <div th:if="${globalForum and !canCreatePost and currentUser.role.name() == 'STUDENT'}"

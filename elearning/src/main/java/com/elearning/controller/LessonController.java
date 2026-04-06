@@ -2,6 +2,7 @@ package com.elearning.controller;
 
 import com.elearning.model.dto.CurriculumSectionDto;
 import com.elearning.model.dto.lesson.LessonAccessDto;
+import com.elearning.model.entity.Assignment;
 import com.elearning.model.entity.Course;
 import com.elearning.model.entity.Lesson;
 import com.elearning.model.entity.Note;
@@ -10,6 +11,7 @@ import com.elearning.model.entity.User;
 import com.elearning.repository.UserRepository;
 import com.elearning.service.CourseService;
 import com.elearning.service.EnrollmentService;
+import com.elearning.service.AssignmentService;
 import com.elearning.service.LessonService;
 import com.elearning.service.LessonUnlockService;
 import com.elearning.service.NoteService;
@@ -42,6 +44,7 @@ public class LessonController {
     private final EnrollmentService enrollmentService;
     private final NoteService noteService;
     private final LessonUnlockService lessonUnlockService;
+    private final AssignmentService assignmentService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
@@ -102,6 +105,7 @@ public class LessonController {
         String videoEmbed = VideoEmbedUtil.embedUrl(lesson.getVideoUrl());
 
         boolean isCompleted = enrollmentService.isLessonCompleted(user.getId(), lessonId);
+        List<Assignment> lessonAssignments = assignmentService.findLessonWorkflowAssignments(courseId, lessonId);
         List<Note> lessonNotes = noteService.findByStudentAndLesson(user.getId(), lessonId);
 
         model.addAttribute("course", course);
@@ -116,6 +120,7 @@ public class LessonController {
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
         model.addAttribute("isCompleted", isCompleted);
+        model.addAttribute("lessonAssignments", lessonAssignments);
         model.addAttribute("lessonNotes", lessonNotes);
         model.addAttribute("lessonAccessMap", lessonAccessMap);
         model.addAttribute("nextLessonAccess", next != null ? lessonAccessMap.get(next.getId()) : null);
@@ -186,7 +191,14 @@ public class LessonController {
                 "You completed the lesson: " + lesson.getLessonTitle() + " (+20 XP).",
                 Notification.NotifType.BADGE
         );
-        ra.addFlashAttribute("success", "Lesson marked as complete. +20 XP");
-        return "redirect:/lessons/" + lessonId + "?courseId=" + courseId;
+        return assignmentService.findFirstLessonWorkflowAssignment(courseId, lessonId)
+                .map(nextAssignment -> {
+                    ra.addFlashAttribute("success", "Lesson marked as complete. Continue with the quiz and homework for this lesson.");
+                    return "redirect:/assignments/" + nextAssignment.getId();
+                })
+                .orElseGet(() -> {
+                    ra.addFlashAttribute("success", "Lesson marked as complete. +20 XP");
+                    return "redirect:/lessons/" + lessonId + "?courseId=" + courseId;
+                });
     }
 }

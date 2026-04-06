@@ -6,6 +6,7 @@ import com.elearning.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -20,6 +21,17 @@ public class NotificationService {
 
     public long countUnread(Long userId) {
         return notificationRepository.countByUserIdAndIsReadFalse(userId);
+    }
+
+    public List<Notification> findUnreadPreview(Long userId, int limit) {
+        if (limit <= 0) {
+            return Collections.emptyList();
+        }
+        List<Notification> unread = notificationRepository.findByUserIdAndIsReadFalseOrderByCreatedAtDesc(userId);
+        if (unread.size() <= limit) {
+            return unread;
+        }
+        return unread.subList(0, limit);
     }
 
     @Transactional

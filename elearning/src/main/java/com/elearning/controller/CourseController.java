@@ -69,7 +69,6 @@ public class CourseController {
         model.addAttribute("totalLectures", lessons.size());
         model.addAttribute("previewVideoEmbedUrl", previewEmbed);
         model.addAttribute("recentPosts", recentPosts);
-        model.addAttribute("assignments", assignments);
 
         User user = addUserToModel(userDetails, model);
         model.addAttribute("enrolled", false);
@@ -84,8 +83,10 @@ public class CourseController {
                         .collect(Collectors.toList());
                 model.addAttribute("lessonAccessMap", lessonAccessMap);
                 model.addAttribute("completedLessonIds", completedLessonIds);
+                assignments = assignmentService.findVisibleForStudent(id, user.getId());
             }
         }
+        model.addAttribute("assignments", assignments);
         return "course/detail";
     }
 
