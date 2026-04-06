@@ -62,8 +62,8 @@ public class NoteController {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
 
-        Note note = noteService.findById(id).orElse(null);
-        if (note == null || !note.getStudent().getId().equals(user.getId())) {
+        Note note = noteService.findByIdAndStudentId(id, user.getId()).orElse(null);
+        if (note == null) {
             return "redirect:/notes";
         }
 
@@ -73,7 +73,7 @@ public class NoteController {
         model.addAttribute("linkCandidates", noteService.listOtherNotesForLinking(user.getId(), id));
         model.addAttribute("currentUser", user);
         model.addAttribute("unreadCount", notificationService.countUnread(user.getId()));
-        return "note/detail";
+        return "note/detail-fixed";
     }
 
     /**
@@ -216,11 +216,7 @@ public class NoteController {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) return "redirect:/login";
 
-        noteService.findById(id).ifPresent(note -> {
-            if (note.getStudent().getId().equals(user.getId())) {
-                noteService.delete(id);
-            }
-        });
+        noteService.findByIdAndStudentId(id, user.getId()).ifPresent(note -> noteService.delete(id));
         ra.addFlashAttribute("success", "Note deleted.");
         return "redirect:/notes";
     }
@@ -256,15 +252,13 @@ public class NoteController {
             return "redirect:/notes/" + id;
         }
 
-        noteService.findById(id).ifPresent(note -> {
-            if (note.getStudent().getId().equals(user.getId())) {
-                note.setContent(content);
-                note.setHighlightColor(highlightColor);
-                if (title != null) note.setTitle(title);
-                note.setSourceExcerpt(sourceExcerpt != null && !sourceExcerpt.trim().isEmpty() ? sourceExcerpt.trim() : null);
-                note.setTags(tagsNorm);
-                noteService.save(note);
-            }
+        noteService.findByIdAndStudentId(id, user.getId()).ifPresent(note -> {
+            note.setContent(content);
+            note.setHighlightColor(highlightColor);
+            if (title != null) note.setTitle(title);
+            note.setSourceExcerpt(sourceExcerpt != null && !sourceExcerpt.trim().isEmpty() ? sourceExcerpt.trim() : null);
+            note.setTags(tagsNorm);
+            noteService.save(note);
         });
         ra.addFlashAttribute("success", "Note updated.");
         return "redirect:/notes/" + id;

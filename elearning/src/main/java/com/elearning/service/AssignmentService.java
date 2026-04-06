@@ -178,6 +178,29 @@ public class AssignmentService {
     }
 
     @Transactional
+    public void removeHomeworkSubmission(Long assignmentId, User student) {
+        Assignment assignment = getDetailedAssignmentOrThrow(assignmentId);
+        validateStudentMaySubmit(assignment, student);
+
+        if (assignment.getType() != Assignment.AssignmentType.HOMEWORK) {
+            throw new AssessmentValidationException("Only homework submissions can be removed.");
+        }
+        if (isPastDue(assignment)) {
+            throw new AssessmentValidationException("This homework can no longer be removed because the submission window has closed.");
+        }
+
+        List<Submission> submissionHistory = submissionRepository.findHistoryByAssignmentIdAndStudentId(
+                assignmentId, student.getId());
+        if (submissionHistory.isEmpty()) {
+            throw new AssessmentValidationException("There is no homework submission to remove.");
+        }
+
+        Submission submission = submissionHistory.get(0);
+        assessmentFileStorageService.deleteSubmissionFile(submission.getFileUrl());
+        submissionRepository.delete(submission);
+    }
+
+    @Transactional
     public SubmissionResult submit(Long assignmentId,
                                    User student,
                                    AssignmentSubmissionForm form,
@@ -369,6 +392,8 @@ public class AssignmentService {
             throw new AssessmentValidationException("This homework can no longer be edited because the submission window has closed.");
         }
 
+        String previousFileUrl = existingSubmission.getFileUrl();
+        MultipartFile newAttachment = form.getAttachment();
         existingSubmission.setContent(normalize(form.getContent()));
         existingSubmission.setLateSubmission(false);
         existingSubmission.setStatus(Submission.SubmissionStatus.SUBMITTED);
@@ -377,7 +402,13 @@ public class AssignmentService {
         existingSubmission.setAutoGraded(false);
         existingSubmission.setGradedAt(null);
         existingSubmission.setSubmittedAt(LocalDateTime.now());
-        attachFile(existingSubmission, form.getAttachment(), assignment.getId(), existingSubmission.getStudent().getId());
+        attachFile(existingSubmission, newAttachment, assignment.getId(), existingSubmission.getStudent().getId());
+        if (newAttachment != null
+                && !newAttachment.isEmpty()
+                && StringUtils.hasText(previousFileUrl)
+                && !previousFileUrl.equals(existingSubmission.getFileUrl())) {
+            assessmentFileStorageService.deleteSubmissionFile(previousFileUrl);
+        }
         validateOpenSubmission(existingSubmission);
 
         Submission saved = submissionRepository.save(existingSubmission);

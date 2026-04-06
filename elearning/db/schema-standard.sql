@@ -1,20 +1,4 @@
-﻿-- =============================================================================
--- LÆ°á»£c Ä‘á»“ CSDL chuáº©n hÃ³a cho há»‡ E-Learning há»c thuáº­t (Khoa CNTT / Ä‘áº¡i há»c)
--- MySQL 8.x, InnoDB, utf8mb4_unicode_ci
--- =============================================================================
--- NguyÃªn táº¯c thiáº¿t káº¿ (tham chiáº¿u giÃ¡o trÃ¬nh CSDL / quy trÃ¬nh Ä‘Ã o táº¡o):
---   1) KhÃ³a chÃ­nh surrogate (BIGINT AUTO_INCREMENT), khÃ³a nghiá»‡p vá»¥ (mÃ£ mÃ´n, MSSV) UNIQUE.
---   2) 3NF: mÃ´ táº£ khoa tÃ¡ch báº£ng departments; khÃ´ng lá»“ng giÃ¡ trá»‹ Ä‘a trá»‹ trong má»™t cá»™t.
---   3) ToÃ n váº¹n tham chiáº¿u: FK ON DELETE RESTRICT (hoáº·c CASCADE cÃ³ chá»§ Ä‘Ã­ch) â€” trÃ¡nh má»“ cÃ´i dá»¯ liá»‡u.
---   4) ÄÄƒng kÃ½ há»c pháº§n: enrollments = quan há»‡ N:M sinh viÃªn â†” lá»›p há»c pháº§n (courses = má»™t láº§n má»Ÿ lá»›p theo ká»³).
---   5) TiÃªn quyáº¿t há»c pháº§n: báº£ng course_prerequisites (mÃ£ mÃ´n tiÃªn quyáº¿t theo mÃ£ CTÄT â€” lÆ°u mÃ£ chuá»—i Ä‘á»ƒ linh hoáº¡t nhiá»u ká»³ má»Ÿ lá»›p).
---   6) Chá»‰ má»¥c trÃªn FK vÃ  cÃ¡c cá»™t lá»c thÆ°á»ng dÃ¹ng (status, role, semester).
---
--- CÃ¡ch dÃ¹ng: táº¡o database rá»“i cháº¡y file nÃ y, sau Ä‘Ã³ cháº¡y seed-data.sql (ddl-auto=none).
--- DB Ä‘Ã£ táº¡o tá»« báº£n cÅ© (thiáº¿u course_sections / lessons.section_id): cháº¡y thÃªm db/migration-course-sections.sql.
---   mysql -u root -p --default-character-set=utf8mb4 -e "CREATE DATABASE IF NOT EXISTS \`e-learning\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
---   mysql -u root -p --default-character-set=utf8mb4 e-learning < elearning/db/schema-standard.sql
--- =============================================================================
+﻿
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -40,9 +24,6 @@ DROP TABLE IF EXISTS `departments`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- -----------------------------------------------------------------------------
--- Khoa / Ä‘Æ¡n vá»‹ Ä‘Ã o táº¡o (vÃ­ dá»¥: Khoa CÃ´ng nghá»‡ ThÃ´ng tin)
--- -----------------------------------------------------------------------------
 CREATE TABLE `departments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `code` VARCHAR(20) NOT NULL COMMENT 'MÃ£ khoa, vÃ­ dá»¥ CNTT',

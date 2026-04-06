@@ -162,7 +162,7 @@
                             <div class="flex justify-between gap-3 p-4">
                                 <div class="flex-1 min-w-0">
                                     <div th:if="${n.title != null and !n.title.trim().isEmpty()}" class="font-semibold text-on-surface text-sm" th:text="${n.title}"></div>
-                                    <div th:if="${n.sourceExcerpt != null and !n.sourceExcerpt.isEmpty()}" class="text-xs text-slate-600 italic mt-2 whitespace-pre-wrap" th:text="'\"' + ${n.sourceExcerpt} + '\"'"></div>
+                                    <div th:if="${n.sourceExcerpt != null and !n.sourceExcerpt.isEmpty()}" class="text-xs text-slate-600 italic mt-2 whitespace-pre-wrap" th:text='|"${n.sourceExcerpt}"|'></div>
                                     <div th:if="${n.tags != null and !n.tags.isEmpty()}" class="text-[11px] text-slate-500 mt-2" th:text="${n.tags}"></div>
                                     <div class="text-sm text-on-surface mt-2 whitespace-pre-wrap" th:text="${n.content}"></div>
                                     <div class="text-[11px] text-slate-400 mt-2" th:text="${#temporals.format(n.createdAt, 'MM/dd/yyyy HH:mm')}"></div>

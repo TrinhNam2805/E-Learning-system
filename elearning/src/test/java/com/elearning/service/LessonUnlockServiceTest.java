@@ -20,6 +20,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -140,5 +142,17 @@ class LessonUnlockServiceTest {
         Map<Long, LessonAccessDto> accessMap = lessonUnlockService.buildCourseLessonAccess(course.getId(), 3L);
 
         assertTrue(accessMap.get(lesson2.getId()).isAccessible());
+    }
+
+    @Test
+    void completedLessonShouldRemainAccessibleWithoutBlockingQuizLookup() {
+        when(lessonService.findPublishedByCourseId(course.getId())).thenReturn(Arrays.asList(lesson1, lesson2));
+        when(enrollmentService.isLessonCompleted(3L, lesson1.getId())).thenReturn(true);
+        when(enrollmentService.isLessonCompleted(3L, lesson2.getId())).thenReturn(true);
+
+        Map<Long, LessonAccessDto> accessMap = lessonUnlockService.buildCourseLessonAccess(course.getId(), 3L);
+
+        assertTrue(accessMap.get(lesson2.getId()).isAccessible());
+        verify(assignmentRepository, never()).findByCourseIdAndLessonIdOrderByDueDateAsc(course.getId(), lesson1.getId());
     }
 }

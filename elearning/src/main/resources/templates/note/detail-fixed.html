@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Note')}"></head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<header th:replace="~{fragments/layout :: navbar}"></header>
+<main class="flex-1 overflow-y-auto bg-background">
+    <div class="max-w-3xl mx-auto px-4 pb-8 pt-20 md:px-8 md:pb-10 md:pt-24 space-y-6">
+        <a th:href="@{/notes}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
+            <span class="material-symbols-outlined text-lg">arrow_back</span> All notes
+        </a>
+
+        <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
+        <div th:if="${error}" class="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100" th:text="${error}"></div>
+
+        <article class="bg-surface-container-lowest rounded-xl border border-slate-100 p-6 shadow-sm"
+                 th:style="'border-top:4px solid ' + ${note.highlightColor}">
+            <div class="text-xs text-on-surface-variant mb-3 flex flex-wrap gap-2">
+                <span th:if="${note.course != null}" th:text="${note.course.courseCode}"></span>
+                <span th:if="${note.lesson != null}" th:text="|Lesson: ${note.lesson.lessonTitle}|"></span>
+                <span th:text="|Updated: ${#temporals.format(note.updatedAt != null ? note.updatedAt : note.createdAt, 'yyyy-MM-dd HH:mm')}|"></span>
+            </div>
+            <h1 class="text-xl font-bold font-headline text-on-background mb-3" th:text="${note.title != null and !note.title.isEmpty() ? note.title : 'Note'}">Note</h1>
+            <div th:if="${note.tags != null and !note.tags.isEmpty()}" class="flex flex-wrap gap-1 mb-4">
+                <span th:each="t : ${#strings.arraySplit(note.tags, ',')}"
+                      class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-on-surface"
+                      th:text="${#strings.trim(t)}">tag</span>
+            </div>
+            <div th:if="${note.sourceExcerpt != null and !note.sourceExcerpt.isEmpty()}"
+                 class="text-sm text-on-surface bg-surface-container-low border-l-4 border-primary rounded-r-lg p-4 mb-4 whitespace-pre-wrap">
+                <strong class="text-on-background">Source excerpt:</strong>
+                <span th:text="${note.sourceExcerpt}"></span>
+            </div>
+            <div class="text-sm leading-relaxed whitespace-pre-wrap text-on-surface" th:text="${note.content}"></div>
+        </article>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div class="bg-surface-container-lowest rounded-xl border border-slate-100 p-4">
+                <h3 class="text-sm font-bold font-headline text-on-background mb-2">Links to (this -> other)</h3>
+                <ul class="text-sm text-primary space-y-1 list-disc list-inside">
+                    <li th:each="l : ${outgoing}">
+                        <a th:href="@{/notes/{id}(id=${l.toNote.id})}" class="font-medium hover:underline"
+                           th:text="${l.toNote.title != null ? l.toNote.title : 'Note #' + l.toNote.id}"></a>
+                        <span th:if="${l.relationLabel != null}" class="text-on-surface-variant"
+                              th:text="| (${l.relationLabel})|"></span>
+                    </li>
+                    <li th:if="${outgoing.isEmpty()}" class="text-slate-400 list-none">None</li>
+                </ul>
+            </div>
+            <div class="bg-surface-container-lowest rounded-xl border border-slate-100 p-4">
+                <h3 class="text-sm font-bold font-headline text-on-background mb-2">Linked from (other -> this)</h3>
+                <ul class="text-sm text-primary space-y-1 list-disc list-inside">
+                    <li th:each="l : ${incoming}">
+                        <a th:href="@{/notes/{id}(id=${l.fromNote.id})}" class="font-medium hover:underline"
+                           th:text="${l.fromNote.title != null ? l.fromNote.title : 'Note #' + l.fromNote.id}"></a>
+                    </li>
+                    <li th:if="${incoming.isEmpty()}" class="text-slate-400 list-none">None</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-surface-container-low rounded-xl border border-slate-100 p-5">
+            <h3 class="text-sm font-bold font-headline text-on-background mb-4">Add link to another note</h3>
+            <form th:action="@{/notes/{id}/link(id=${note.id})}" method="post" class="flex flex-wrap gap-4 items-end">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div class="min-w-[200px] flex-1">
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Target note</label>
+                    <select name="toNoteId" required class="w-full rounded-lg border-slate-200 text-sm bg-white">
+                        <option value="">-- Select --</option>
+                        <option th:each="c : ${linkCandidates}" th:value="${c.id}"
+                                th:text="${(c.title != null and !c.title.isEmpty() ? c.title : 'Note') + ' | ' + #temporals.format(c.createdAt, 'MM/dd')}"></option>
+                    </select>
+                </div>
+                <div class="min-w-[180px] flex-1">
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Relation (optional)</label>
+                    <input type="text" name="linkLabel" placeholder="e.g. prerequisite"
+                           class="w-full rounded-lg border-slate-200 text-sm px-3 py-2">
+                </div>
+                <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Link</button>
+            </form>
+        </div>
+
+        <div class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5">
+            <h3 class="text-sm font-bold font-headline text-on-background mb-4">Edit</h3>
+            <form th:action="@{/notes/{id}/update(id=${note.id})}" method="post" class="space-y-4">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Title</label>
+                    <input type="text" name="title" th:value="${note.title}"
+                           class="w-full rounded-lg border-slate-200 text-sm px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Tags (comma-separated)</label>
+                    <input type="text" name="tags" th:value="${note.tags}" placeholder="e.g. normalization"
+                           class="w-full rounded-lg border-slate-200 text-sm px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Source excerpt</label>
+                    <textarea name="sourceExcerpt" rows="3" placeholder="Quote from lesson..."
+                              class="w-full rounded-lg border-slate-200 text-sm px-3 py-2"
+                              th:text="${note.sourceExcerpt}"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-1">Content</label>
+                    <textarea name="content" required rows="8"
+                              class="w-full rounded-lg border-slate-200 text-sm px-3 py-2"
+                              th:text="${note.content}"></textarea>
+                </div>
+                <div>
+                    <span class="block text-xs font-semibold text-on-surface-variant mb-2">Highlight</span>
+                    <div class="flex gap-2 flex-wrap">
+                        <label th:each="color : ${ {'#FFFF00','#90EE90','#FFB6C1','#87CEEB','#FFA500'} }" class="cursor-pointer">
+                            <input type="radio" name="highlightColor" th:value="${color}" th:checked="${note.highlightColor == color}" class="hidden">
+                            <span th:style="'display:inline-block;width:24px;height:24px;border-radius:50%;background:' + ${color} + ';border:2px solid #ccc'"></span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg border-0 cursor-pointer">Save</button>
+            </form>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

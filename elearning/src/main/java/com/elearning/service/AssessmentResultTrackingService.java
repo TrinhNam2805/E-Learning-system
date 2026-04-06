@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,12 +56,16 @@ public class AssessmentResultTrackingService {
     }
 
     public List<AssessmentSubmissionDto> getAssignmentHistory(Long assignmentId, Long studentId) {
+        Assignment assignment = assignmentService.getDetailedAssignmentOrThrow(assignmentId);
         List<Submission> submissions = submissionRepository.findHistoryByAssignmentIdAndStudentId(assignmentId, studentId);
-        return mapSubmissions(submissions);
+        List<QuizQuestion> questions = assignment.getType() == Assignment.AssignmentType.QUIZ
+                ? assignmentService.findQuestions(assignmentId)
+                : Collections.emptyList();
+        return mapSubmissions(submissions, questions);
     }
 
     public List<AssessmentSubmissionDto> getStudentSubmissionHistory(Long studentId) {
-        return mapSubmissions(submissionRepository.findDetailedByStudentId(studentId));
+        return mapSubmissions(submissionRepository.findDetailedByStudentId(studentId), Collections.emptyList());
     }
 
     public List<AssessmentProgressDto> getStudentCourseProgress(Long studentId) {
@@ -137,10 +142,13 @@ public class AssessmentResultTrackingService {
                 .build();
     }
 
-    private List<AssessmentSubmissionDto> mapSubmissions(List<Submission> submissions) {
+    private List<AssessmentSubmissionDto> mapSubmissions(List<Submission> submissions,
+                                                         List<QuizQuestion> questions) {
         List<AssessmentSubmissionDto> items = new ArrayList<AssessmentSubmissionDto>();
         for (Submission submission : submissions) {
-            items.add(AssessmentSubmissionDto.fromEntity(submission));
+            items.add(AssessmentSubmissionDto.fromEntity(
+                    submission,
+                    buildQuizResponses(submission, questions)));
         }
         return items;
     }
@@ -158,16 +166,21 @@ public class AssessmentResultTrackingService {
 
     private List<AssessmentQuizResponseDto> buildLatestQuizResponses(Submission latestSubmission,
                                                                      List<QuizQuestion> questions) {
+        return buildQuizResponses(latestSubmission, questions);
+    }
+
+    private List<AssessmentQuizResponseDto> buildQuizResponses(Submission submission,
+                                                               List<QuizQuestion> questions) {
         List<AssessmentQuizResponseDto> items = new ArrayList<AssessmentQuizResponseDto>();
-        if (latestSubmission == null || questions == null || questions.isEmpty()) {
+        if (submission == null || questions == null || questions.isEmpty()) {
             return items;
         }
-        if (latestSubmission.getAssignment() == null
-                || latestSubmission.getAssignment().getType() != Assignment.AssignmentType.QUIZ) {
+        if (submission.getAssignment() == null
+                || submission.getAssignment().getType() != Assignment.AssignmentType.QUIZ) {
             return items;
         }
 
-        Map<Long, String> answersByQuestionId = parseQuizAnswers(latestSubmission.getContent());
+        Map<Long, String> answersByQuestionId = parseQuizAnswers(submission.getContent());
         for (QuizQuestion question : questions) {
             String selectedOption = normalizeOption(answersByQuestionId.get(question.getId()));
             String correctOption = normalizeOption(question.getCorrectAnswer());

@@ -932,7 +932,7 @@ SELECT
   NULL,
   NULL,
   NULL,
-  ROUND(6 + MOD(tes.student_id + c.id, 5), 1),
+  ROUND(6 + MOD(tes.student_id + c.id + l.lesson_order - 1, 5), 1),
   CONCAT('Auto-graded seed result for ', c.course_code, ' lesson ', l.lesson_order, '.'),
   'GRADED',
   1,
@@ -942,10 +942,10 @@ SELECT
   TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 10 DAY), '20:00:00')
 FROM `tmp_enrollment_seed` tes
 JOIN `courses` c ON c.course_code = tes.course_code
-JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 1
+JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order <= tes.completed_lessons
 JOIN `assignments` a ON a.course_id = c.id AND a.lesson_id = l.id AND a.type = 'QUIZ'
 WHERE tes.completed_lessons >= 1
-ORDER BY tes.student_id, c.id;
+ORDER BY tes.student_id, c.id, l.lesson_order;
 
 INSERT INTO `submissions`
 (`assignment_id`, `student_id`, `content`, `file_url`, `original_file_name`, `file_size`, `score`, `feedback`, `status`, `attempt_number`, `late_submission`, `auto_graded`, `submitted_at`, `graded_at`)
@@ -978,30 +978,6 @@ JOIN `courses` c ON c.course_code = tes.course_code
 JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 1
 JOIN `assignments` a ON a.course_id = c.id AND a.lesson_id = l.id AND a.type = 'HOMEWORK'
 WHERE tes.completed_lessons >= 1
-ORDER BY tes.student_id, c.id;
-
-INSERT INTO `submissions`
-(`assignment_id`, `student_id`, `content`, `file_url`, `original_file_name`, `file_size`, `score`, `feedback`, `status`, `attempt_number`, `late_submission`, `auto_graded`, `submitted_at`, `graded_at`)
-SELECT
-  a.id,
-  tes.student_id,
-  CONCAT('Seed quiz answers for ', c.course_code, ' lesson ', l.lesson_order),
-  NULL,
-  NULL,
-  NULL,
-  ROUND(6 + MOD(tes.student_id + c.id + 1, 5), 1),
-  CONCAT('Auto-graded seed result for ', c.course_code, ' lesson ', l.lesson_order, '.'),
-  'GRADED',
-  1,
-  b'0',
-  b'1',
-  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 15 DAY), '20:15:00'),
-  TIMESTAMP(DATE_ADD(tes.enrolled_at, INTERVAL l.lesson_order + 15 DAY), '20:15:00')
-FROM `tmp_enrollment_seed` tes
-JOIN `courses` c ON c.course_code = tes.course_code
-JOIN `lessons` l ON l.course_id = c.id AND l.lesson_order = 2
-JOIN `assignments` a ON a.course_id = c.id AND a.lesson_id = l.id AND a.type = 'QUIZ'
-WHERE tes.completed_lessons >= 2
 ORDER BY tes.student_id, c.id;
 
 INSERT INTO `notifications`
@@ -1060,5 +1036,4 @@ ALTER TABLE `lesson_progress` AUTO_INCREMENT = 100;
 ALTER TABLE `notes` AUTO_INCREMENT = 100;
 ALTER TABLE `note_links` AUTO_INCREMENT = 100;
 ALTER TABLE `notifications` AUTO_INCREMENT = 100;
-
 

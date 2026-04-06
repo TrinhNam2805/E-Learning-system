@@ -29,17 +29,20 @@ public class LessonUnlockService {
         for (int i = 0; i < lessons.size(); i++) {
             Lesson lesson = lessons.get(i);
             boolean completed = enrollmentService.isLessonCompleted(studentId, lesson.getId());
+            Lesson previousLesson = i > 0 ? lessons.get(i - 1) : null;
 
-            if (i == 0) {
-                accessMap.put(lesson.getId(), LessonAccessDto.builder()
+            if (i == 0 || completed) {
+                LessonAccessDto.LessonAccessDtoBuilder accessBuilder = LessonAccessDto.builder()
                         .lessonId(lesson.getId())
                         .accessible(true)
-                        .completed(completed)
-                        .build());
+                        .completed(completed);
+                if (previousLesson != null) {
+                    accessBuilder.prerequisiteLessonTitle(previousLesson.getLessonTitle());
+                }
+                accessMap.put(lesson.getId(), accessBuilder.build());
                 continue;
             }
 
-            Lesson previousLesson = lessons.get(i - 1);
             if (!enrollmentService.isLessonCompleted(studentId, previousLesson.getId())) {
                 accessMap.put(lesson.getId(), LessonAccessDto.builder()
                         .lessonId(lesson.getId())

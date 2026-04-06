@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -33,8 +34,14 @@ public class AssessmentSubmissionDto {
     private final boolean graded;
     private final LocalDateTime submittedAt;
     private final LocalDateTime gradedAt;
+    private final List<AssessmentQuizResponseDto> quizResponses;
 
     public static AssessmentSubmissionDto fromEntity(Submission submission) {
+        return fromEntity(submission, null);
+    }
+
+    public static AssessmentSubmissionDto fromEntity(Submission submission,
+                                                     List<AssessmentQuizResponseDto> quizResponses) {
         Submission.SubmissionStatus status = submission.getStatus();
         boolean graded = submission.getScore() != null
                 || status == Submission.SubmissionStatus.GRADED
@@ -69,6 +76,7 @@ public class AssessmentSubmissionDto {
                 .graded(graded)
                 .submittedAt(submission.getSubmittedAt())
                 .gradedAt(submission.getGradedAt())
+                .quizResponses(quizResponses)
                 .build();
     }
 }

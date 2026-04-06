@@ -96,6 +96,22 @@ public class AssessmentFileStorageService {
         }
     }
 
+    public void deleteSubmissionFile(String storedFileName) {
+        if (!StringUtils.hasText(storedFileName)) {
+            return;
+        }
+
+        try {
+            Path filePath = uploadRoot.resolve(storedFileName).normalize();
+            if (!filePath.startsWith(uploadRoot)) {
+                throw new AssessmentValidationException("The file path is invalid.");
+            }
+            Files.deleteIfExists(filePath);
+        } catch (IOException ex) {
+            throw new AssessmentStorageException("The submission file could not be removed right now.", ex);
+        }
+    }
+
     public long getMaxFileSizeBytes() {
         return maxFileSizeBytes;
     }

@@ -47,6 +47,26 @@ public class LessonService {
         return lessonRepository.findById(id);
     }
 
+    public Optional<Lesson> findNextPublishedLesson(Long courseId, Long currentLessonId) {
+        if (courseId == null || currentLessonId == null) {
+            return Optional.empty();
+        }
+
+        List<Lesson> orderedLessons = findPublishedByCourseId(courseId);
+        for (int i = 0; i < orderedLessons.size(); i++) {
+            Lesson lesson = orderedLessons.get(i);
+            if (!currentLessonId.equals(lesson.getId())) {
+                continue;
+            }
+            if (i + 1 < orderedLessons.size()) {
+                return Optional.of(orderedLessons.get(i + 1));
+            }
+            break;
+        }
+
+        return Optional.empty();
+    }
+
     @Transactional
     public Lesson save(Lesson lesson) {
         if (lesson != null) {

@@ -23,6 +23,7 @@ public class AssessmentAssignmentDto {
     private final String type;
     private final LocalDateTime dueDate;
     private final double maxScore;
+    private final Double minimumPassingScore;
     private final boolean allowLateSubmission;
     private final int maxAttempts;
     private final boolean unlimitedAttempts;
@@ -72,6 +73,7 @@ public class AssessmentAssignmentDto {
                 .type(assignment.getType() != null ? assignment.getType().name() : null)
                 .dueDate(assignment.getDueDate())
                 .maxScore(assignment.getMaxScore())
+                .minimumPassingScore(assignment.getMinimumPassingScore())
                 .allowLateSubmission(assignment.isAllowLateSubmission())
                 .maxAttempts(maxAttempts)
                 .unlimitedAttempts(unlimitedAttempts)
