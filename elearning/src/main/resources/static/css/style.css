@@ -36,6 +36,9 @@ body {
   overflow-x: hidden;
   overscroll-behavior-y: none;
 }
+body.mobile-nav-open {
+  overflow: hidden;
+}
 /* Tailwind-driven pages (body.bg-background): do not override background/text colors */
 body:not(.bg-background) {
   background: var(--bg);

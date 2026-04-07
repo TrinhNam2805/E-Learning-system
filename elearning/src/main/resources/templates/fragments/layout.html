@@ -108,7 +108,12 @@
         </nav>
     </div>
     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-        <button type="button" class="md:hidden p-2 text-slate-500 hover:bg-surface-container-low rounded-lg" onclick="document.getElementById('mobile-nav-panel').classList.toggle('hidden')" aria-label="Open menu">
+        <button type="button"
+                id="mobile-nav-toggle"
+                class="md:hidden p-2 text-slate-500 hover:bg-surface-container-low rounded-lg"
+                aria-label="Open menu"
+                aria-controls="mobile-nav-panel"
+                aria-expanded="false">
             <span class="material-symbols-outlined">menu</span>
         </button>
         <th:block th:if="${currentUser != null}">
@@ -168,19 +173,19 @@
             <a th:href="@{/login}" class="text-sm font-semibold text-primary no-underline hover:underline px-2">Login</a>
         </th:block>
     </div>
+    <div id="mobile-nav-panel" class="hidden md:hidden fixed inset-x-0 top-16 bottom-0 z-[60] bg-black/40">
+        <nav class="bg-white border-b border-slate-100 p-4 flex flex-col gap-2 font-manrope text-sm font-semibold shadow-lg">
+            <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Courses</a>
+            <a th:if="${currentUser == null}" th:href="@{/announcements}" class="py-2 text-slate-700 no-underline">Announcements</a>
+            <th:block th:if="${currentUser != null}">
+                <a th:href="@{/rankings}" class="py-2 text-slate-700 no-underline">Rankings</a>
+                <a th:href="@{/forum}" class="py-2 text-slate-700 no-underline">Forums</a>
+                <a th:href="@{/assignments/results}" class="py-2 text-slate-700 no-underline">Assignments</a>
+                <a th:href="@{/notes}" class="py-2 text-slate-700 no-underline">Notes</a>
+            </th:block>
+        </nav>
+    </div>
 </header>
-<div id="mobile-nav-panel" class="hidden md:hidden fixed inset-0 top-16 z-40 bg-black/40" onclick="this.classList.add('hidden')">
-    <nav class="bg-white border-b border-slate-100 p-4 flex flex-col gap-2 font-manrope text-sm font-semibold shadow-lg" onclick="event.stopPropagation()">
-        <a th:href="@{/courses}" class="py-2 text-slate-700 no-underline">Courses</a>
-        <a th:if="${currentUser == null}" th:href="@{/announcements}" class="py-2 text-slate-700 no-underline">Announcements</a>
-        <th:block th:if="${currentUser != null}">
-            <a th:href="@{/rankings}" class="py-2 text-slate-700 no-underline">Rankings</a>
-            <a th:href="@{/forum}" class="py-2 text-slate-700 no-underline">Forums</a>
-            <a th:href="@{/assignments/results}" class="py-2 text-slate-700 no-underline">Assignments</a>
-            <a th:href="@{/notes}" class="py-2 text-slate-700 no-underline">Notes</a>
-        </th:block>
-    </nav>
-</div>
 
 <!-- Student sidebar: pass active = home | dashboard | courses | notes | rankings | other -->
 <aside th:fragment="studentSidebar(active)"
