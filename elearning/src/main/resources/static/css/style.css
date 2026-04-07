@@ -4,6 +4,9 @@
 /* ===== CSS VARIABLES ===== */
 :root {
   --header-h: 56px;
+  --footer-height: 3.5rem;
+  --footer-safe-gap: clamp(5.5rem, 8vw, 6.5rem);
+  --footer-safe-gap-mobile: 6rem;
   --primary: #0a66c2;
   --primary-dark: #004fa3;
   --danger: #b00020;
@@ -17,22 +20,34 @@
 /* ===== RESET ===== */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; }
+html {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
 body {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   font-family: var(--font);
   line-height: 1.65;
   font-size: 16px;
   word-wrap: break-word;
   overflow-wrap: break-word;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 /* Tailwind-driven pages (body.bg-background): do not override background/text colors */
 body:not(.bg-background) {
   background: var(--bg);
   color: #222;
 }
-main { flex: 1; min-width: 0; min-height: 0; }
+main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overscroll-behavior-y: none;
+  scroll-padding-bottom: var(--footer-safe-gap);
+}
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { display: block; max-width: 100%; }
@@ -57,9 +72,19 @@ img { display: block; max-width: 100%; }
 footer {
   margin-top: auto;
 }
+.page-shell-main,
+.page-scroll-main,
+.page-main-with-fixed-footer,
+.public-course-list-main {
+  scroll-padding-bottom: var(--footer-safe-gap);
+}
+.page-shell-main,
+.page-scroll-main {
+  padding-bottom: clamp(3.5rem, 6vw, 4.75rem);
+}
 body.public-course-list-page,
 body.fixed-footer-page {
-  padding-bottom: 4.5rem;
+  padding-bottom: var(--footer-safe-gap);
 }
 body.public-course-list-page > footer,
 body.fixed-footer-page > footer {
@@ -73,17 +98,44 @@ body.fixed-footer-page > footer {
 body.public-course-list-page .public-course-list-main,
 body.public-course-list-page .page-main-with-fixed-footer,
 body.fixed-footer-page .page-main-with-fixed-footer {
-  padding-bottom: 5rem;
+  padding-bottom: var(--footer-safe-gap);
+}
+body.public-course-list-page .public-course-list-main > :last-child,
+body.public-course-list-page .page-main-with-fixed-footer > :last-child,
+body.fixed-footer-page .page-main-with-fixed-footer > :last-child {
+  margin-bottom: 0.5rem;
+}
+body.forum-fixed-footer-page {
+  padding-bottom: clamp(7.5rem, 10vw, 9rem);
+}
+body.forum-fixed-footer-page .forum-page-main {
+  padding-bottom: clamp(7.5rem, 10vw, 9rem);
+}
+body.forum-fixed-footer-page .forum-page-main > :last-child {
+  padding-bottom: 1.5rem;
+}
+body.forum-fixed-footer-page .forum-page-main > :last-child > :last-child {
+  margin-bottom: 1.5rem;
 }
 @media (max-width: 640px) {
+  .page-shell-main,
+  .page-scroll-main {
+    padding-bottom: 4.5rem;
+  }
   body.public-course-list-page,
   body.fixed-footer-page {
-    padding-bottom: 5.5rem;
+    padding-bottom: var(--footer-safe-gap-mobile);
   }
   body.public-course-list-page .public-course-list-main,
   body.public-course-list-page .page-main-with-fixed-footer,
   body.fixed-footer-page .page-main-with-fixed-footer {
-    padding-bottom: 6rem;
+    padding-bottom: var(--footer-safe-gap-mobile);
+  }
+  body.forum-fixed-footer-page {
+    padding-bottom: 8.5rem;
+  }
+  body.forum-fixed-footer-page .forum-page-main {
+    padding-bottom: 8.5rem;
   }
 }
 .notif-menu:hover #notif-dropdown,

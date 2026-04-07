@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head(${assignment.title})}"></head>
-<body class="bg-background text-on-background min-h-screen flex flex-col">
+<body class="bg-background text-on-background min-h-screen flex flex-col fixed-footer-page">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<div class="flex flex-1 pt-16 min-h-0">
+<div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
     <aside th:if="${currentUser.role.name() == 'STUDENT'}"
            th:replace="~{fragments/layout :: studentSidebar('assignments')}"></aside>
-    <main class="flex-1 min-w-0 min-h-0 p-4 md:p-8 bg-background">
-    <div class="max-w-6xl mx-auto space-y-6 pb-24 md:pb-28">
+    <main class="page-main-with-fixed-footer flex-1 min-w-0 min-h-0 p-4 md:p-8 bg-background">
+    <div class="max-w-6xl mx-auto space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="flex flex-wrap items-center gap-3">
                 <a th:href="@{/courses/{id}(id=${assignment.courseId})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
@@ -548,9 +548,7 @@
     </div>
     </main>
 </div>
-<div class="fixed inset-x-0 bottom-0 z-40">
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
-</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 <script>
     (function () {

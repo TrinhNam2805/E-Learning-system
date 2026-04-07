@@ -14,7 +14,7 @@
 <th:block th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}">
     <div class="flex flex-1 overflow-x-hidden pt-16 min-h-0 w-full">
         <aside th:replace="~{fragments/layout :: studentSidebar('courses')}"></aside>
-        <main class="flex-1 min-w-0 bg-background p-4 sm:p-6 md:p-8">
+        <main class="page-shell-main flex-1 min-w-0 bg-background p-4 sm:p-6 md:p-8">
             <div th:replace="~{fragments/course-list-inner :: inner}"></div>
         </main>
     </div>

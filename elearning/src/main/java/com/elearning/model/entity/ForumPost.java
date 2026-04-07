@@ -58,7 +58,7 @@ public class ForumPost {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     @Builder.Default
-    private PostType postType = PostType.DISCUSSION;
+    private PostType postType = PostType.QUESTION;
 
     @Builder.Default
     private int viewCount = 0;

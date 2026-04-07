@@ -121,7 +121,6 @@ public class ForumController {
     public String createPost(@RequestParam(required = false) Long courseId,
                              @RequestParam(required = false) Long lessonId,
                              @RequestParam String title,
-                             @RequestParam String postType,
                              @RequestParam String content,
                              @AuthenticationPrincipal UserDetails userDetails,
                              RedirectAttributes ra) {
@@ -133,18 +132,7 @@ public class ForumController {
             return "redirect:/login";
         }
 
-        ForumPost.PostType type;
-        try {
-            type = ForumPost.PostType.valueOf(postType);
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "Invalid post type.");
-            return redirectToForumList(courseId);
-        }
-
-        if (type == ForumPost.PostType.ANNOUNCEMENT) {
-            ra.addFlashAttribute("error", "Announcement posts are not supported in the student-only version.");
-            return redirectToForumList(courseId);
-        }
+        ForumPost.PostType type = ForumPost.PostType.QUESTION;
 
         if (courseId == null) {
             if (!mayCreateGlobalForumPost(user)) {

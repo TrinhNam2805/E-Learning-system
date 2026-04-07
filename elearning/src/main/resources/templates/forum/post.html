@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head(${post.title})}"></head>
-<body class="bg-background text-on-background min-h-screen flex flex-col fixed-footer-page">
+<body class="bg-background text-on-background min-h-screen flex flex-col fixed-footer-page forum-fixed-footer-page">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<main class="page-main-with-fixed-footer flex-1 min-h-0 bg-background px-4 pb-8 pt-20 md:px-8 md:pb-10 md:pt-24">
+<main class="forum-page-main page-main-with-fixed-footer flex-1 min-h-0 bg-background px-4 pb-8 pt-20 md:px-8 md:pb-10 md:pt-24">
     <div class="max-w-3xl mx-auto space-y-6">
         <a th:if="${post.course != null}" th:href="@{/forum(courseId=${post.course.id})}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
             <span class="material-symbols-outlined text-lg">arrow_back</span> Course forum
@@ -17,7 +17,8 @@
 
         <article class="bg-surface-container-lowest rounded-xl border border-slate-100 p-6 shadow-sm">
             <div class="flex flex-wrap gap-2 mb-4">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary" th:text="${post.postType}"></span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary"
+                      th:text="${post.postType.name() == 'QUESTION' ? 'Question' : (post.postType.name() == 'DISCUSSION' ? 'Discussion' : 'Announcement')}"></span>
                 <span th:if="${post.course != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white" th:text="${post.course.courseCode}"></span>
                 <span th:if="${post.lesson != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800" th:text="'Lesson: ' + ${post.lesson.lessonTitle}"></span>
             </div>

@@ -6,7 +6,7 @@
 <div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
     <aside th:if="${currentUser != null and currentUser.role.name() == 'STUDENT' and hideStudentSidebar != true}"
            th:replace="~{fragments/layout :: studentSidebar('courses')}"></aside>
-    <main class="flex-1 min-w-0 min-h-0 bg-background p-4 md:p-8">
+    <main class="page-shell-main flex-1 min-w-0 min-h-0 bg-background p-4 md:p-8">
         <div class="max-w-6xl mx-auto space-y-8">
             <a th:href="@{/courses}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
                 <span class="material-symbols-outlined text-lg">arrow_back</span> Back to courses
@@ -15,8 +15,8 @@
             <div th:if="${success}" class="rounded-lg px-4 py-3 text-sm bg-emerald-50 text-emerald-800 border border-emerald-100" th:text="${success}"></div>
             <div th:if="${error}" class="rounded-lg px-4 py-3 text-sm bg-red-50 text-red-800 border border-red-100" th:text="${error}"></div>
 
-            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] items-start">
-                <section class="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-surface-container-lowest">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px] items-start">
+                <section class="min-w-0 rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-surface-container-lowest">
                     <div class="aspect-video bg-[#1c1d1f] relative">
                         <iframe th:if="${previewVideoEmbedUrl != null}"
                                 class="absolute inset-0 w-full h-full border-0"
@@ -58,7 +58,7 @@
                     </div>
                 </section>
 
-                <aside class="bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm lg:sticky lg:top-20">
+                <aside class="min-w-0 bg-surface-container-lowest rounded-xl border border-slate-100 p-5 shadow-sm xl:sticky xl:top-20">
                     <h2 class="text-sm font-bold font-headline text-on-background mb-4">Enrollment</h2>
                     <th:block th:if="${currentUser == null}">
                         <a class="block w-full text-center py-3 rounded-lg bg-primary text-on-primary font-bold text-sm no-underline hover:opacity-90"
@@ -173,7 +173,8 @@
                 <div th:if="${recentPosts == null or recentPosts.isEmpty()}" class="text-center py-8 text-on-surface-variant rounded-xl border border-dashed border-slate-200 text-sm">No posts yet.</div>
                 <div th:each="p : ${recentPosts}" class="bg-surface-container-low rounded-xl border border-slate-100 p-4 mb-2">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary" th:text="${p.postType}"></span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary"
+                              th:text="${p.postType.name() == 'QUESTION' ? 'Question' : (p.postType.name() == 'DISCUSSION' ? 'Discussion' : 'Announcement')}"></span>
                         <span th:if="${p.lesson != null}" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800" th:text="${p.lesson.lessonTitle}"></span>
                         <span class="font-semibold text-on-surface text-sm" th:text="${p.title}"></span>
                     </div>

@@ -6,7 +6,7 @@
 <div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
     <aside th:if="${currentUser != null and currentUser.role.name() == 'STUDENT'}"
            th:replace="~{fragments/layout :: studentSidebar('rankings')}"></aside>
-    <main class="flex-1 min-w-0 bg-background p-6 md:p-8">
+    <main class="page-shell-main flex-1 min-w-0 bg-background p-6 md:p-8">
         <div class="max-w-6xl mx-auto space-y-8">
             <section class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                 <div>

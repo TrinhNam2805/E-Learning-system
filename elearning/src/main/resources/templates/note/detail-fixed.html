@@ -3,7 +3,7 @@
 <head th:replace="~{fragments/layout :: head('Note')}"></head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 <header th:replace="~{fragments/layout :: navbar}"></header>
-<main class="flex-1 overflow-y-auto bg-background">
+<main class="page-scroll-main flex-1 bg-background">
     <div class="max-w-3xl mx-auto px-4 pb-8 pt-20 md:px-8 md:pb-10 md:pt-24 space-y-6">
         <a th:href="@{/notes}" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline no-underline">
             <span class="material-symbols-outlined text-lg">arrow_back</span> All notes
