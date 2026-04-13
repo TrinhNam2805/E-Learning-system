@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map | IT Scholar Design</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="design.css">
+    <style>
+        body {
+            font-family: Manrope, system-ui, sans-serif !important;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .hero-bg {
+            background: radial-gradient(circle at top left, rgba(98, 161, 253, 0.22), transparent 36%), radial-gradient(circle at bottom right, rgba(213, 183, 250, 0.18), transparent 30%), linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(238, 240, 255, 0.96));
+        }
+    </style>
+</head>
+
+<body class="design-clone-page bg-[#f6f5ff] text-[#202d51] min-h-screen flex flex-col">
+    <header id="top-nav"
+        class="bg-white/80 backdrop-blur-lg shadow-sm fixed top-0 w-full flex justify-between items-center px-4 sm:px-8 h-16 z-50 border-b border-slate-100/80">
+        <div class="flex items-center gap-4 md:gap-8 min-w-0"><a href="index.html"
+                class="flex items-center gap-2 no-underline hover:opacity-90"><span
+                    class="text-xl font-extrabold tracking-tighter text-[#005baf]">IT Scholar</span></a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-tight"><a href="courses.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Courses</a><a href="announcements.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Announcements</a><a href="screens.html"
+                    class="text-[#005baf] no-underline">Clone Map</a><a href="components.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Components</a></nav>
+        </div>
+        <div class="flex items-center gap-3 shrink-0"><a href="login.html"
+                class="text-sm font-semibold text-[#005baf] no-underline hover:underline px-2">Login</a><a
+                href="register.html"
+                class="inline-flex items-center justify-center rounded-xl bg-[#005baf] px-4 py-2.5 text-sm font-bold text-white no-underline hover:opacity-90">Create
+                account</a></div>
+    </header>
+    <main class="flex-1 pt-16 bg-[#f6f5ff]">
+        <section class="hero-bg border-b border-slate-100/80">
+            <div class="max-w-6xl mx-auto px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+                <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] items-start">
+                    <div><span
+                            class="inline-flex items-center gap-2 rounded-full bg-[#005baf]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#005baf]"><span
+                                class="material-symbols-outlined text-sm">web</span>Full static clone</span>
+                        <h1 class="mt-5 text-3xl font-extrabold tracking-tight text-[#202d51] md:text-5xl">Every major
+                            screen from the E-Learning website, rebuilt as direct HTML/CSS pages.</h1>
+                        <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">This directory mirrors
+                            the original IT Scholar interface using the same palette, typography, card rhythm, and
+                            learning flow. All sample content is in English and every file sits directly in
+                            <code>Desgin</code>.</p>
+                    </div>
+                    <div class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+                        <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Included flows
+                        </div>
+                        <div class="mt-4 grid gap-3 text-sm text-slate-700">
+                            <div class="rounded-xl bg-[#eef0ff] p-3">Guest home, course catalog, announcements, and auth
+                                pages.</div>
+                            <div class="rounded-xl bg-[#eef0ff] p-3">Signed-in home, dashboard, course detail, and
+                                lesson view.</div>
+                            <div class="rounded-xl bg-[#eef0ff] p-3">Assignments, forums, rankings, notes,
+                                notifications, and profile.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-6xl mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-14 space-y-10">
+            <div>
+                <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Page directory</div>
+                <h2 class="mt-2 text-2xl font-bold text-[#202d51]">Static screens</h2>
+            </div>
+            <div class="clone-grid clone-grid-3"><a class="clone-map-card" href="index.html"><span
+                        class="clone-map-kicker">Guest</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Home</h3>
+                    <p class="mt-2 text-sm text-slate-600">Landing hero, featured courses, workflow overview, and public
+                        highlights.</p>
+                </a><a class="clone-map-card" href="courses.html"><span class="clone-map-kicker">Catalog</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Courses</h3>
+                    <p class="mt-2 text-sm text-slate-600">Browse and preview the full course catalog.</p>
+                </a><a class="clone-map-card" href="course-detail.html"><span class="clone-map-kicker">Course</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Course Detail</h3>
+                    <p class="mt-2 text-sm text-slate-600">Preview, lessons, assignments, forum topics, and enrollment
+                        state.</p>
+                </a><a class="clone-map-card" href="student-home.html"><span class="clone-map-kicker">Student</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Signed-in Home</h3>
+                    <p class="mt-2 text-sm text-slate-600">Continue-learning cards, notes, notifications, and badge
+                        previews.</p>
+                </a><a class="clone-map-card" href="dashboard.html"><span class="clone-map-kicker">Student</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Dashboard</h3>
+                    <p class="mt-2 text-sm text-slate-600">XP, rankings, badges, courses, and upcoming assignments.</p>
+                </a><a class="clone-map-card" href="lesson-view.html"><span class="clone-map-kicker">Lesson</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Lesson View</h3>
+                    <p class="mt-2 text-sm text-slate-600">Lesson content, notes, actions, and the course-content rail.
+                    </p>
+                </a><a class="clone-map-card" href="assignments.html"><span class="clone-map-kicker">Assessment</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Assignments</h3>
+                    <p class="mt-2 text-sm text-slate-600">Detail state, latest attempts, progress snapshots, and
+                        history.</p>
+                </a><a class="clone-map-card" href="forum.html"><span class="clone-map-kicker">Community</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Forum</h3>
+                    <p class="mt-2 text-sm text-slate-600">Topic list, lesson context, post detail, and comment thread.
+                    </p>
+                </a><a class="clone-map-card" href="ranking.html"><span class="clone-map-kicker">Gamification</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Leaderboard</h3>
+                    <p class="mt-2 text-sm text-slate-600">Rank rules, earned badges, and the full ranking list.</p>
+                </a><a class="clone-map-card" href="note-detail.html"><span class="clone-map-kicker">Study Tools</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Note Detail</h3>
+                    <p class="mt-2 text-sm text-slate-600">Single-note view with source excerpt, links, and edit form.
+                    </p>
+                </a><a class="clone-map-card" href="account.html"><span class="clone-map-kicker">Account</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Notifications & Profile</h3>
+                    <p class="mt-2 text-sm text-slate-600">Notification feed plus the editable profile card.</p>
+                </a><a class="clone-map-card" href="announcements.html"><span class="clone-map-kicker">Public</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Announcements</h3>
+                    <p class="mt-2 text-sm text-slate-600">Official notices shown with the same public page structure.
+                    </p>
+                </a><a class="clone-map-card" href="login.html"><span class="clone-map-kicker">Auth</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Login</h3>
+                    <p class="mt-2 text-sm text-slate-600">Single-screen auth matching the original layout.</p>
+                </a><a class="clone-map-card" href="register.html"><span class="clone-map-kicker">Auth</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Register</h3>
+                    <p class="mt-2 text-sm text-slate-600">Create-account screen with the same field hierarchy and tone.
+                    </p>
+                </a><a class="clone-map-card" href="forgot-password.html"><span class="clone-map-kicker">Auth</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Forgot Password</h3>
+                    <p class="mt-2 text-sm text-slate-600">Password-recovery request screen from the live site.</p>
+                </a><a class="clone-map-card" href="reset-password.html"><span class="clone-map-kicker">Auth</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Reset Password</h3>
+                    <p class="mt-2 text-sm text-slate-600">Token-based password reset layout rebuilt as static HTML.</p>
+                </a><a class="clone-map-card" href="components.html"><span class="clone-map-kicker">System</span>
+                    <h3 class="mt-4 text-lg font-bold text-[#202d51]">Components</h3>
+                    <p class="mt-2 text-sm text-slate-600">Palette, typography, buttons, chips, tables, notes, and
+                        badges.</p>
+                </a></div>
+        </section>
+    </main>
+    <footer class="design-clone-footer mt-auto shrink-0 border-t border-slate-200/90 bg-white/95">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-slate-500">
+            <p class="m-0 text-slate-400 leading-snug">© 2026 IT Scholar</p>
+            <nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 font-medium" aria-label="Footer"><a
+                    href="index.html" class="text-slate-600 hover:text-[#005baf] no-underline">Home</a><a
+                    href="courses.html" class="text-slate-600 hover:text-[#005baf] no-underline">Courses</a><a
+                    href="announcements.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Announcements</a><a href="components.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Components</a></nav>
+        </div>
+    </footer>
+</body>
+
+</html>

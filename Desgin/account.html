@@ -1,0 +1,360 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account | IT Scholar Design</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="design.css">
+    <style>
+        body {
+            font-family: Manrope, system-ui, sans-serif !important;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .hero-bg {
+            background: radial-gradient(circle at top left, rgba(98, 161, 253, 0.22), transparent 36%), radial-gradient(circle at bottom right, rgba(213, 183, 250, 0.18), transparent 30%), linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(238, 240, 255, 0.96));
+        }
+
+        .glass-card {
+            box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .clone-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 1.5rem;
+            background: white;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
+        }
+
+        .clone-soft-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 1.5rem;
+            background: #eef0ff;
+        }
+
+        .clone-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: #64748b;
+        }
+
+        .clone-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            border-radius: 999px;
+            background: rgba(0, 91, 175, .10);
+            color: #005baf;
+            padding: .4rem .8rem;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+        }
+
+        .clone-card-link {
+            display: block;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .clone-card-link:hover {
+            text-decoration: none;
+        }
+
+        .clone-map-card {
+            display: block;
+            background: #fff;
+            border: 1px solid #e5ecf5;
+            border-radius: 18px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .clone-map-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+            border-color: #b8c8f5;
+            text-decoration: none;
+        }
+
+        .clone-map-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .35rem .65rem;
+            border-radius: 999px;
+            background: rgba(10, 102, 194, .1);
+            color: #0a66c2;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .clone-sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .85rem 1rem;
+            border-radius: .9rem;
+            color: #64748b;
+            font-size: .95rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .18s ease;
+        }
+
+        .clone-sidebar-link:hover {
+            background: rgba(255, 255, 255, .72);
+            color: #005baf;
+            transform: translateX(2px);
+            text-decoration: none;
+        }
+
+        .clone-sidebar-link.is-active {
+            background: #fff;
+            color: #005baf;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, .08);
+        }
+
+        .clone-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .clone-table th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: #64748b;
+            padding: .75rem 1rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .clone-table td {
+            padding: .9rem 1rem;
+            border-bottom: 1px solid #f8fafc;
+            vertical-align: top;
+            color: #202d51;
+        }
+
+        .clone-table tr:hover {
+            background: #f8faff;
+        }
+    </style>
+</head>
+
+<body class="design-clone-page bg-[#f6f5ff] text-[#202d51] min-h-screen flex flex-col">
+    <header id="top-nav"
+        class="bg-white/80 backdrop-blur-lg shadow-sm fixed top-0 w-full flex justify-between items-center px-4 sm:px-8 h-16 z-50 border-b border-slate-100/80">
+        <div class="flex items-center gap-4 md:gap-8 min-w-0"><a href="student-home.html"
+                class="flex items-center gap-2 no-underline hover:opacity-90"><span
+                    class="text-xl font-extrabold tracking-tighter text-[#005baf]">IT Scholar</span></a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-tight"><a href="courses.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Courses</a><a
+                    href="ranking.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Rankings</a><a
+                    href="forum.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Forums</a><a
+                    href="assignments.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Assignments</a><a
+                    href="notes.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Notes</a></nav>
+        </div>
+        <div class="flex items-center gap-3 shrink-0"><a href="account.html"
+                class="relative p-2 rounded-lg text-slate-500 hover:bg-[#eef0ff] no-underline"><span
+                    class="material-symbols-outlined">notifications</span><span
+                    class="absolute top-1 right-1 min-w-[18px] h-[18px] text-[10px] font-bold bg-[#b31b25] text-white rounded-full flex items-center justify-center px-0.5">4</span></a><a
+                href="account.html"
+                class="hidden sm:flex items-center gap-2 max-w-[220px] px-2 py-1.5 rounded-lg hover:bg-[#eef0ff] text-sm font-semibold text-[#202d51] no-underline"><span
+                    class="h-8 w-8 rounded-full bg-[#62a1fd]/20 flex items-center justify-center text-xs font-bold text-[#005baf] shrink-0">P</span><span
+                    class="truncate">Pham Minh Chau</span></a></div>
+    </header>
+    <div class="flex flex-1 overflow-x-hidden pt-16 min-h-0">
+        <aside
+            class="hidden md:flex flex-col w-64 border-r border-slate-100 p-4 bg-slate-50 sticky top-16 self-start shrink-0">
+            <div class="mb-6 px-2">
+                <div class="flex items-center gap-3 mb-1">
+                    <div
+                        class="h-10 w-10 rounded-lg bg-[#62a1fd]/20 flex items-center justify-center text-sm font-bold text-[#005baf]">
+                        P</div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-slate-900 text-sm truncate">Pham Minh Chau</h3>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-tight font-semibold">Level 12 Specialist
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex flex-col space-y-1 flex-1 min-h-0 text-sm font-medium"><a href='student-home.html'
+                    class='clone-sidebar-link'><span
+                        class='material-symbols-outlined text-xl'>dashboard</span><span>Home</span></a><a
+                    href='dashboard.html' class='clone-sidebar-link'><span
+                        class='material-symbols-outlined text-xl'>analytics</span><span>Dashboard</span></a><a
+                    href='courses.html' class='clone-sidebar-link'><span
+                        class='material-symbols-outlined text-xl'>menu_book</span><span>My Curriculum</span></a><a
+                    href='notes.html' class='clone-sidebar-link is-active'><span
+                        class='material-symbols-outlined text-xl'>description</span><span>Notes</span></a><a
+                    href='ranking.html' class='clone-sidebar-link'><span
+                        class='material-symbols-outlined text-xl'>leaderboard</span><span>Leaderboard</span></a><a
+                    href='assignments.html' class='clone-sidebar-link'><span
+                        class='material-symbols-outlined text-xl'>assignment</span><span>Assignments</span></a></nav>
+            <div class="pt-4 mt-4 border-t border-slate-100"><a href="dashboard.html"
+                    class="block w-full py-2.5 px-4 bg-[#005baf] text-white font-bold text-xs rounded-lg shadow-md hover:opacity-90 text-center no-underline">Resume
+                    Learning</a></div>
+        </aside>
+        <main class="page-shell-main flex-1 min-w-0 min-h-0 bg-[#f6f5ff] p-4 md:p-8">
+            <div class="max-w-6xl mx-auto grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+                <section class="space-y-6">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-[#202d51]">My Profile</h1>
+                        <p class="text-sm text-slate-600 mt-1">Student account details, editable profile data, and quick
+                            links.</p>
+                    </div>
+                    <div class="clone-panel p-6">
+                        <div class="flex flex-col sm:flex-row gap-4 items-start">
+                            <div
+                                class="h-16 w-16 rounded-2xl bg-[#62a1fd]/30 flex items-center justify-center text-2xl font-bold text-[#005baf] shrink-0">
+                                P</div>
+                            <div class="min-w-0">
+                                <h2 class="text-xl font-bold text-[#202d51]">Pham Minh Chau</h2>
+                                <p class="text-sm text-slate-600 mt-1">minh.chau@student.cntt.edu.vn</p><span
+                                    class="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-white">STUDENT</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clone-panel p-6">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+                            <h3 class="text-sm font-bold text-[#202d51]">Personal Information</h3><button type="button"
+                                class="px-3 py-1.5 text-xs font-bold border border-[#005baf] text-[#005baf] rounded-lg">Edit</button>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Full
+                                    Name</span><span class="block text-[#202d51] mt-1">Pham Minh Chau</span></div>
+                            <div><span
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Email</span><span
+                                    class="block text-[#202d51] mt-1">minh.chau@student.cntt.edu.vn</span></div>
+                            <div><span
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Username</span><span
+                                    class="block text-[#202d51] mt-1">sv.phamminhchau</span></div>
+                            <div><span
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Phone</span><span
+                                    class="block text-[#202d51] mt-1">0913456789</span></div>
+                            <div><span
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Role</span><span
+                                    class="block text-[#202d51] mt-1">STUDENT</span></div>
+                            <div><span
+                                    class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Joined</span><span
+                                    class="block text-[#202d51] mt-1">09/01/2025</span></div>
+                        </div>
+                        <div class="mt-6 border-t border-slate-100 pt-6 space-y-4">
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Full
+                                        Name</label><input type="text" value="Pham Minh Chau"
+                                        class="w-full rounded-lg border-slate-200 text-sm px-3 py-2"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Phone</label><input
+                                        type="tel" value="0913456789"
+                                        class="w-full rounded-lg border-slate-200 text-sm px-3 py-2"></div>
+                            </div>
+                            <div class="flex flex-wrap gap-2"><button type="button"
+                                    class="px-4 py-2 bg-[#005baf] text-white text-sm font-bold rounded-lg">Save
+                                    Changes</button><button type="button"
+                                    class="px-4 py-2 border border-slate-200 text-slate-700 text-sm font-bold rounded-lg">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-[#202d51] flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-[#005baf]">notifications</span> Notifications
+                            </h2>
+                            <p class="text-sm text-slate-600 mt-1">Recent alerts from grades, forums, badges, and system
+                                activity.</p>
+                        </div><button type="button"
+                            class="px-4 py-2 text-xs font-bold border border-[#005baf] text-[#005baf] rounded-lg hover:bg-[#005baf]/5">Mark
+                            all as read</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex gap-4 bg-white rounded-xl border border-slate-100 p-4">
+                            <div class="text-2xl shrink-0">🎉</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-[#202d51] text-sm">Completed course ITF101</div>
+                                <div class="text-sm text-slate-600 mt-1">You have completed ITF101 and unlocked the next
+                                    stage of the IT learning path.</div>
+                                <div class="text-[11px] text-slate-400 mt-2">03/28/2026 08:15</div>
+                            </div><span
+                                class="shrink-0 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white self-start">New</span>
+                        </div>
+                        <div class="flex gap-4 bg-white rounded-xl border border-slate-100 p-4">
+                            <div class="text-2xl shrink-0">📊</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-[#202d51] text-sm">Homework graded</div>
+                                <div class="text-sm text-slate-600 mt-1">Your homework in PRG101 has been graded. Open
+                                    assignment history to read the feedback.</div>
+                                <div class="text-[11px] text-slate-400 mt-2">03/29/2026 09:30</div>
+                            </div><span
+                                class="shrink-0 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white self-start">New</span>
+                        </div>
+                        <div class="flex gap-4 bg-white rounded-xl border border-slate-100 p-4">
+                            <div class="text-2xl shrink-0">🧠</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-[#202d51] text-sm">Next lesson unlocked</div>
+                                <div class="text-sm text-slate-600 mt-1">You passed the latest quiz and the next lesson
+                                    in WEB201 is now unlocked.</div>
+                                <div class="text-[11px] text-slate-400 mt-2">03/29/2026 10:00</div>
+                            </div><span
+                                class="shrink-0 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white self-start">New</span>
+                        </div>
+                        <div class="flex gap-4 bg-white rounded-xl border border-slate-100 p-4">
+                            <div class="text-2xl shrink-0">💬</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-[#202d51] text-sm">Forum discussion updated</div>
+                                <div class="text-sm text-slate-600 mt-1">There is a new reply in the WEB201 mini project
+                                    discussion topic.</div>
+                                <div class="text-[11px] text-slate-400 mt-2">03/31/2026 07:45</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <footer class="design-clone-footer mt-auto shrink-0 border-t border-slate-200/90 bg-white/95">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-slate-500">
+            <p class="m-0 text-slate-400 leading-snug">© 2026 IT Scholar</p>
+            <nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 font-medium" aria-label="Footer"><a
+                    href="index.html" class="text-slate-600 hover:text-[#005baf] no-underline">Home</a><a
+                    href="courses.html" class="text-slate-600 hover:text-[#005baf] no-underline">Courses</a><a
+                    href="announcements.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Announcements</a><a href="screens.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">All Screens</a></nav>
+        </div>
+    </footer>
+</body>
+
+</html>

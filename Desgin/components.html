@@ -1,0 +1,381 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Components | IT Scholar Design</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="design.css">
+    <style>
+        body {
+            font-family: Manrope, system-ui, sans-serif !important;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .hero-bg {
+            background: radial-gradient(circle at top left, rgba(98, 161, 253, 0.22), transparent 36%), radial-gradient(circle at bottom right, rgba(213, 183, 250, 0.18), transparent 30%), linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(238, 240, 255, 0.96));
+        }
+
+        .glass-card {
+            box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .clone-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 1.5rem;
+            background: white;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
+        }
+
+        .clone-soft-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 1.5rem;
+            background: #eef0ff;
+        }
+
+        .clone-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: #64748b;
+        }
+
+        .clone-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            border-radius: 999px;
+            background: rgba(0, 91, 175, .10);
+            color: #005baf;
+            padding: .4rem .8rem;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+        }
+
+        .clone-card-link {
+            display: block;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .clone-card-link:hover {
+            text-decoration: none;
+        }
+
+        .clone-map-card {
+            display: block;
+            background: #fff;
+            border: 1px solid #e5ecf5;
+            border-radius: 18px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .clone-map-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+            border-color: #b8c8f5;
+            text-decoration: none;
+        }
+
+        .clone-map-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .35rem .65rem;
+            border-radius: 999px;
+            background: rgba(10, 102, 194, .1);
+            color: #0a66c2;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .clone-sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .85rem 1rem;
+            border-radius: .9rem;
+            color: #64748b;
+            font-size: .95rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .18s ease;
+        }
+
+        .clone-sidebar-link:hover {
+            background: rgba(255, 255, 255, .72);
+            color: #005baf;
+            transform: translateX(2px);
+            text-decoration: none;
+        }
+
+        .clone-sidebar-link.is-active {
+            background: #fff;
+            color: #005baf;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, .08);
+        }
+
+        .clone-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .clone-table th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: #64748b;
+            padding: .75rem 1rem;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .clone-table td {
+            padding: .9rem 1rem;
+            border-bottom: 1px solid #f8fafc;
+            vertical-align: top;
+            color: #202d51;
+        }
+
+        .clone-table tr:hover {
+            background: #f8faff;
+        }
+    </style>
+</head>
+
+<body class="design-clone-page bg-[#f6f5ff] text-[#202d51] min-h-screen flex flex-col">
+    <header id="top-nav"
+        class="bg-white/80 backdrop-blur-lg shadow-sm fixed top-0 w-full flex justify-between items-center px-4 sm:px-8 h-16 z-50 border-b border-slate-100/80">
+        <div class="flex items-center gap-4 md:gap-8 min-w-0"><a href="index.html"
+                class="flex items-center gap-2 no-underline hover:opacity-90"><span
+                    class="text-xl font-extrabold tracking-tighter text-[#005baf]">IT Scholar</span></a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-tight"><a href="courses.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Courses</a><a
+                    href="announcements.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Announcements</a><a
+                    href="screens.html" class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Clone
+                    Map</a><a href="components.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Components</a></nav>
+        </div>
+        <div class="flex items-center gap-3 shrink-0"><a href="login.html"
+                class="text-sm font-semibold text-[#005baf] no-underline hover:underline px-2">Login</a><a
+                href="register.html"
+                class="inline-flex items-center justify-center rounded-xl bg-[#005baf] px-4 py-2.5 text-sm font-bold text-white shadow-lg no-underline hover:opacity-90">Create
+                account</a></div>
+    </header>
+    <main class="flex-1 pt-16 bg-[#f6f5ff]">
+        <section class="hero-bg border-b border-slate-100/80">
+            <div class="max-w-6xl mx-auto px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+                <div class="max-w-3xl">
+                    <div class="clone-kicker">Design system</div>
+                    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold tracking-tight text-[#202d51]">Core visual
+                        language taken from the original IT Scholar interface.</h1>
+                    <p class="mt-4 text-sm md:text-base leading-7 text-slate-600">This page condenses the shared
+                        palette, typography, buttons, cards, notes, tables, and badges used across the cloned pages.</p>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-6xl mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-14 space-y-10">
+            <section>
+                <div class="clone-label">Color palette</div>
+                <h2 class="mt-2 text-2xl font-bold text-[#202d51]">Product colors</h2>
+                <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <div class="clone-panel p-4">
+                        <div class="h-24 rounded-2xl bg-[#005baf]"></div>
+                        <div class="mt-4 font-bold text-[#202d51]">Primary</div>
+                        <div class="text-sm text-slate-600">#005BAF</div>
+                    </div>
+                    <div class="clone-panel p-4">
+                        <div class="h-24 rounded-2xl bg-[#62a1fd]"></div>
+                        <div class="mt-4 font-bold text-[#202d51]">Primary Container</div>
+                        <div class="text-sm text-slate-600">#62A1FD</div>
+                    </div>
+                    <div class="clone-panel p-4">
+                        <div class="h-24 rounded-2xl bg-[#e3e7ff]"></div>
+                        <div class="mt-4 font-bold text-[#202d51]">Surface Container</div>
+                        <div class="text-sm text-slate-600">#E3E7FF</div>
+                    </div>
+                    <div class="clone-panel p-4">
+                        <div class="h-24 rounded-2xl bg-[#69508a]"></div>
+                        <div class="mt-4 font-bold text-[#202d51]">Tertiary</div>
+                        <div class="text-sm text-slate-600">#69508A</div>
+                    </div>
+                </div>
+            </section>
+            <section class="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+                <div class="clone-panel p-6">
+                    <div class="clone-label">Typography</div>
+                    <h2 class="mt-3 text-4xl font-extrabold tracking-tight text-[#202d51]">Manrope drives the headline
+                        rhythm.</h2>
+                    <p class="mt-4 text-base leading-8 text-slate-600">Body copy also uses Manrope in the live site,
+                        while compact labels and metadata switch to Inter for tighter density.</p>
+                    <div class="mt-6 rounded-2xl bg-[#eef0ff] p-5">
+                        <div class="text-xs uppercase tracking-[0.24em] text-slate-500 font-semibold">Label example
+                        </div>
+                        <div class="mt-2 text-sm font-semibold text-[#202d51]"
+                            style="font-family: Inter, system-ui, sans-serif;">Upcoming assignments</div>
+                    </div>
+                </div>
+                <div class="clone-panel p-6 space-y-5">
+                    <div>
+                        <div class="clone-label">Buttons and chips</div>
+                        <div class="mt-4 flex flex-wrap gap-3"><span
+                                class="inline-flex items-center gap-2 rounded-xl bg-[#005baf] px-5 py-3 text-sm font-bold text-white">Primary
+                                action</span><span
+                                class="inline-flex items-center gap-2 rounded-xl border border-[#005baf]/20 bg-white px-5 py-3 text-sm font-bold text-[#005baf]">Secondary
+                                action</span><span
+                                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700">Neutral
+                                action</span></div>
+                        <div class="mt-4 flex flex-wrap gap-2"><span
+                                class="rounded-full bg-[#005baf]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#005baf]">API301</span><span
+                                class="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">SEM1</span><span
+                                class="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-800">Completed</span><span
+                                class="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-800">Late
+                                allowed</span></div>
+                    </div>
+                    <div>
+                        <div class="clone-label">Stats</div>
+                        <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                            <div class="rounded-2xl bg-[#eef0ff] p-4">
+                                <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Total
+                                    XP</div>
+                                <div class="mt-2 text-3xl font-black text-[#005baf]">1130</div>
+                            </div>
+                            <div class="rounded-2xl bg-[#eef0ff] p-4">
+                                <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Rank
+                                </div>
+                                <div class="mt-2 text-3xl font-black text-[#69508a]">#2</div>
+                            </div>
+                            <div class="rounded-2xl bg-[#eef0ff] p-4">
+                                <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Courses</div>
+                                <div class="mt-2 text-3xl font-black text-[#202d51]">5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="grid gap-6 xl:grid-cols-2">
+                <div class="clone-panel p-6">
+                    <div class="clone-label">Course card</div>
+                    <div class="mt-4 overflow-hidden rounded-2xl border border-slate-100 bg-white"><img
+                            src="intro-e-learning.png" alt="Course sample" class="w-full aspect-video object-cover">
+                        <div class="p-5">
+                            <div class="flex flex-wrap gap-2"><span
+                                    class="rounded-full bg-[#005baf]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#005baf]">API301</span><span
+                                    class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">Password
+                                    protected</span></div>
+                            <h3 class="mt-4 text-lg font-bold text-[#202d51]">Backend Development with Spring Boot</h3>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">Design a client-server backend with Spring
+                                Boot, REST APIs, JPA, authentication, file upload, testing, and release workflow.</p>
+                            <div class="mt-4 flex items-center justify-between text-xs text-slate-500"><span>75
+                                    hours</span><span class="font-bold text-[#005baf]">View details</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clone-panel p-6 space-y-4">
+                    <div class="clone-label">Notes and badges</div>
+                    <div class="rounded-2xl border border-slate-100 bg-white p-5"
+                        style="border-left:4px solid #FDE68A;">
+                        <div class="font-bold text-[#202d51]">Overview note - API301</div>
+                        <p class="mt-2 text-sm text-slate-600">Follow the 12 lessons in order, pass the quiz to unlock
+                            the next lesson, and submit the Spring Boot project ZIP with API collection for homework.
+                        </p>
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="rounded-2xl border border-slate-100 bg-white p-4"><span
+                                class="material-symbols-outlined text-3xl text-amber-500">rocket_launch</span>
+                            <div class="mt-3 font-bold text-[#202d51]">First Step</div>
+                            <div class="mt-1 text-sm text-slate-600">Complete the first lesson in the system.</div>
+                        </div>
+                        <div class="rounded-2xl border border-slate-100 bg-white p-4"><span
+                                class="material-symbols-outlined text-3xl text-amber-500">workspace_premium</span>
+                            <div class="mt-3 font-bold text-[#202d51]">XP Bronze</div>
+                            <div class="mt-1 text-sm text-slate-600">Reach at least 100 accumulated XP.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="clone-panel overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100">
+                    <div class="clone-label">Data tables</div>
+                    <h2 class="mt-2 text-2xl font-bold text-[#202d51]">Assessment and ranking tables</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="clone-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Assignment</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>XP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>API301</td>
+                                <td>[QUIZ] API301 - Lesson 05: Validation and Exception Handling</td>
+                                <td>Graded</td>
+                                <td>9 / 10</td>
+                                <td>40</td>
+                            </tr>
+                            <tr>
+                                <td>WEB201</td>
+                                <td>[HOMEWORK] WEB201 - Lesson 01: Semantic HTML Structure</td>
+                                <td>Graded</td>
+                                <td>8.5 / 10</td>
+                                <td>30</td>
+                            </tr>
+                            <tr>
+                                <td>PRG101</td>
+                                <td>[QUIZ] PRG101 - Lesson 08: Basic Debugging and Reading Tracebacks</td>
+                                <td>Pending</td>
+                                <td>N/A</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+    <footer class="design-clone-footer mt-auto shrink-0 border-t border-slate-200/90 bg-white/95">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-slate-500">
+            <p class="m-0 text-slate-400 leading-snug">© 2026 IT Scholar</p>
+            <nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 font-medium" aria-label="Footer"><a
+                    href="index.html" class="text-slate-600 hover:text-[#005baf] no-underline">Home</a><a
+                    href="courses.html" class="text-slate-600 hover:text-[#005baf] no-underline">Courses</a><a
+                    href="announcements.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">Announcements</a><a href="screens.html"
+                    class="text-slate-600 hover:text-[#005baf] no-underline">All Screens</a></nav>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,286 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | IT Scholar Design</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="design.css">
+    <style>
+        body {
+            font-family: Manrope, system-ui, sans-serif !important;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="design-clone-page bg-[#f6f5ff] text-[#202d51] min-h-screen flex flex-col">
+    <header id="top-nav"
+        class="bg-white/80 backdrop-blur-lg shadow-sm fixed top-0 w-full flex justify-between items-center px-4 sm:px-8 h-16 z-50 border-b border-slate-100/80">
+        <div class="flex items-center gap-4 md:gap-8 min-w-0"><a href="index.html"
+                class="flex items-center gap-2 no-underline hover:opacity-90"><span
+                    class="text-xl font-extrabold tracking-tighter text-[#005baf]">IT Scholar</span></a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold tracking-tight"><a href="courses.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Courses</a><a
+                    href="announcements.html"
+                    class="text-slate-600 hover:text-[#005baf] transition-colors no-underline">Announcements</a></nav>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4 shrink-0"><button type="button" id="mobile-nav-toggle"
+                class="md:hidden p-2 text-slate-500 hover:bg-[#eef0ff] rounded-lg" aria-label="Open menu"
+                aria-controls="mobile-nav-panel" aria-expanded="false"><span
+                    class="material-symbols-outlined">menu</span></button><a href="login.html"
+                class="text-sm font-semibold text-[#005baf] no-underline hover:underline px-2">Login</a></div>
+        <div id="mobile-nav-panel" class="hidden md:hidden fixed inset-x-0 top-16 bottom-0 z-[60] bg-black/40">
+            <nav class="bg-white border-b border-slate-100 p-4 flex flex-col gap-2 text-sm font-semibold shadow-lg"><a
+                    href="courses.html" class="py-2 text-slate-700 no-underline">Courses</a><a href="announcements.html"
+                    class="py-2 text-slate-700 no-underline">Announcements</a></nav>
+        </div>
+    </header>
+    <main class="page-scroll-main flex-1 pt-16 bg-[#f6f5ff]">
+        <section class="relative overflow-hidden border-b border-slate-100/80">
+            <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(98,161,253,0.22),_transparent_38%),linear-gradient(135deg,_rgba(255,255,255,0.96),_rgba(227,231,255,0.95))]">
+            </div>
+            <div class="absolute right-[-8rem] top-[-6rem] h-56 w-56 rounded-full bg-[#005baf]/10 blur-3xl"></div>
+            <div class="absolute bottom-[-6rem] left-[-5rem] h-48 w-48 rounded-full bg-[#d5b7fa]/20 blur-3xl"></div>
+            <div class="relative max-w-6xl mx-auto px-4 py-12 sm:px-6 md:py-16 lg:px-8 lg:py-20">
+                <div class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
+                    <div
+                        class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur md:p-8">
+                        <span
+                            class="inline-flex items-center gap-2 rounded-full bg-[#005baf]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-[#005baf]"><span
+                                class="material-symbols-outlined text-sm">school</span> IT Scholar </span>
+                        <h1 class="mt-5 max-w-2xl text-3xl font-extrabold tracking-tight text-[#202d51] md:text-5xl">A
+                            cleaner learning hub for courses, practice, and progress.</h1>
+                        <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">Follow your Faculty of
+                            IT curriculum in one place, move between lessons without friction, and keep assignments,
+                            questions, rankings, and notes aligned with the same study flow.</p>
+                        <div class="mt-8 flex flex-wrap gap-3"><a href="courses.html"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005baf] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#005baf]/20 no-underline transition-opacity hover:opacity-90"><span
+                                    class="material-symbols-outlined text-base">menu_book</span> Browse courses </a><a
+                                href="register.html"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#005baf]/20 bg-white px-5 py-3 text-sm font-bold text-[#005baf] no-underline transition-colors hover:bg-[#005baf]/5"><span
+                                    class="material-symbols-outlined text-base">person_add</span> Create account </a><a
+                                href="announcements.html"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 no-underline transition-colors hover:bg-slate-50"><span
+                                    class="material-symbols-outlined text-base text-[#005baf]">campaign</span> Latest
+                                announcements </a></div>
+                        <div class="mt-8 grid gap-3 sm:grid-cols-3">
+                            <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                                <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Structured learning</div>
+                                <div class="mt-2 text-sm font-bold text-[#202d51]">Course, lesson, and assessment flow
+                                    stays connected.</div>
+                            </div>
+                            <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                                <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Student focus</div>
+                                <div class="mt-2 text-sm font-bold text-[#202d51]">Question-led forums, notes, and
+                                    progress in one system.</div>
+                            </div>
+                            <div class="rounded-2xl border border-slate-100 bg-white p-4">
+                                <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Visible progress</div>
+                                <div class="mt-2 text-sm font-bold text-[#202d51]">Leaderboard, XP, and submissions
+                                    reflect live activity.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid gap-4">
+                        <div class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div
+                                    class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#005baf]/10 text-[#005baf]">
+                                    <span class="material-symbols-outlined">assignment</span></div>
+                                <div class="min-w-0">
+                                    <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                        Assessment flow</div>
+                                    <h2 class="mt-2 text-base font-bold text-[#202d51]">Assignments and quizzes live
+                                        next to the lesson that unlocks them.</h2>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">Students can move from study
+                                        material to practice without switching context.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-[1.75rem] border border-slate-100 bg-[#e3e7ff] p-5 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div
+                                    class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[#005baf] shadow-sm">
+                                    <span class="material-symbols-outlined">help</span></div>
+                                <div class="min-w-0">
+                                    <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                        Student forum</div>
+                                    <h2 class="mt-2 text-base font-bold text-[#202d51]">Questions stay tied to the
+                                        course or even the lesson being discussed.</h2>
+                                    <p class="mt-2 text-sm leading-6 text-slate-600">That keeps forum activity useful
+                                        instead of turning into a disconnected message board.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-sm">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                        Most joined course</div>
+                                    <div class="mt-1 text-sm font-bold text-[#202d51]">Backend Development with Spring
+                                        Boot</div>
+                                </div><span
+                                    class="rounded-full bg-[#005baf]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#005baf]">API301</span>
+                            </div>
+                            <div class="mt-4 overflow-hidden rounded-2xl bg-slate-100"><img src="intro-e-learning.png"
+                                    alt="Backend Development with Spring Boot" class="h-40 w-full object-cover"></div><a
+                                href="course-detail.html"
+                                class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#005baf] no-underline hover:underline"><span>Open
+                                    course preview</span><span
+                                    class="material-symbols-outlined text-base">arrow_forward</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:py-14 space-y-12">
+            <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#202d51]">Built around the student workflow</h2>
+                        <p class="mt-2 max-w-2xl text-sm text-slate-600">The public landing page mirrors the same card
+                            language, spacing rhythm, and tone used across the signed-in product.</p>
+                    </div><a href="courses.html"
+                        class="text-sm font-bold text-[#005baf] no-underline hover:underline">Explore all courses</a>
+                </div>
+                <div class="mt-6 grid gap-4 md:grid-cols-3">
+                    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><span
+                            class="material-symbols-outlined text-3xl text-[#005baf]">library_books</span>
+                        <h3 class="mt-4 text-base font-bold text-[#202d51]">Course-first navigation</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">Browse the curriculum before signing in, then
+                            continue straight into the same structure after enrollment.</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><span
+                            class="material-symbols-outlined text-3xl text-[#005baf]">monitoring</span>
+                        <h3 class="mt-4 text-base font-bold text-[#202d51]">Progress you can read quickly</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">Scores, XP, and ranking feedback are presented
+                            with the same visual hierarchy used in dashboards and course pages.</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"><span
+                            class="material-symbols-outlined text-3xl text-[#005baf]">edit_note</span>
+                        <h3 class="mt-4 text-base font-bold text-[#202d51]">Study tools stay nearby</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">Notes, assignments, and questions are treated
+                            as part of the learning path instead of separate utilities.</p>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#202d51]">Featured courses</h2>
+                        <p class="mt-2 text-sm text-slate-600">Top 4 courses shown in the public catalog preview.</p>
+                    </div><a href="courses.html"
+                        class="text-sm font-bold text-[#005baf] no-underline hover:underline">View catalog</a>
+                </div>
+                <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"><a href="course-detail.html"
+                        class="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#62a1fd]/40 hover:shadow-md no-underline text-inherit">
+                        <div class="aspect-video overflow-hidden bg-slate-100"><img src="python.jpg"
+                                alt="Programming Fundamentals with Python"
+                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <div class="flex flex-1 flex-col p-5">
+                            <div class="flex flex-wrap gap-2"><span
+                                    class="rounded-full bg-[#005baf]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#005baf]">PRG101</span><span
+                                    class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">SEM1</span>
+                            </div>
+                            <h3 class="mt-4 text-base font-bold text-[#202d51]">Programming Fundamentals with Python
+                            </h3>
+                            <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">Build programming thinking in Python
+                                from variables, loops, and functions to file handling and a mini project.</p>
+                            <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-500"><span>75
+                                    hours</span><span class="font-bold text-[#005baf]">View details</span></div>
+                        </div>
+                    </a><a href="course-detail.html"
+                        class="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#62a1fd]/40 hover:shadow-md no-underline text-inherit">
+                        <div class="aspect-video overflow-hidden bg-slate-100"><img src="html-css.png"
+                                alt="Web Frontend Development"
+                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <div class="flex flex-1 flex-col p-5">
+                            <div class="flex flex-wrap gap-2"><span
+                                    class="rounded-full bg-[#005baf]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#005baf]">WEB201</span><span
+                                    class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">SEM1</span>
+                            </div>
+                            <h3 class="mt-4 text-base font-bold text-[#202d51]">Web Frontend Development with HTML, CSS,
+                                and JavaScript</h3>
+                            <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">Move from semantic HTML and CSS
+                                layout to responsive design, DOM work, and a complete frontend mini project.</p>
+                            <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-500"><span>75
+                                    hours</span><span class="font-bold text-[#005baf]">View details</span></div>
+                        </div>
+                    </a><a href="course-detail.html"
+                        class="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#62a1fd]/40 hover:shadow-md no-underline text-inherit">
+                        <div class="aspect-video overflow-hidden bg-slate-100"><img src="strategies.png"
+                                alt="Databases and Practical SQL"
+                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <div class="flex flex-1 flex-col p-5">
+                            <div class="flex flex-wrap gap-2"><span
+                                    class="rounded-full bg-[#005baf]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#005baf]">DBI201</span><span
+                                    class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">SEM1</span>
+                            </div>
+                            <h3 class="mt-4 text-base font-bold text-[#202d51]">Databases and Practical SQL</h3>
+                            <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">Study relational models, SQL data
+                                manipulation, schema design, and application-to-database integration.</p>
+                            <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-500"><span>75
+                                    hours</span><span class="font-bold text-[#005baf]">View details</span></div>
+                        </div>
+                    </a><a href="course-detail.html"
+                        class="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#62a1fd]/40 hover:shadow-md no-underline text-inherit">
+                        <div class="aspect-video overflow-hidden bg-slate-100"><img src="intro-e-learning.png"
+                                alt="Backend Development with Spring Boot"
+                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <div class="flex flex-1 flex-col p-5">
+                            <div class="flex flex-wrap gap-2"><span
+                                    class="rounded-full bg-[#005baf]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#005baf]">API301</span><span
+                                    class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-700">SEM1</span>
+                            </div>
+                            <h3 class="mt-4 text-base font-bold text-[#202d51]">Backend Development with Spring Boot
+                            </h3>
+                            <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">Design a client-server backend with
+                                Spring Boot, REST APIs, JPA, authentication, file upload, testing, and release workflow.
+                            </p>
+                            <div class="mt-4 flex items-center justify-between gap-3 text-xs text-slate-500"><span>75
+                                    hours</span><span class="font-bold text-[#005baf]">View details</span></div>
+                        </div>
+                    </a></div>
+            </section>
+        </div>
+    </main>
+    <footer class="design-clone-footer mt-auto shrink-0 border-t border-slate-200/90 bg-white/95">
+        <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-xs text-slate-500">
+            <p class="m-0 text-slate-400 leading-snug">© 2026 IT Scholar</p>
+            <nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 font-medium" aria-label="Footer"><a
+                    href="courses.html" class="text-slate-600 hover:text-[#005baf] no-underline">Courses</a><a
+                    href="announcements.html" class="text-slate-600 hover:text-[#005baf] no-underline">Announcements</a>
+            </nav>
+        </div>
+    </footer>
+    <script>
+        (function () {
+            var toggle = document.getElementById('mobile-nav-toggle'); var panel = document.getElementById('mobile-nav-panel'); if (!toggle | !panel) return; toggle.addEventListener('click', function () { var hidden = panel.classList.toggle('hidden'); toggle.setAttribute('aria-expanded', hidden ? 'false' : 'true'); }); panel.addEventListener('click', function (event) { if (event.target === panel) { panel.classList.add('hidden'); toggle.setAttribute('aria-expanded', 'false'); } });
+        })();
+    </script>
+</body>
+
+</html>
